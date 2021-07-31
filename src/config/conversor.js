@@ -1,8 +1,7 @@
-export const convertToObj = (parseObject) => {
+export const convertToObj = parseObject => {
   return JSON.parse(JSON.stringify(parseObject));
 };
 
-export const convertFromAsyncStorage = (asyncObject) => {
-  console.log(asyncObject);
+export const convertFromAsyncStorage = asyncObject => {
   return JSON.parse(asyncObject);
 };

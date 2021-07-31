@@ -1,22 +1,26 @@
-import React from 'react'
+import React from 'react';
 
-import {Content, ContentButton, ContentButtonText} from "./styled";
+import {ContentButton, ContentButtonText} from './styled';
 
-const SubmitButton = ({text, onPress, width, height, fontSize}) => {
-    return (
-        <>
-            <ContentButton
-                onPress={onPress}
-                width={width}
-                height={height}
-            >
-                <ContentButtonText    fontSize={fontSize}>
-                    {text}
-                </ContentButtonText>
-            </ContentButton>
-        </>
-
-    )
-}
+const SubmitButton = ({
+  text,
+  onPress,
+  width,
+  height,
+  fontSize,
+  buttonColor,
+}) => {
+  return (
+    <>
+      <ContentButton
+        onPress={onPress}
+        width={width}
+        height={height}
+        buttonColor={buttonColor}>
+        <ContentButtonText fontSize={fontSize}>{text}</ContentButtonText>
+      </ContentButton>
+    </>
+  );
+};
 
 export default SubmitButton;

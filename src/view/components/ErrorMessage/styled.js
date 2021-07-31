@@ -17,6 +17,6 @@ export const Content = styled.View`
 
 export const Message = styled.Text`
   font-family: ${global.fonts.s};
-  color: ${global.colors.purpleColor};
+  color: ${props => props.textColor};
   font-weight: bold;
 `;

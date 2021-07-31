@@ -5,6 +5,7 @@ export const Container = styled.View`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: ${global.colors.lightGreyColor};
 `;
 
 export const Content = styled.View`
@@ -17,7 +18,7 @@ export const Content = styled.View`
 `;
 
 export const HeaderContent = styled.View`
-  flex: 2;
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -37,7 +38,7 @@ export const HeaderText = styled.Text`
 `;
 
 export const BodyContent = styled.View`
-  flex: 4;
+  flex: 3;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -49,4 +50,26 @@ export const FooterContent = styled.View`
   display: flex;
   align-items: flex-end;
   width: 100%;
+`;
+
+export const AddButtonContent = styled.View`
+  margin-top: 5px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+`;
+
+export const SubmitButtonContent = styled.View`
+  margin: 20px 10px 20px 0;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+`;
+
+export const LoadingContent = styled.View`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;

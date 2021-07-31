@@ -7,4 +7,5 @@ export const Input = styled.TextInput`
   border-bottom-width: 1px;
   border-bottom-color: ${global.colors.purpleColor};
   color: black;
+  font-size: ${props => props.fontSize};
 `;

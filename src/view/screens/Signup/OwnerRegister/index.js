@@ -1,17 +1,34 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import * as S from './styled';
 import Input from '../../../components/Input';
 import SubmitButton from '../../../components/SubmitButton';
 import {useNavigation} from '@react-navigation/native';
-import {SignupContext} from '../../../../contexts/User/Signup/SignupContext';
 import ErrorMessage from '../../../components/ErrorMessage';
+import {UserContext} from '../../../../contexts/User/UserContext';
+import errorMessages from '../../../../common/errorMessages';
+import global from '../../../../common/global';
 
 const OwnerRegister = () => {
-  const {saveOwnerInformation} = useContext(SignupContext);
+  const {saveOwnerInformation, salon, owner, user} = useContext(UserContext);
   const [ownerData, setOwnerData] = useState({});
   const [errorMessage, setErrorMessage] = useState('');
 
   const navigate = useNavigation();
+
+  useEffect(() => {
+    if (Object.keys(salon).length !== 0 && Object.keys(owner).length !== 0) {
+      const storagedOwnerData = {
+        salon: salon.name,
+        cnpj: salon.cnpj,
+        name: owner.name,
+        tel: owner.tel,
+        email: user.username,
+        password: user.password,
+      };
+
+      setOwnerData(storagedOwnerData);
+    }
+  }, [owner, salon, user.password, user.username]);
 
   const handleChange = (value, name) => {
     setOwnerData({
@@ -21,19 +38,16 @@ const OwnerRegister = () => {
   };
 
   const goNextPage = () => {
-    // if (verifyInformation()) {
-    // setErrorMessage('');
-    // saveOwnerInformation(ownerData);
-    navigate.push('ProceduresRegister');
-    // }
+    if (verifyInformation()) {
+      setErrorMessage('');
+      saveOwnerInformation(ownerData);
+      navigate.push('ProceduresRegister');
+    }
   };
 
   const verifyInformation = () => {
     let ableToGo = true;
-    let errorMessage = {
-      salonMessage: 'Nome do Salão ou CNPJ não foram preenchidos',
-      ownerMessage: 'Preencha todas as informações do proprietário',
-    };
+    let errorMessage = '';
 
     if (
       ownerData.salon === undefined ||
@@ -42,7 +56,7 @@ const OwnerRegister = () => {
       ownerData.cnpj === ''
     ) {
       ableToGo = false;
-      errorMessage = errorMessage.salonMessage;
+      errorMessage = errorMessages.salonMessage;
     } else if (
       ownerData.name === undefined ||
       ownerData.name === '' ||
@@ -52,7 +66,7 @@ const OwnerRegister = () => {
       ownerData.email === ''
     ) {
       ableToGo = false;
-      errorMessage = errorMessage.ownerMessage;
+      errorMessage = errorMessages.ownerMessage;
     }
 
     setErrorMessage(errorMessage);
@@ -79,6 +93,8 @@ const OwnerRegister = () => {
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={false}
+            fontSize={'18px'}
+            disabled={false}
           />
           <Input
             handleChange={handleChange}
@@ -88,6 +104,8 @@ const OwnerRegister = () => {
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
+            fontSize={'18px'}
+            disabled={false}
           />
           <Input
             handleChange={handleChange}
@@ -97,6 +115,8 @@ const OwnerRegister = () => {
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={false}
+            fontSize={'18px'}
+            disabled={false}
           />
           <Input
             handleChange={handleChange}
@@ -106,6 +126,8 @@ const OwnerRegister = () => {
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
+            fontSize={'18px'}
+            disabled={false}
           />
           <Input
             handleChange={handleChange}
@@ -115,6 +137,20 @@ const OwnerRegister = () => {
             width={'80%'}
             keyboard={'email-address'}
             isSecureTextEntry={false}
+            fontSize={'18px'}
+            disabled={false}
+          />
+
+          <Input
+            handleChange={handleChange}
+            name={'password'}
+            placeholder={'Senha'}
+            value={ownerData.password}
+            width={'80%'}
+            keyboard={'default'}
+            isSecureTextEntry={true}
+            fontSize={'18px'}
+            disabled={false}
           />
         </S.BodyContent>
         <S.FooterContent>
@@ -124,10 +160,15 @@ const OwnerRegister = () => {
             width={'40%'}
             height={'50px'}
             fontSize={'18px'}
+            buttonColor={`${global.colors.purpleColor}`}
           />
 
           {errorMessage !== '' && (
-            <ErrorMessage text={errorMessage} width={'70%'} />
+            <ErrorMessage
+              text={errorMessage}
+              width={'70%'}
+              textColor={`${global.colors.purpleColor}`}
+            />
           )}
         </S.FooterContent>
       </S.Content>

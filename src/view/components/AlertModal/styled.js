@@ -39,17 +39,18 @@ export const BodyText = styled.Text`
 
 export const FooterContent = styled.View`
   display: flex;
+  flex-direction: row;
   justify-content: flex-end;
   align-items: flex-end;
 `;
 
-export const CloseButton = styled.TouchableOpacity`
+export const Button = styled.TouchableOpacity`
   color: lightgrey;
   padding: 5px;
   font-weight: bold;
 `;
 
-export const CloseButtonText = styled.Text`
+export const ButtonText = styled.Text`
   font-family: ${global.fonts.s};
 `;
 

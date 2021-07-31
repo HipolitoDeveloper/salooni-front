@@ -6,12 +6,18 @@ import {UserContext} from '../../../../contexts/User/UserContext';
 
 import {useNavigation} from '@react-navigation/native';
 import Input from '../../../components/Input';
+import errorMessages from '../../../../common/errorMessages';
+import ErrorMessage from '../../../components/ErrorMessage';
+import global from '../../../../common/global';
 
 const SignInOwner = () => {
   const {doLogin} = useContext(UserContext);
   const navigate = useNavigation();
-
-  const [userData, setUserData] = useState({});
+  const [errorMessage, setErrorMessage] = useState('');
+  const [userData, setUserData] = useState({
+    email: 'gabriel@gmail.com',
+    password: '123',
+  });
 
   const handleChange = (value, name) => {
     setUserData({
@@ -23,9 +29,11 @@ const SignInOwner = () => {
   const onLogin = async () => {
     await doLogin(userData).then(
       () => {
-        navigate.push('SchedulingList');
+        navigate.push('Client');
+        setErrorMessage('');
       },
       error => {
+        setErrorMessage(errorMessages.signinMessage);
         console.log(error);
       },
     );
@@ -44,6 +52,8 @@ const SignInOwner = () => {
           width={'70%'}
           keyboard={'email-address'}
           isSecureTextEntry={false}
+          fontSize={'18px'}
+          disabled={false}
         />
 
         <Input
@@ -54,6 +64,8 @@ const SignInOwner = () => {
           width={'70%'}
           keyboard={'default'}
           isSecureTextEntry={true}
+          fontSize={'18px'}
+          disabled={false}
         />
 
         <S.PasswordResetButton>
@@ -66,6 +78,14 @@ const SignInOwner = () => {
           height={'50px'}
           fontSize={'18px'}
         />
+        {errorMessage !== '' && (
+          <ErrorMessage
+            text={errorMessage}
+            width={'70%'}
+            textColor={`${global.colors.purpleColor}`}
+          />
+        )}
+
         <S.RegisterContent>
           <S.RegisterText>Não possui cadastro?</S.RegisterText>
           <S.RegisterButton onPress={() => navigate.push('SignupStack')}>

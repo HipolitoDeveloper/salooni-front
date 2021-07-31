@@ -2,15 +2,45 @@ import Parse from 'parse/react-native';
 import {convertToObj} from '../config/conversor';
 
 const EmployeeObject = Parse.Object.extend('Funcionario');
-const query = new Parse.Query(EmployeeObject);
+const EmployeeQuery = new Parse.Query(EmployeeObject);
 
 export const getEmployeeById = employeeId => {
   return new Promise(async (resolve, reject) => {
     try {
-      query.equalTo('objectId', employeeId);
-      resolve(convertToObj(await query.first()));
+      EmployeeQuery.equalTo('objectId', employeeId);
+      resolve(convertToObj(await EmployeeQuery.first()));
     } catch (e) {
-      reject('Deu ruim ao pegar o funcionário pelo id', e);
+      reject(`Empregador ${JSON.stringify(e)}`);
+    }
+  });
+};
+
+export const saveEmployee = (employeeObj, returnParseObject) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const {cnpj, tel, employee_type, name, salaoFK} = employeeObj;
+
+      const newEmployee = new EmployeeObject();
+      newEmployee.set('Nome', name);
+      newEmployee.set('CNPJ', cnpj);
+      newEmployee.set('TipoFunc', employee_type);
+      newEmployee.set('Telefone', tel);
+      newEmployee.set('IdSalaoFK', salaoFK);
+
+      newEmployee.save().then(
+        savedEmployee => {
+          if (returnParseObject) {
+            resolve(savedEmployee);
+          } else {
+            resolve(convertToObj(savedEmployee));
+          }
+        },
+        error => {
+          reject(`Empregador ${JSON.stringify(error)}`);
+        },
+      );
+    } catch (e) {
+      reject(`Empregador ${JSON.stringify(e)}`);
     }
   });
 };

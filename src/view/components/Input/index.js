@@ -9,10 +9,14 @@ const Input = ({
   name,
   keyboard,
   isSecureTextEntry,
+  disabled,
+  fontSize,
 }) => {
   return (
     <>
       <S.Input
+        fontSize={fontSize}
+        disabled={disabled}
         width={width}
         onChangeText={value => handleChange(value, name)}
         placeholderTextColor={'grey'}
@@ -27,3 +31,15 @@ const Input = ({
 };
 
 export default Input;
+
+Input.defaultProps = {
+  handleChange: () => {},
+  placeholder: '',
+  value: '',
+  width: '80%',
+  name: '',
+  keyboard: 'numeric',
+  isSecureTextEntry: false,
+  disabled: false,
+  fontSize: '18px',
+};

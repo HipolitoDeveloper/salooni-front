@@ -6,6 +6,7 @@ export const Container = styled.View`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: ${global.colors.lightGreyColor};
 `;
 
 export const Content = styled.View`

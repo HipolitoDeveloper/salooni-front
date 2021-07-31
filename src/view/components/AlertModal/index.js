@@ -3,7 +3,7 @@ import React from 'react';
 import * as S from './styled';
 import {Modal} from 'react-native';
 
-const AlertModal = ({isVisible, title, text, onClose}) => {
+const AlertModal = ({isVisible, title, text, onClose, onOk}) => {
   return (
     <S.Container>
       <Modal
@@ -19,9 +19,14 @@ const AlertModal = ({isVisible, title, text, onClose}) => {
             <S.BodyText>{text}</S.BodyText>
           </S.BodyContent>
           <S.FooterContent>
-            <S.CloseButton onPress={() => onClose()}>
-              <S.CloseButtonText>Fechar</S.CloseButtonText>
-            </S.CloseButton>
+            {onOk && (
+              <S.Button onPress={() => onOk()}>
+                <S.ButtonText>SIM</S.ButtonText>
+              </S.Button>
+            )}
+            <S.Button onPress={() => onClose()}>
+              <S.ButtonText>Fechar</S.ButtonText>
+            </S.Button>
           </S.FooterContent>
         </S.Content>
       </Modal>

@@ -29,7 +29,7 @@ const SignInPartner = () => {
   const onLogin = async () => {
     doLogin(userData).then(
       () => {
-        navigate.push('SchedulingList');
+        navigate.push('Client');
       },
       error => {
         console.log(error);
@@ -93,6 +93,7 @@ const SignInPartner = () => {
           width={'60%'}
           height={'50px'}
           fontSize={'18px'}
+          buttonColor={`${global.colors.purpleColor}`}
         />
 
         <AlertModal
