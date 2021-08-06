@@ -14,10 +14,10 @@ export const ContentButton = styled.TouchableOpacity`
   justify-content: center;
   width: ${props => props.width};
   height: ${props => props.height};
-
   color: ${global.colors.lightGreyColor};
   border-radius: 30px;
   background-color: ${props => props.buttonColor};
+  opacity: ${props => (props.disabled ? 0.5 : 1)};
 `;
 
 export const ContentButtonText = styled.Text`

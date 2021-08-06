@@ -7,6 +7,7 @@ import ErrorMessage from '../../../components/ErrorMessage';
 import {UserContext} from '../../../../contexts/User/UserContext';
 import errorMessages from '../../../../common/errorMessages';
 import global from '../../../../common/global';
+import BackButton from '../../../components/BackButton';
 
 const OwnerRegister = () => {
   const {saveOwnerInformation, salon, owner, user} = useContext(UserContext);
@@ -16,24 +17,31 @@ const OwnerRegister = () => {
   const navigate = useNavigation();
 
   useEffect(() => {
-    if (Object.keys(salon).length !== 0 && Object.keys(owner).length !== 0) {
-      const storagedOwnerData = {
-        salon: salon.name,
-        cnpj: salon.cnpj,
-        name: owner.name,
-        tel: owner.tel,
-        email: user.username,
-        password: user.password,
-      };
+    if (owner !== undefined && salon !== undefined && user !== undefined) {
+      if (
+        Object.keys(salon).length !== 0 &&
+        Object.keys(owner).length !== 0 &&
+        Object.keys(user).length !== 0
+      ) {
+        const storagedOwnerData = {
+          salon: salon.name,
+          cnpj: salon.cnpj,
+          name: owner.name,
+          tel: owner.tel,
+          email: user.username,
+          password: user.password,
+        };
 
-      setOwnerData(storagedOwnerData);
+        setOwnerData(storagedOwnerData);
+      }
     }
-  }, [owner, salon, user.password, user.username]);
+  }, []);
 
-  const handleChange = (value, name) => {
+  const handleChange = (text, rawText, name) => {
+    console.log(text);
     setOwnerData({
       ...ownerData,
-      [name]: value,
+      [name]: text,
     });
   };
 
@@ -76,14 +84,21 @@ const OwnerRegister = () => {
   return (
     <S.Container>
       <S.Content>
-        <S.HeaderContent>
-          <S.HeaderTitle>Proprietário</S.HeaderTitle>
-          <S.HeaderText>
-            Nos informe alguns dados para podermos ir em frente.
-            {'\n'}
-            Não demorará muito
-          </S.HeaderText>
-        </S.HeaderContent>
+        <S.HeaderContainer>
+          <BackButton
+            positionTop={'20px'}
+            buttonColor={`${global.colors.purpleColor}`}
+            onPress={navigate.goBack}
+          />
+          <S.HeaderContent>
+            <S.HeaderTitle>Proprietário</S.HeaderTitle>
+            <S.HeaderText>
+              Nos informe alguns dados para podermos ir em frente.
+              {'\n'}
+              Não demorará muito
+            </S.HeaderText>
+          </S.HeaderContent>
+        </S.HeaderContainer>
         <S.BodyContent>
           <Input
             handleChange={handleChange}
@@ -93,8 +108,9 @@ const OwnerRegister = () => {
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={false}
-            fontSize={'18px'}
+            fontSize={18}
             disabled={false}
+            mask={'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
           />
           <Input
             handleChange={handleChange}
@@ -104,8 +120,9 @@ const OwnerRegister = () => {
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
-            fontSize={'18px'}
+            fontSize={18}
             disabled={false}
+            mask={'99.999.999/9999-99'}
           />
           <Input
             handleChange={handleChange}
@@ -115,8 +132,9 @@ const OwnerRegister = () => {
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={false}
-            fontSize={'18px'}
+            fontSize={18}
             disabled={false}
+            mask={'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
           />
           <Input
             handleChange={handleChange}
@@ -126,8 +144,9 @@ const OwnerRegister = () => {
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
-            fontSize={'18px'}
+            fontSize={18}
             disabled={false}
+            mask={'(99) 99999-9999'}
           />
           <Input
             handleChange={handleChange}
@@ -137,8 +156,9 @@ const OwnerRegister = () => {
             width={'80%'}
             keyboard={'email-address'}
             isSecureTextEntry={false}
-            fontSize={'18px'}
+            fontSize={18}
             disabled={false}
+            mask={'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'}
           />
 
           <Input
@@ -149,8 +169,11 @@ const OwnerRegister = () => {
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={true}
-            fontSize={'18px'}
+            fontSize={18}
             disabled={false}
+            mask={
+              'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'
+            }
           />
         </S.BodyContent>
         <S.FooterContent>
@@ -159,7 +182,7 @@ const OwnerRegister = () => {
             onPress={() => goNextPage()}
             width={'40%'}
             height={'50px'}
-            fontSize={'18px'}
+            fontSize={18}
             buttonColor={`${global.colors.purpleColor}`}
           />
 

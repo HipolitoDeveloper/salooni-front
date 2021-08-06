@@ -9,8 +9,7 @@ export default {
   noProcedureMessage:
     'Nenhum procedimento foi adicionado, tem certeza que deseja continuar?',
   warningMessage: 'Algo deu errado, estamos trabalhando nisso!',
-  comissionMessage:
-    'Nem todas as informações relacionadas às comissões foram preenchidas',
+  commissionMessage: 'Adicione um tipo de comissão ao procedimento',
   clientMessage:
     'Nem todas as informações relacionas ao cliente foram preenchidas',
   noClientMessage: 'Nenhum cliente foi adicionado',

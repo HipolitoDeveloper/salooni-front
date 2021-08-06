@@ -1,4 +1,5 @@
 import styled from 'styled-components/native/dist/styled-components.native.esm';
+import {StyleSheet} from 'react-native';
 import global from '../../../common/global';
 
 export const Input = styled.TextInput`

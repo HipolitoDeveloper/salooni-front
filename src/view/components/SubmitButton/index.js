@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {ContentButton, ContentButtonText} from './styled';
+import Input from '../Input';
 
 const SubmitButton = ({
   text,
@@ -9,6 +10,7 @@ const SubmitButton = ({
   height,
   fontSize,
   buttonColor,
+  disabled,
 }) => {
   return (
     <>
@@ -16,7 +18,8 @@ const SubmitButton = ({
         onPress={onPress}
         width={width}
         height={height}
-        buttonColor={buttonColor}>
+        buttonColor={buttonColor}
+        disabled={disabled}>
         <ContentButtonText fontSize={fontSize}>{text}</ContentButtonText>
       </ContentButton>
     </>
@@ -24,3 +27,13 @@ const SubmitButton = ({
 };
 
 export default SubmitButton;
+
+SubmitButton.defaultProps = {
+  text: '',
+  onPress: () => {},
+  width: '100%',
+  height: '100%',
+  fontSize: 18,
+  buttonColor: '',
+  disabled: false,
+};

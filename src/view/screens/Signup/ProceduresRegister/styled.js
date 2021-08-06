@@ -19,13 +19,18 @@ export const Content = styled.View`
   height: 100%;
 `;
 
-export const HeaderContent = styled.View`
+export const HeaderContainer = styled.View`
   flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const HeaderContent = styled.View`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 90%;
-  margin-bottom: 10px;
 `;
 
 export const HeaderTitle = styled.Text`
@@ -98,6 +103,7 @@ export const BoxContent = styled.TouchableOpacity`
 export const BoxText = styled.Text`
   font-family: ${global.fonts.s};
   font-size: 18px;
+  color: ${props => (props.isInView ? 'red' : 'black')};
 `;
 
 export const RegisteredProceduresBoxTitle = styled.Text`

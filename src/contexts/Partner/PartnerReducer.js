@@ -6,7 +6,7 @@ export const PartnerReducer = (state, action) => {
       const newPartner = {
         cnpj: cnpj,
         tel: tel,
-        employee_type: 'PRT',
+        employee_type: 'PRC',
         name: name,
         email: email,
         procedure: procedure,

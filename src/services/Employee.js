@@ -1,14 +1,19 @@
 import Parse from 'parse/react-native';
-import {convertToObj} from '../config/conversor';
+import {convertToObj} from '../common/conversor';
 
 const EmployeeObject = Parse.Object.extend('Funcionario');
 const EmployeeQuery = new Parse.Query(EmployeeObject);
 
-export const getEmployeeById = employeeId => {
+export const getEmployeeById = (employeeId, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
       EmployeeQuery.equalTo('objectId', employeeId);
-      resolve(convertToObj(await EmployeeQuery.first()));
+
+      if (returnParseObject) {
+        await EmployeeQuery.first();
+      } else {
+        resolve(convertToObj(await EmployeeQuery.first()));
+      }
     } catch (e) {
       reject(`Empregador ${JSON.stringify(e)}`);
     }

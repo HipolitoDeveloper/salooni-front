@@ -1,5 +1,5 @@
 import Parse from 'parse/react-native';
-import {convertToObj} from '../config/conversor';
+import {convertToObj} from '../common/conversor';
 
 const UserObject = Parse.Object.extend('User');
 const UserQuery = new Parse.Query(UserObject);

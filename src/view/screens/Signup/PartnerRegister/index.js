@@ -12,6 +12,7 @@ import {UserContext} from '../../../../contexts/User/UserContext';
 import {useNavigation} from '@react-navigation/native';
 import AlertModal from '../../../components/AlertModal';
 import errorMessages from '../../../../common/errorMessages';
+import BackButton from '../../../components/BackButton';
 
 const PartnerRegister = () => {
   const {procedures, cleanProceduresInformation} = useContext(ProcedureContext);
@@ -36,10 +37,10 @@ const PartnerRegister = () => {
 
   const navigate = useNavigation();
 
-  const handleChange = (value, name) => {
+  const handleChange = (text, rawText, name) => {
     setPartner({
       ...partner,
-      [name]: value,
+      [name]: text,
     });
   };
 
@@ -149,14 +150,21 @@ const PartnerRegister = () => {
   return (
     <S.Container>
       <S.Content>
-        <S.HeaderContent>
-          <S.HeaderTitle>Parceiros</S.HeaderTitle>
-          <S.HeaderText>
-            Adicione os parceriso do seu Salão.
-            {'\n'}
-            Depois disso você poderá usar o Salooni tranquilamente
-          </S.HeaderText>
-        </S.HeaderContent>
+        <S.HeaderContainer>
+          <BackButton
+            positionTop={'35px'}
+            buttonColor={`${global.colors.purpleColor}`}
+            onPress={navigate.goBack}
+          />
+          <S.HeaderContent>
+            <S.HeaderTitle>Parceiros</S.HeaderTitle>
+            <S.HeaderText>
+              Adicione os parceiros do seu Salão.
+              {'\n'}
+              Depois disso você poderá usar o Salooni tranquilamente
+            </S.HeaderText>
+          </S.HeaderContent>
+        </S.HeaderContainer>
         <S.BodyContent>
           <Input
             handleChange={handleChange}
@@ -166,8 +174,9 @@ const PartnerRegister = () => {
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={false}
-            fontSize={'18px'}
+            fontSize={18}
             disabled={false}
+            mask={'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
           />
 
           <Input
@@ -178,8 +187,11 @@ const PartnerRegister = () => {
             width={'80%'}
             keyboard={'email-address'}
             isSecureTextEntry={false}
-            fontSize={'18px'}
+            fontSize={18}
             disabled={false}
+            mask={
+              'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'
+            }
           />
 
           <Input
@@ -190,8 +202,9 @@ const PartnerRegister = () => {
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
-            fontSize={'18px'}
+            fontSize={18}
             disabled={false}
+            mask={'(99) 99999-9999'}
           />
 
           <Input
@@ -202,8 +215,9 @@ const PartnerRegister = () => {
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
-            fontSize={'18px'}
+            fontSize={18}
             disabled={false}
+            mask={'99.999.999/9999-99'}
           />
 
           <Picker

@@ -18,15 +18,22 @@ export const Content = styled.View`
   height: 100%;
 `;
 
+export const HeaderContainer = styled.View`
+  height: 20%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
+
 export const HeaderContent = styled.View`
-  flex: 2;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
 export const HeaderTitle = styled.Text`
-  margin: 60px 0 30px 0;
+  margin: 20px 0 30px 0;
   font-family: ${global.fonts.g};
   font-size: 26px;
   color: ${global.colors.purpleColor};

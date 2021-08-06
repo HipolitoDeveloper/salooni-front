@@ -1,6 +1,6 @@
 import Parse from 'parse/react-native';
-import {convertToObj} from '../config/conversor';
-import {saveComission} from './Comission';
+import {convertToObj} from '../common/conversor';
+import {saveCommission} from './Commission';
 
 const ProcedureEmployeeObject = Parse.Object.extend('ProcedimentoXFuncionario');
 const ProcedureEmployeeQuery = new Parse.Query(ProcedureEmployeeObject);

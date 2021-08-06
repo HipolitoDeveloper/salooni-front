@@ -13,23 +13,25 @@ export const Container = styled.View`
 export const Content = styled.View`
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
   height: 100%;
 `;
 
 export const HeaderContent = styled.View`
-  flex: 1;
+  margin-top: 20px;
+  height: 10%;
   display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   width: 90%;
-  margin-bottom: 10px;
 `;
 
 export const HeaderTitle = styled.Text`
-  margin: 60px 0 30px 0;
+  text-align: center;
+
   font-family: ${global.fonts.g};
   font-size: 26px;
   color: ${global.colors.blueColor};
@@ -42,7 +44,7 @@ export const HeaderText = styled.Text`
 `;
 
 export const BodyContent = styled.View`
-  flex: 2;
+  height: 68%;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -50,6 +52,7 @@ export const BodyContent = styled.View`
 `;
 
 export const ClientInformationContent = styled.View`
+  height: 37%;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -58,7 +61,8 @@ export const ClientInformationContent = styled.View`
 `;
 
 export const InformationContent = styled.View`
-  width: 34%;
+  width: ${props => (!props.isEditing ? '34%' : '95%')};
+  height: 64%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -89,6 +93,7 @@ export const BoxContent = styled.TouchableOpacity`
 export const BoxText = styled.Text`
   font-family: ${global.fonts.s};
   font-size: 18px;
+  color: ${props => (props.isInView ? 'red' : 'black')};
 `;
 
 export const RegisteredProceduresBoxTitle = styled.Text`
@@ -97,7 +102,7 @@ export const RegisteredProceduresBoxTitle = styled.Text`
 `;
 
 export const FooterContent = styled.View`
-  flex: 1;
+  height: 25%;
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
@@ -105,18 +110,29 @@ export const FooterContent = styled.View`
 `;
 
 export const AddButtonContent = styled.View`
-  margin-top: 30px;
   width: 100%;
   display: flex;
   align-items: center;
 `;
 
 export const SubmitButtonContent = styled.View`
-  margin: 30px 10px 20px 0;
+  margin: 10px 10px 20px 0;
   width: 100%;
   display: flex;
-  align-items: flex-end;
+  flex-direction: row;
+  align-items: center;
   justify-content: flex-end;
+`;
+
+export const DeleteButton = styled.TouchableOpacity`
+  margin-left: 20px;
+  height: 30px;
+  width: 30px;
+  border-radius: 30px;
+  background-color: ${global.colors.blueColor};
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const LoadingContent = styled.View`

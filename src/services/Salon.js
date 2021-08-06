@@ -1,8 +1,7 @@
 import Parse from 'parse/react-native';
-import {convertToObj} from '../config/conversor';
+import {convertToObj} from '../common/conversor';
 
 const SalonObject = Parse.Object.extend('Salao');
-const query = new Parse.Query(SalonObject);
 
 export const saveSalon = (salonObj, returnParseObject) => {
   return new Promise((resolve, reject) => {
@@ -28,6 +27,22 @@ export const saveSalon = (salonObj, returnParseObject) => {
       );
     } catch (e) {
       reject(`Salão ${JSON.stringify(e)}`);
+    }
+  });
+};
+
+export const getSalonById = (salonId, returnParseObject) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const SalonQuery = new Parse.Query(SalonObject);
+
+      if (returnParseObject) {
+        resolve(await SalonQuery.get(salonId));
+      } else {
+        resolve(convertToObj(await SalonQuery.get(salonId)));
+      }
+    } catch (e) {
+      reject(`Cliente ${JSON.stringify(e)}`);
     }
   });
 };

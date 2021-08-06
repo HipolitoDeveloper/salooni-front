@@ -10,43 +10,71 @@ import {useNavigation} from '@react-navigation/native';
 import {ProcedureContext} from '../../../../contexts/Procedure/ProcedureContext';
 import errorMessages from '../../../../common/errorMessages';
 import AlertModal from '../../../components/AlertModal';
+import BackButton from '../../../components/BackButton';
 
 const ProceduresRegister = () => {
-  const [procedure, setProcedure] = useState({});
-  const {addProcedure, procedures} = useContext(ProcedureContext);
+  const [procedure, setProcedure] = useState({commission: {}});
+  const {addProcedure, procedures, updateProcedures, editProcedure} =
+    useContext(ProcedureContext);
   const [errorMessage, setErrorMessage] = useState('');
   const [showAlertModal, setShowAlertModal] = useState({
     isShowing: false,
     text: '',
   });
+
   const navigate = useNavigation();
 
-  const handleChange = (value, name) => {
+  const handleChange = (text, rawText, name) => {
     if (name === 'percentage') {
       delete procedure.isFixedValue;
       delete procedure.fixed_value;
 
-      procedure.comission = {value: value, type: name};
+      procedure.commission = {value: text, type: name};
       setProcedure({
         ...procedure,
-        ['isPercentage']: !!value,
-        [name]: value,
+        ['isPercentage']: !!text,
+        [name]: text,
       });
     } else if (name === 'fixed_value') {
       delete procedure.isPercentage;
       delete procedure.percentage;
-      procedure.comission = {value: value, type: name};
+      procedure.commission = {value: text, type: name};
       setProcedure({
         ...procedure,
-        ['isFixedValue']: !!value,
-        [name]: value,
+        ['isFixedValue']: !!text,
+        [name]: text,
       });
     } else {
       setProcedure({
         ...procedure,
-        [name]: value,
+        [name]: text,
       });
     }
+  };
+
+  const handleProcedure = (procedure, index) => {
+    updateProcedures(index);
+    procedure.isInView = !procedure.isInView;
+    procedure.indexInView = index;
+
+    procedure.fixed_value = procedure.commission.percentage
+      ? procedure.commission.percentage
+      : null;
+    procedure.isFixedValue = !!procedure.commission.percentage;
+    procedure.percentage = procedure.commission.value
+      ? procedure.commission.value
+      : null;
+    procedure.isPercentage = !!procedure.commission.value;
+
+    setProcedure(procedure);
+
+    if (!verifyIfIsEditing()) {
+      setProcedure({commission: {}});
+    }
+  };
+
+  const verifyIfIsEditing = () => {
+    return procedures.some(procedure => procedure.isInView === true);
   };
 
   const handleModal = (isShowing, text, isNavigating) => {
@@ -57,19 +85,29 @@ const ProceduresRegister = () => {
     }
   };
 
-  const addNewProcedure = () => {
-    if (verifyInformation()) {
+  const chooseAddProcedureMethod = () => {
+    const {isInView, indexInView} = {...procedure};
+    if (verifyInformation() && isInView) {
+      procedure.isInView = false;
+      editProcedure({procedure: procedure, index: indexInView});
+
+      setErrorMessage('');
+      setProcedure({commission: {}});
+    }
+
+    if (verifyInformation() && !isInView) {
       addProcedure(procedure);
       setErrorMessage('');
-      setProcedure({});
+      setProcedure({commission: {}});
     }
   };
 
   const goNextPage = () => {
+    updateProcedures(-1);
     if (verifyInformationToGo()) {
       navigate.push('PartnerRegister');
       setErrorMessage('');
-      setProcedure({});
+      setProcedure({commission: {}});
     }
   };
 
@@ -103,12 +141,17 @@ const ProceduresRegister = () => {
     ) {
       ableToGo = false;
       errorMessage = errorMessages.procedureMessage;
+    } else if (Object.keys(procedure.commission).length === 0) {
+      ableToGo = false;
+      errorMessage = errorMessages.commissionMessage;
     } else if (
-      procedure.comission === undefined ||
-      procedure.comission === ''
+      (procedure.commission.percentage === undefined ||
+        procedure.commission.percentage === '') &&
+      (procedure.commission.value === undefined ||
+        procedure.commission.value === '')
     ) {
       ableToGo = false;
-      errorMessage = errorMessages.comissionMessage;
+      errorMessage = errorMessages.commissionMessage;
     }
 
     setErrorMessage(errorMessage);
@@ -117,23 +160,34 @@ const ProceduresRegister = () => {
 
   const loadBoxInformation = () =>
     procedures.map((procedure, index) => (
-      <S.BoxContent key={index}>
-        <S.BoxText>{procedure.name} - </S.BoxText>
-        <S.BoxText>{procedure.time} minutos</S.BoxText>
+      <S.BoxContent
+        onPress={() => handleProcedure(procedure, index)}
+        key={index}>
+        <S.BoxText isInView={procedure.isInView}>{procedure.name} - </S.BoxText>
+        <S.BoxText isInView={procedure.isInView}>
+          {procedure.time} minutos
+        </S.BoxText>
       </S.BoxContent>
     ));
 
   return (
     <S.Container>
       <S.Content>
-        <S.HeaderContent>
-          <S.HeaderTitle>Procedimentos</S.HeaderTitle>
-          <S.HeaderText>
-            Cadastre os procedimentos realizados em seu estabelecimento.
-            {'\n'}
-            Se precisar, você poderá mudar ou adicionar detalhes depois
-          </S.HeaderText>
-        </S.HeaderContent>
+        <S.HeaderContainer>
+          <BackButton
+            positionTop={'45px'}
+            buttonColor={`${global.colors.purpleColor}`}
+            onPress={navigate.goBack}
+          />
+          <S.HeaderContent>
+            <S.HeaderTitle>Procedimentos</S.HeaderTitle>
+            <S.HeaderText>
+              Cadastre os procedimentos realizados em seu estabelecimento.
+              {'\n'}
+              Se precisar, você poderá mudar ou adicionar detalhes depois
+            </S.HeaderText>
+          </S.HeaderContent>
+        </S.HeaderContainer>
         <S.BodyContent>
           <Input
             handleChange={handleChange}
@@ -143,8 +197,9 @@ const ProceduresRegister = () => {
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={false}
-            fontSize={'18px'}
+            fontSize={18}
             disabled={false}
+            mask={'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
           />
 
           <Input
@@ -155,8 +210,9 @@ const ProceduresRegister = () => {
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
-            fontSize={'18px'}
+            fontSize={18}
             disabled={false}
+            mask={'00:99'}
           />
 
           <S.ProcedureInformationContent>
@@ -169,8 +225,9 @@ const ProceduresRegister = () => {
                 width={'85%'}
                 keyboard={'numeric'}
                 isSecureTextEntry={false}
-                fontSize={'18px'}
+                fontSize={18}
                 disabled={false}
+                mask={'R$999,99'}
               />
 
               <S.CheckboxContent>
@@ -190,8 +247,9 @@ const ProceduresRegister = () => {
                   width={'73%'}
                   keyboard={'numeric'}
                   isSecureTextEntry={false}
-                  fontSize={'18px'}
+                  fontSize={18}
                   disabled={false}
+                  mask={'%999'}
                 />
               </S.CheckboxContent>
               <S.CheckboxContent>
@@ -211,8 +269,9 @@ const ProceduresRegister = () => {
                   width={'73%'}
                   keyboard={'numeric'}
                   isSecureTextEntry={false}
-                  fontSize={'18px'}
+                  fontSize={18}
                   disabled={false}
+                  mask={'R$999,99'}
                 />
               </S.CheckboxContent>
             </S.PriceContent>
@@ -237,8 +296,8 @@ const ProceduresRegister = () => {
               />
             )}
             <SubmitButton
-              text={'Adicionar'}
-              onPress={() => addNewProcedure()}
+              text={procedure.isInView ? 'Editar' : 'Adicionar'}
+              onPress={() => chooseAddProcedureMethod()}
               width={'40%'}
               height={'30px'}
               fontSize={'18px'}
@@ -247,6 +306,7 @@ const ProceduresRegister = () => {
           </S.AddButtonContent>
           <S.SubmitButtonContent>
             <SubmitButton
+              disabled={verifyIfIsEditing()}
               text={'Avançar'}
               onPress={() => goNextPage()}
               width={'40%'}
@@ -272,5 +332,4 @@ const ProceduresRegister = () => {
     </S.Container>
   );
 };
-
 export default ProceduresRegister;

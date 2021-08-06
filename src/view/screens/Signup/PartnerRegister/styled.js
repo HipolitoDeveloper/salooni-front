@@ -1,5 +1,6 @@
 import styled from 'styled-components/native';
 import global from '../../../../common/global';
+
 export const Container = styled.View`
   display: flex;
   flex-direction: column;
@@ -17,8 +18,15 @@ export const Content = styled.View`
   height: 100%;
 `;
 
-export const HeaderContent = styled.View`
+export const HeaderContainer = styled.View`
   flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const HeaderContent = styled.View`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -36,7 +44,6 @@ export const HeaderText = styled.Text`
   font-family: ${global.fonts.s};
   text-align: center;
 `;
-
 export const BodyContent = styled.View`
   flex: 3;
   display: flex;

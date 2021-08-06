@@ -1,7 +1,7 @@
 import React, {createContext, useReducer} from 'react';
 import Parse from 'parse/react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {convertToObj} from '../../config/conversor';
+import {convertToObj} from '../../common/conversor';
 import {getUserByEmail, signUp} from '../../services/User';
 import {getEmployeeById, saveEmployee} from '../../services/Employee';
 import {UserReducer} from './UserReducer';
@@ -58,10 +58,13 @@ const UserProvider = ({children}) => {
         await Parse.User.logIn(userData.email, userData.password).then(
           async user => {
             const stringfiedUser = convertToObj(user);
-
+            const employeeObj = await getEmployeeById(
+              stringfiedUser.IdFuncFK.objectId,
+            );
             const currentUser = {
               id: stringfiedUser.objectId,
               idFunc: stringfiedUser.IdFuncFK.objectId,
+              idSalon: employeeObj.IdSalaoFK.objectId,
             };
 
             await setCurrentUser(currentUser);
@@ -76,7 +79,7 @@ const UserProvider = ({children}) => {
 
   const doLogout = async () => {
     await Parse.User.logOut().then(async () => {
-      dispatch({type: 'SET_CURRENT_USER', ...initialState.currentUser});
+      dispatch({type: 'SET_CURRENT_USER', user: {}});
 
       await AsyncStorage.clear();
     });

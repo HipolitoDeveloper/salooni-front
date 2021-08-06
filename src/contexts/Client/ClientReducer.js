@@ -1,23 +1,26 @@
-import {getAllClients} from '../../services/Client';
+import {ClientParseObjectToClientObject} from '../../common/conversor';
 
 export const ClientReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_CLIENTS':
-      const clients = action.clients;
+      state.clients = action.clients;
 
       return {
-        clients: clients,
+        clients: state.clients,
         ...state,
       };
     case 'ADD_CLIENT':
-      const {name, email, cpf, tel, born_date} = action.payload;
+      const {name, email, cpf, tel, tel2, born_date, IdSalaoFK} =
+        action.payload;
       let newClients = state.registeredClients;
       const newClient = {
         name: name,
         email: email,
         cpf: cpf,
         tel: tel,
+        tel2: tel2,
         born_date: born_date,
+        IdSalaoFK: IdSalaoFK,
       };
       newClients.push(newClient);
 
@@ -33,6 +36,65 @@ export const ClientReducer = (state, action) => {
         ...state,
       };
 
+    case 'UPDATE_CLIENT':
+      return {
+        clientInView: {},
+        ...state,
+      };
+    case 'DELETE_CLIENT':
+      const {objectId} = action.payload;
+      state.clients.forEach((client, index) => {
+        if (client.objectId === objectId) {
+          state.clients.splice(index, 1);
+        }
+      });
+
+      return {
+        clients: state.clients,
+        ...state,
+      };
+
+    case 'UPDATE_CLIENTS':
+      const clientInViewIndex = action.payload;
+      state.registeredClients.map((client, index) => {
+        if (client.isInView === true && index !== clientInViewIndex) {
+          client.isInView = false;
+        }
+
+        return client;
+      });
+      return {
+        registeredClients: state.registeredClients,
+        ...state,
+      };
+    case 'EDIT_CLIENT':
+      const {client, index} = action.payload;
+      state.registeredClients = state.registeredClients.map((c, i) => {
+        if (index === i) {
+          c = {...client};
+        }
+
+        return c;
+      });
+
+      return {
+        registeredClients: state.registeredClients,
+        ...state,
+      };
+    case 'SET_CLIENT_INVIEW':
+      state.clientInView = ClientParseObjectToClientObject(action.payload);
+
+      return {
+        clientInView: state.clientInView,
+        ...state,
+      };
+
+    case 'CLEAN_CLIENT_INVIEW':
+      state.clientInView = {};
+      return {
+        clientInView: {},
+        ...state,
+      };
     case 'CLEAN_REGISTERED_CLIENTS':
       state.registeredClients = [];
       return {

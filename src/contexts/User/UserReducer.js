@@ -19,17 +19,21 @@ export const UserReducer = (state, action) => {
       };
 
     case 'SET_CURRENT_USER':
-      console.log(action);
+      console.log(action.user);
+      state.currentUser = action.user;
       return {
-        currentUser: action.user,
+        currentUser: state.currentUser,
       };
 
     case 'CLEAN_USER':
+      state.user = {};
+      state.salon = {};
+      state.owner = {};
       return {
         ...state,
-        owner: {},
-        user: {},
-        salon: {},
+        owner: state.owner,
+        user: state.user,
+        salon: state.salon,
       };
 
     default:

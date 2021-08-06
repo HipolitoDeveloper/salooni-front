@@ -27,8 +27,8 @@ export const MainStack = () => {
 
   return (
     <UserProvider>
-      {isLoggedIn ? (
-        <ClientProvider>
+      <ClientProvider>
+        {isLoggedIn ? (
           <Stack.Navigator
             initialRouteName="Client"
             screenOptions={{
@@ -37,18 +37,22 @@ export const MainStack = () => {
             <Stack.Screen name="Client" component={Client} />
             <Stack.Screen name="ClientRegister" component={ClientRegister} />
             <Stack.Screen name="SchedulingList" component={SchedulingList} />
+            <Stack.Screen name="EntranceStack" component={EntranceStack} />
+            <Stack.Screen name="SignupStack" component={SignupStack} />
           </Stack.Navigator>
-        </ClientProvider>
-      ) : (
-        <Stack.Navigator
-          initialRouteName="EntranceStack"
-          screenOptions={{
-            headerShown: false,
-          }}>
-          <Stack.Screen name="EntranceStack" component={EntranceStack} />
-          <Stack.Screen name="SignupStack" component={SignupStack} />
-        </Stack.Navigator>
-      )}
+        ) : (
+          <Stack.Navigator
+            initialRouteName="EntranceStack"
+            screenOptions={{
+              headerShown: false,
+            }}>
+            <Stack.Screen name="EntranceStack" component={EntranceStack} />
+            <Stack.Screen name="SignupStack" component={SignupStack} />
+            <Stack.Screen name="Client" component={Client} />
+            <Stack.Screen name="ClientRegister" component={ClientRegister} />
+          </Stack.Navigator>
+        )}
+      </ClientProvider>
     </UserProvider>
   );
 };

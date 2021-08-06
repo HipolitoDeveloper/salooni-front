@@ -13,7 +13,6 @@ export default () => (
   <ProcedureProvider>
     <PartnerProvider>
       <Stack.Navigator
-        initialRouteName="OwnerRegister"
         screenOptions={{
           headerShown: false,
         }}>

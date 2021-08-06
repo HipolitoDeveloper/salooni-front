@@ -5,6 +5,7 @@ export const ProcedureContext = createContext();
 
 const initialState = {
   procedures: [],
+  procedureInView: {},
 };
 
 const ProcedureProvider = ({children}) => {
@@ -12,6 +13,18 @@ const ProcedureProvider = ({children}) => {
 
   const addProcedure = payload => {
     dispatch({type: 'ADD_PROCEDURE', payload});
+  };
+
+  const setProcedureInView = payload => {
+    dispatch({type: 'SET_PROCEDURE_INVIEW', payload});
+  };
+
+  const updateProcedures = payload => {
+    dispatch({type: 'UPDATE_PROCEDURES', payload});
+  };
+
+  const editProcedure = payload => {
+    dispatch({type: 'EDIT_PROCEDURE', payload});
   };
 
   const saveProcedure = payload => {
@@ -26,6 +39,9 @@ const ProcedureProvider = ({children}) => {
     addProcedure,
     saveProcedure,
     cleanProceduresInformation,
+    setProcedureInView,
+    updateProcedures,
+    editProcedure,
     ...state,
   };
 

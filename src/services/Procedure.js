@@ -1,6 +1,6 @@
 import Parse from 'parse/react-native';
-import {convertToObj} from '../config/conversor';
-import {saveComission} from './Comission';
+import {convertToObj} from '../common/conversor';
+import {saveCommission} from './Commission';
 
 const ProcedureObject = Parse.Object.extend('Procedimento');
 const ProcedureQuery = new Parse.Query(ProcedureObject);
@@ -10,14 +10,14 @@ export const saveProcedure = (procedureObj, returnParseObject) => {
     try {
       const {name, time, price, commission, IdFuncFK} = procedureObj;
 
-      const savedComission = await saveComission(commission, true);
+      const savedCommission = await saveCommission(commission, true);
 
       const newProcedure = new ProcedureObject();
       newProcedure.set('Nome', name);
-      newProcedure.set('Tempo', time);
+      newProcedure.set('Tempo', parseInt(time));
       newProcedure.set('Valor', price);
       newProcedure.set('IdFuncFK', IdFuncFK);
-      newProcedure.set('IdComissaoFK', savedComission);
+      newProcedure.set('IdComissaoFK', savedCommission);
 
       newProcedure.save().then(
         savedProcedure => {

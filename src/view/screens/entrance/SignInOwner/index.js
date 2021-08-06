@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import SubmitButton from '../../../components/SubmitButton';
 import * as S from './styled';
 import SalooniLogo from '../../../../assets/icone11-nobackground.png';
@@ -9,6 +9,7 @@ import Input from '../../../components/Input';
 import errorMessages from '../../../../common/errorMessages';
 import ErrorMessage from '../../../components/ErrorMessage';
 import global from '../../../../common/global';
+import {ClientContext} from '../../../../contexts/Client/ClientContext';
 
 const SignInOwner = () => {
   const {doLogin} = useContext(UserContext);
@@ -19,10 +20,10 @@ const SignInOwner = () => {
     password: '123',
   });
 
-  const handleChange = (value, name) => {
+  const handleChange = (text, rawText, name) => {
     setUserData({
       ...userData,
-      [name]: value,
+      [name]: text,
     });
   };
 
@@ -52,8 +53,9 @@ const SignInOwner = () => {
           width={'70%'}
           keyboard={'email-address'}
           isSecureTextEntry={false}
-          fontSize={'18px'}
+          fontSize={18}
           disabled={false}
+          mask={'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'}
         />
 
         <Input
@@ -64,8 +66,9 @@ const SignInOwner = () => {
           width={'70%'}
           keyboard={'default'}
           isSecureTextEntry={true}
-          fontSize={'18px'}
+          fontSize={18}
           disabled={false}
+          mask={'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'}
         />
 
         <S.PasswordResetButton>
@@ -77,6 +80,7 @@ const SignInOwner = () => {
           width={'60%'}
           height={'50px'}
           fontSize={'18px'}
+          buttonColor={`${global.colors.purpleColor}`}
         />
         {errorMessage !== '' && (
           <ErrorMessage
