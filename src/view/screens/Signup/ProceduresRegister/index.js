@@ -4,18 +4,23 @@ import Input from '../../../components/Input';
 import SubmitButton from '../../../components/SubmitButton';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import global from '../../../../common/global';
-import {PartnerContext} from '../../../../contexts/Partner/PartnerContext';
 import ErrorMessage from '../../../components/ErrorMessage';
 import {useNavigation} from '@react-navigation/native';
 import {ProcedureContext} from '../../../../contexts/Procedure/ProcedureContext';
 import errorMessages from '../../../../common/errorMessages';
 import AlertModal from '../../../components/AlertModal';
 import BackButton from '../../../components/BackButton';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const ProceduresRegister = () => {
   const [procedure, setProcedure] = useState({commission: {}});
-  const {addProcedure, procedures, updateProcedures, editProcedure} =
-    useContext(ProcedureContext);
+  const {
+    addProcedure,
+    procedures,
+    updateProcedures,
+    editProcedure,
+    deleteProcedureInView,
+  } = useContext(ProcedureContext);
   const [errorMessage, setErrorMessage] = useState('');
   const [showAlertModal, setShowAlertModal] = useState({
     isShowing: false,
@@ -199,7 +204,7 @@ const ProceduresRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
+            mask="none"
           />
 
           <Input
@@ -212,7 +217,7 @@ const ProceduresRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'00:99'}
+            mask={'99:99'}
           />
 
           <S.ProcedureInformationContent>
@@ -227,7 +232,7 @@ const ProceduresRegister = () => {
                 isSecureTextEntry={false}
                 fontSize={18}
                 disabled={false}
-                mask={'R$999,99'}
+                mask={'R$9999,99'}
               />
 
               <S.CheckboxContent>
@@ -271,7 +276,7 @@ const ProceduresRegister = () => {
                   isSecureTextEntry={false}
                   fontSize={18}
                   disabled={false}
-                  mask={'R$999,99'}
+                  mask={'R$9999,99'}
                 />
               </S.CheckboxContent>
             </S.PriceContent>
@@ -295,14 +300,27 @@ const ProceduresRegister = () => {
                 textColor={`${global.colors.purpleColor}`}
               />
             )}
-            <SubmitButton
-              text={procedure.isInView ? 'Editar' : 'Adicionar'}
-              onPress={() => chooseAddProcedureMethod()}
-              width={'40%'}
-              height={'30px'}
-              fontSize={'18px'}
-              buttonColor={`${global.colors.purpleColor}`}
-            />
+
+            <S.ButtonsContent>
+              <SubmitButton
+                text={procedure.isInView ? 'Editar' : 'Adicionar'}
+                onPress={() => chooseAddProcedureMethod()}
+                width={'40%'}
+                height={'30px'}
+                fontSize={'18px'}
+                buttonColor={`${global.colors.purpleColor}`}
+              />
+
+              {procedure.isInView && (
+                <S.DeleteButton
+                  onPress={() => {
+                    deleteProcedureInView(procedure);
+                    setProcedure({});
+                  }}>
+                  <Icon name="trash" size={17} />
+                </S.DeleteButton>
+              )}
+            </S.ButtonsContent>
           </S.AddButtonContent>
           <S.SubmitButtonContent>
             <SubmitButton

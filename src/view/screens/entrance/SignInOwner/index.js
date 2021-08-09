@@ -55,7 +55,7 @@ const SignInOwner = () => {
           isSecureTextEntry={false}
           fontSize={18}
           disabled={false}
-          mask={'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'}
+          mask="none"
         />
 
         <Input
@@ -68,7 +68,7 @@ const SignInOwner = () => {
           isSecureTextEntry={true}
           fontSize={18}
           disabled={false}
-          mask={'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'}
+          mask="none"
         />
 
         <S.PasswordResetButton>

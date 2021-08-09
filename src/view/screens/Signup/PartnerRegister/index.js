@@ -2,7 +2,7 @@ import React, {useContext, useState} from 'react';
 import * as S from './styled';
 import Input from '../../../components/Input';
 import SubmitButton from '../../../components/SubmitButton';
-import {ActivityIndicator, StyleSheet} from 'react-native';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {PartnerContext} from '../../../../contexts/Partner/PartnerContext';
 import {ProcedureContext} from '../../../../contexts/Procedure/ProcedureContext';
@@ -13,6 +13,9 @@ import {useNavigation} from '@react-navigation/native';
 import AlertModal from '../../../components/AlertModal';
 import errorMessages from '../../../../common/errorMessages';
 import BackButton from '../../../components/BackButton';
+import {xorBy} from 'lodash';
+
+import SelectBox from 'react-native-multi-selectbox';
 
 const PartnerRegister = () => {
   const {procedures, cleanProceduresInformation} = useContext(ProcedureContext);
@@ -21,9 +24,11 @@ const PartnerRegister = () => {
   const {doSignup, saveSignupInformation, cleanOwnerInformation} =
     useContext(UserContext);
 
-  const [partner, setPartner] = useState({procedure: 'Nenhuma'});
+  const [partner, setPartner] = useState({procedures: []});
   const [isLoadingSignup, setIsLoadingSignup] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  const [selectedItems, setSelectedItems] = useState([]);
 
   const [showAlertModal, setShowAlertModal] = useState({
     isShowing: false,
@@ -52,6 +57,15 @@ const PartnerRegister = () => {
     }
 
     if (isNavigating) navigate.push('EntranceStack');
+  };
+
+  const handleMultiSelect = item => {
+    let selectedItem = xorBy(partner.procedures, [item], 'name');
+
+    setPartner({
+      ...partner,
+      ['procedures']: selectedItem,
+    });
   };
 
   const addNewPartner = () => {
@@ -176,7 +190,7 @@ const PartnerRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
+            mask="none"
           />
 
           <Input
@@ -189,9 +203,7 @@ const PartnerRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={
-              'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'
-            }
+            mask="none"
           />
 
           <Input
@@ -220,25 +232,37 @@ const PartnerRegister = () => {
             mask={'99.999.999/9999-99'}
           />
 
-          <Picker
-            selectedValue={partner.procedure}
-            onValueChange={itemValue => handleChange(itemValue, 'procedure')}
-            style={styles.picker}
-            dropdownIconColor={'black'}>
-            <Picker.Item
-              style={styles.itemStylePicker}
-              label="Nenhuma"
-              value="Nenhuma"
+          {/*<Picker*/}
+          {/*  selectedValue={partner.procedure}*/}
+          {/*  onValueChange={itemValue => handleChange(itemValue, 'procedure')}*/}
+          {/*  style={styles.picker}*/}
+          {/*  dropdownIconColor={'black'}>*/}
+          {/*  <Picker.Item*/}
+          {/*    style={styles.itemStylePicker}*/}
+          {/*    label="Nenhuma"*/}
+          {/*    value="Nenhuma"*/}
+          {/*  />*/}
+          {/*  {procedures.map((procedure, index) => (*/}
+          {/*    <Picker.Item*/}
+          {/*      style={styles.itemStylePicker}*/}
+          {/*      label={`${procedure.name}`}*/}
+          {/*      value={procedure}*/}
+          {/*      key={index}*/}
+          {/*    />*/}
+          {/*  ))}*/}
+          {/*</Picker>*/}
+          <View
+            style={{
+              width: '80%',
+            }}>
+            <SelectBox
+              options={procedures}
+              selectedValues={partner.procedures}
+              onMultiSelect={handleMultiSelect}
+              onTapClose={handleMultiSelect}
+              isMulti
             />
-            {procedures.map((procedure, index) => (
-              <Picker.Item
-                style={styles.itemStylePicker}
-                label={`${procedure.name}`}
-                value={procedure}
-                key={index}
-              />
-            ))}
-          </Picker>
+          </View>
         </S.BodyContent>
         <S.FooterContent>
           {errorMessage !== '' && (
@@ -279,7 +303,6 @@ const PartnerRegister = () => {
           </S.SubmitButtonContent>
         </S.FooterContent>
       </S.Content>
-
       <AlertModal
         text={showAlertModal.text}
         isVisible={showAlertModal.isShowing}

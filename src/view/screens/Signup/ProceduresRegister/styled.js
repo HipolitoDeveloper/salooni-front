@@ -119,11 +119,31 @@ export const FooterContent = styled.View`
   width: 100%;
 `;
 
+export const ButtonsContent = styled.View`
+  margin: 10px 10px 20px 0;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+`;
+
 export const AddButtonContent = styled.View`
   margin-top: 30px;
   width: 100%;
   display: flex;
   align-items: center;
+`;
+
+export const DeleteButton = styled.TouchableOpacity`
+  margin-left: 20px;
+  height: 30px;
+  width: 30px;
+  border-radius: 30px;
+  background-color: ${global.colors.purpleColor};
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const SubmitButtonContent = styled.View`

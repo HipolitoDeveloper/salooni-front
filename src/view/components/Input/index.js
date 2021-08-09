@@ -66,4 +66,5 @@ Input.defaultProps = {
   fontSize: 18,
   type: 'custom',
   options: {},
+  mask: 'none',
 };

@@ -110,7 +110,7 @@ const OwnerRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
+            mask="none"
           />
           <Input
             handleChange={handleChange}
@@ -134,7 +134,7 @@ const OwnerRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
+            mask="none"
           />
           <Input
             handleChange={handleChange}
@@ -158,7 +158,7 @@ const OwnerRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'}
+            mask="none"
           />
 
           <Input
@@ -171,9 +171,7 @@ const OwnerRegister = () => {
             isSecureTextEntry={true}
             fontSize={18}
             disabled={false}
-            mask={
-              'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'
-            }
+            mask="none"
           />
         </S.BodyContent>
         <S.FooterContent>

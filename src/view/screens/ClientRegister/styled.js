@@ -109,6 +109,15 @@ export const FooterContent = styled.View`
   width: 100%;
 `;
 
+export const ButtonsContent = styled.View`
+  margin: 10px 10px 20px 0;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+`;
+
 export const AddButtonContent = styled.View`
   width: 100%;
   display: flex;

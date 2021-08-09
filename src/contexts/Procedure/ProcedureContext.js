@@ -27,6 +27,10 @@ const ProcedureProvider = ({children}) => {
     dispatch({type: 'EDIT_PROCEDURE', payload});
   };
 
+  const deleteProcedureInView = payload => {
+    dispatch({type: 'DELETE_PROCEDURE_INVIEW', payload});
+  };
+
   const saveProcedure = payload => {
     dispatch({type: 'SAVE_PROCEDURE', payload});
   };
@@ -40,6 +44,7 @@ const ProcedureProvider = ({children}) => {
     saveProcedure,
     cleanProceduresInformation,
     setProcedureInView,
+    deleteProcedureInView,
     updateProcedures,
     editProcedure,
     ...state,

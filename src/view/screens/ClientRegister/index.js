@@ -19,14 +19,15 @@ import Icon from 'react-native-vector-icons/Ionicons';
 const ClientRegister = () => {
   const [client, setClient] = useState({});
   const {
-    updateClients,
     addClient,
     editClient,
     registeredClients,
-    saveClients,
+    saveClient,
     cleanRegisteredClients,
     clientInView,
     updateClientInView,
+    updateClient,
+    deleteClient,
     deleteClientInView,
   } = useContext(ClientContext);
 
@@ -68,15 +69,6 @@ const ClientRegister = () => {
     }
   };
 
-  const addNewClient = async () => {
-    client.IdSalaoFK = await getSalonById(currentUser.idSalon, true);
-    if (verifyInformation()) {
-      addClient(client);
-      setErrorMessage('');
-      setClient({});
-    }
-  };
-
   const chooseAddClientMethod = async () => {
     const {isInView, indexInView} = {...client};
 
@@ -96,7 +88,7 @@ const ClientRegister = () => {
   };
 
   const handleClient = (client, index) => {
-    updateClients(index);
+    updateClientInView(index);
     client.isInView = !client.isInView;
     client.indexInView = index;
 
@@ -111,11 +103,11 @@ const ClientRegister = () => {
     return registeredClients.some(client => client.isInView === true);
   };
 
-  const saveClient = () => {
+  const saveClients = () => {
     setIsLoading(true);
 
     if (verifyInformationToGo()) {
-      saveClients().then(
+      saveClient().then(
         () => {
           setIsLoading(false);
           cleanRegisteredClients();
@@ -131,9 +123,9 @@ const ClientRegister = () => {
     }
   };
 
-  const updateClient = () => {
+  const updateClients = () => {
     setIsLoading(true);
-    updateClientInView(client).then(
+    updateClient(client).then(
       async () => {
         setIsLoading(false);
         navigate.push('Client');
@@ -147,8 +139,8 @@ const ClientRegister = () => {
     );
   };
 
-  const deleteClient = () => {
-    deleteClientInView(client).then(
+  const deleteClients = () => {
+    deleteClient(client).then(
       () => {
         setIsLoading(false);
         navigate.push('Client');
@@ -232,7 +224,7 @@ const ClientRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
+            mask="none"
           />
 
           <Input
@@ -245,9 +237,7 @@ const ClientRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={
-              'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'
-            }
+            mask="none"
           />
 
           <Input
@@ -336,29 +326,41 @@ const ClientRegister = () => {
               </S.LoadingContent>
             )}
 
-            {!isEditing && (
-              <SubmitButton
-                text={client.isInView ? 'Editar' : 'Adicionar'}
-                onPress={() => chooseAddClientMethod()}
-                width={'40%'}
-                height={'30px'}
-                fontSize={'18px'}
-                buttonColor={`${global.colors.blueColor}`}
-              />
-            )}
+            <S.ButtonsContent>
+              {!isEditing && (
+                <SubmitButton
+                  text={client.isInView ? 'Editar' : 'Adicionar'}
+                  onPress={() => chooseAddClientMethod()}
+                  width={'40%'}
+                  height={'30px'}
+                  fontSize={'18px'}
+                  buttonColor={`${global.colors.blueColor}`}
+                />
+              )}
+
+              {client.isInView && (
+                <S.DeleteButton
+                  onPress={() => {
+                    deleteClientInView(client);
+                    setClient({});
+                  }}>
+                  <Icon name="trash" size={17} />
+                </S.DeleteButton>
+              )}
+            </S.ButtonsContent>
           </S.AddButtonContent>
           <S.SubmitButtonContent>
             <SubmitButton
               disabled={verifyIfIsEditing()}
               text={'Salvar'}
-              onPress={() => (!isEditing ? saveClient() : updateClient())}
+              onPress={() => (!isEditing ? saveClients() : updateClients())}
               width={'40%'}
               height={'50px'}
               fontSize={'18px'}
               buttonColor={`${global.colors.blueColor}`}
             />
             {isEditing && (
-              <S.DeleteButton onPress={() => deleteClient(client)}>
+              <S.DeleteButton onPress={() => deleteClients(client)}>
                 <Icon name="trash" size={17} />
               </S.DeleteButton>
             )}

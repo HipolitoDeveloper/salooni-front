@@ -20,7 +20,7 @@ export const ProcedureReducer = (state, action) => {
       };
     case 'UPDATE_PROCEDURES':
       const procedureInViewIndex = action.payload;
-      state.procedures.map((procedure, index) => {
+      state.procedures = state.procedures.map((procedure, index) => {
         if (procedure.isInView === true && index !== procedureInViewIndex) {
           procedure.isInView = false;
         }
@@ -40,6 +40,17 @@ export const ProcedureReducer = (state, action) => {
 
         return p;
       });
+
+      return {
+        procedures: state.procedures,
+        ...state,
+      };
+
+    case 'DELETE_PROCEDURE_INVIEW':
+      const procedureToDelete = action.payload;
+
+      const indexToDelete = state.procedures.indexOf(procedureToDelete);
+      state.procedures.splice(indexToDelete, 1);
 
       return {
         procedures: state.procedures,

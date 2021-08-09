@@ -54,7 +54,18 @@ export const ClientReducer = (state, action) => {
         ...state,
       };
 
-    case 'UPDATE_CLIENTS':
+    case 'DELETE_CLIENT_INVIEW':
+      const clientToDelete = action.payload;
+
+      const indexToDelete = state.registeredClients.indexOf(clientToDelete);
+      state.registeredClients.splice(indexToDelete, 1);
+
+      return {
+        registeredClients: state.registeredClients,
+        ...state,
+      };
+
+    case 'UPDATE_CLIENTS_INVIEW':
       const clientInViewIndex = action.payload;
       state.registeredClients.map((client, index) => {
         if (client.isInView === true && index !== clientInViewIndex) {

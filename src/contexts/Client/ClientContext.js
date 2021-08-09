@@ -2,9 +2,11 @@ import React, {createContext, useReducer} from 'react';
 import {ClientReducer} from './ClientReducer';
 import {
   deleteClient,
+  deleteClientCRUD,
   getAllClientsBySalonId,
-  insertClient,
+  insertClientCRUD,
   updateClient,
+  updateClientCRUD,
 } from '../../services/Client';
 
 export const ClientContext = createContext();
@@ -37,19 +39,19 @@ const ClientProvider = ({children}) => {
     dispatch({type: 'ADD_CLIENT', payload});
   };
 
-  const updateClients = payload => {
-    dispatch({type: 'UPDATE_CLIENTS', payload});
+  const updateClientInView = payload => {
+    dispatch({type: 'UPDATE_CLIENTS_INVIEW', payload});
   };
 
   const editClient = payload => {
     dispatch({type: 'EDIT_CLIENT', payload});
   };
 
-  const saveClients = payload => {
+  const saveClient = payload => {
     return new Promise((resolve, reject) => {
       try {
         state.registeredClients.forEach(client => {
-          insertClient(client, false).then(newClient => {
+          insertClientCRUD(client, false).then(newClient => {
             dispatch({type: 'SAVE_CLIENTS', newClient});
           });
         });
@@ -60,10 +62,10 @@ const ClientProvider = ({children}) => {
     });
   };
 
-  const updateClientInView = payload => {
+  const updateClient = payload => {
     return new Promise(async (resolve, reject) => {
       try {
-        updateClient(payload, false).then(updatedClient => {
+        updateClientCRUD(payload, false).then(updatedClient => {
           dispatch({type: 'UPDATE_CLIENT', updatedClient});
         });
 
@@ -74,15 +76,19 @@ const ClientProvider = ({children}) => {
     });
   };
 
-  const deleteClientInView = payload => {
+  const deleteClient = payload => {
     return new Promise(async (resolve, reject) => {
       try {
         dispatch({type: 'DELETE_CLIENT', payload});
-        resolve(await deleteClient(payload.objectId));
+        resolve(await deleteClientCRUD(payload.objectId));
       } catch (e) {
         reject(`Deu ruim ao excluir clientes ${e}`);
       }
     });
+  };
+
+  const deleteClientInView = payload => {
+    dispatch({type: 'DELETE_CLIENT_INVIEW', payload});
   };
 
   const cleanRegisteredClients = payload => {
@@ -104,14 +110,15 @@ const ClientProvider = ({children}) => {
   const contextValues = {
     loadAllClients,
     addClient,
-    saveClients,
+    saveClient,
     cleanRegisteredClients,
     cleanClients,
     setClientInView,
     cleanClientInView,
-    updateClientInView,
+    updateClient,
+    deleteClient,
     deleteClientInView,
-    updateClients,
+    updateClientInView,
     editClient,
     ...state,
   };

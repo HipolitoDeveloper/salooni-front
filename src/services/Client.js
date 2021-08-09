@@ -20,7 +20,7 @@ export const getClientById = (clientId, returnParseObject) => {
   });
 };
 
-export const insertClient = (clientObj, returnParseObject) => {
+export const insertClientCRUD = (clientObj, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
       const {name, email, cpf, tel, tel2, born_date, IdSalaoFK} = clientObj;
@@ -44,7 +44,7 @@ export const insertClient = (clientObj, returnParseObject) => {
   });
 };
 
-export const updateClient = (clientObj, returnParseObject) => {
+export const updateClientCRUD = (clientObj, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
       const {name, email, cpf, tel, born_date, objectId} = clientObj;
@@ -84,7 +84,7 @@ export const getAllClientsBySalonId = (salonId, returnParseObject) => {
     }
   });
 };
-export const deleteClient = (clientId, returnParseObject) => {
+export const deleteClientCRUD = (clientId, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
       const client = await getClientById(clientId, true);
