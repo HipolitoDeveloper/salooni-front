@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import * as S from './styled';
 import Input from '../../../components/Input';
 import SubmitButton from '../../../components/SubmitButton';
@@ -13,13 +13,14 @@ import BackButton from '../../../components/BackButton';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const ProceduresRegister = () => {
-  const [procedure, setProcedure] = useState({commission: {}});
+  const [procedure, setProcedure] = useState({});
   const {
     addProcedure,
-    procedures,
-    updateProcedures,
+    registeredProcedures,
+    updateProcedureInView,
     editProcedure,
     deleteProcedureInView,
+    cleanProceduresInformation,
   } = useContext(ProcedureContext);
   const [errorMessage, setErrorMessage] = useState('');
   const [showAlertModal, setShowAlertModal] = useState({
@@ -32,18 +33,15 @@ const ProceduresRegister = () => {
   const handleChange = (text, rawText, name) => {
     if (name === 'percentage') {
       delete procedure.isFixedValue;
-      delete procedure.fixed_value;
-
-      procedure.commission = {value: text, type: name};
+      procedure.fixedValue = 0;
       setProcedure({
         ...procedure,
         ['isPercentage']: !!text,
         [name]: text,
       });
-    } else if (name === 'fixed_value') {
+    } else if (name === 'fixedValue') {
       delete procedure.isPercentage;
-      delete procedure.percentage;
-      procedure.commission = {value: text, type: name};
+      procedure.percentage = 0;
       setProcedure({
         ...procedure,
         ['isFixedValue']: !!text,
@@ -58,35 +56,30 @@ const ProceduresRegister = () => {
   };
 
   const handleProcedure = (procedure, index) => {
-    updateProcedures(index);
+    updateProcedureInView(index);
     procedure.isInView = !procedure.isInView;
     procedure.indexInView = index;
 
-    procedure.fixed_value = procedure.commission.percentage
-      ? procedure.commission.percentage
-      : null;
-    procedure.isFixedValue = !!procedure.commission.percentage;
-    procedure.percentage = procedure.commission.value
-      ? procedure.commission.value
-      : null;
-    procedure.isPercentage = !!procedure.commission.value;
+    procedure.isFixedValue = !!procedure.value;
+
+    procedure.isPercentage = !!procedure.percentage;
 
     setProcedure(procedure);
 
     if (!verifyIfIsEditing()) {
-      setProcedure({commission: {}});
+      setProcedure({});
     }
   };
 
   const verifyIfIsEditing = () => {
-    return procedures.some(procedure => procedure.isInView === true);
+    return registeredProcedures.some(procedure => procedure.isInView === true);
   };
 
   const handleModal = (isShowing, text, isNavigating) => {
     setShowAlertModal({isShowing: isShowing, text: text});
 
     if (isNavigating) {
-      navigate.push('PartnerRegister');
+      navigate.navigate('PartnerRegister');
     }
   };
 
@@ -97,22 +90,22 @@ const ProceduresRegister = () => {
       editProcedure({procedure: procedure, index: indexInView});
 
       setErrorMessage('');
-      setProcedure({commission: {}});
+      setProcedure({});
     }
 
     if (verifyInformation() && !isInView) {
-      addProcedure(procedure);
+      addProcedure({procedure: procedure, isSignup: true});
       setErrorMessage('');
-      setProcedure({commission: {}});
+      setProcedure({});
     }
   };
 
   const goNextPage = () => {
-    updateProcedures(-1);
+    updateProcedureInView(-1);
     if (verifyInformationToGo()) {
-      navigate.push('PartnerRegister');
+      navigate.navigate('PartnerRegister');
       setErrorMessage('');
-      setProcedure({commission: {}});
+      setProcedure({});
     }
   };
 
@@ -122,7 +115,7 @@ const ProceduresRegister = () => {
     if (Object.keys(procedure).length === 6) {
       addProcedure(procedure);
       return ableToGo;
-    } else if (procedures.length === 0) {
+    } else if (registeredProcedures.length === 0) {
       ableToGo = false;
       handleModal(true, errorMessages.noProcedureMessage);
     }
@@ -146,14 +139,9 @@ const ProceduresRegister = () => {
     ) {
       ableToGo = false;
       errorMessage = errorMessages.procedureMessage;
-    } else if (Object.keys(procedure.commission).length === 0) {
-      ableToGo = false;
-      errorMessage = errorMessages.commissionMessage;
     } else if (
-      (procedure.commission.percentage === undefined ||
-        procedure.commission.percentage === '') &&
-      (procedure.commission.value === undefined ||
-        procedure.commission.value === '')
+      (procedure.percentage === undefined || procedure.percentage === '') &&
+      (procedure.fixedValue === undefined || procedure.value === '')
     ) {
       ableToGo = false;
       errorMessage = errorMessages.commissionMessage;
@@ -164,14 +152,11 @@ const ProceduresRegister = () => {
   };
 
   const loadBoxInformation = () =>
-    procedures.map((procedure, index) => (
+    registeredProcedures.map((procedure, index) => (
       <S.BoxContent
         onPress={() => handleProcedure(procedure, index)}
         key={index}>
-        <S.BoxText isInView={procedure.isInView}>{procedure.name} - </S.BoxText>
-        <S.BoxText isInView={procedure.isInView}>
-          {procedure.time} minutos
-        </S.BoxText>
+        <S.BoxText isInView={procedure.isInView}>{procedure.name}</S.BoxText>
       </S.BoxContent>
     ));
 
@@ -232,20 +217,30 @@ const ProceduresRegister = () => {
                 isSecureTextEntry={false}
                 fontSize={18}
                 disabled={false}
-                mask={'R$9999,99'}
+                type={'currency'}
+                options={{
+                  prefix: '$',
+                  decimalSeparator: '.',
+                  groupSeparator: ',',
+                  precision: 2,
+                }}
               />
 
               <S.CheckboxContent>
                 <BouncyCheckbox
                   isChecked={procedure.isPercentage}
-                  onPress={isChecked => handleChange(isChecked, 'isPercentage')}
+                  onPress={isChecked =>
+                    handleChange(!procedure.isPercentage, '', 'percentage')
+                  }
                   fillColor={`${global.colors.purpleColor}`}
                   disableBuiltInState={true}
                   disableText={true}
                 />
 
                 <Input
-                  handleChange={handleChange}
+                  handleChange={(text, rawText, name) =>
+                    handleChange(text, rawText, name)
+                  }
                   name={'percentage'}
                   placeholder={'%'}
                   value={procedure.percentage}
@@ -254,29 +249,46 @@ const ProceduresRegister = () => {
                   isSecureTextEntry={false}
                   fontSize={18}
                   disabled={false}
-                  mask={'%999'}
+                  type={'currency'}
+                  options={{
+                    prefix: '%',
+                    decimalSeparator: '.',
+                    groupSeparator: ',',
+                    precision: 2,
+                  }}
                 />
               </S.CheckboxContent>
               <S.CheckboxContent>
                 <BouncyCheckbox
+                  style={{borderColor: global.colors.purpleColor}}
                   isChecked={procedure.isFixedValue}
-                  onPress={isChecked => handleChange(isChecked, 'isFixedValue')}
+                  onPress={isChecked =>
+                    handleChange(!procedure.isFixedValue, '', 'fixedValue')
+                  }
                   fillColor={`${global.colors.purpleColor}`}
                   disableBuiltInState={true}
                   disableText={true}
                 />
 
                 <Input
-                  handleChange={handleChange}
-                  name={'fixed_value'}
+                  handleChange={(text, rawText, name) =>
+                    handleChange(text, rawText, name)
+                  }
+                  name={'fixedValue'}
                   placeholder={'R$'}
-                  value={procedure.fixed_value}
+                  value={procedure.fixedValue}
                   width={'73%'}
                   keyboard={'numeric'}
                   isSecureTextEntry={false}
                   fontSize={18}
                   disabled={false}
-                  mask={'R$9999,99'}
+                  type={'currency'}
+                  options={{
+                    prefix: '$',
+                    decimalSeparator: '.',
+                    groupSeparator: ',',
+                    precision: 2,
+                  }}
                 />
               </S.CheckboxContent>
             </S.PriceContent>

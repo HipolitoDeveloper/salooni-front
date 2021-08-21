@@ -35,7 +35,7 @@ export const HeaderContent = styled.View`
 export const HeaderTitle = styled.Text`
   margin: 60px 0 30px 0;
   font-family: ${global.fonts.g};
-  font-size: 26px;
+  font-size: 24px;
   color: ${global.colors.purpleColor};
 `;
 

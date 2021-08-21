@@ -7,6 +7,7 @@ export const UserReducer = (state, action) => {
         tel: tel,
         employee_type: 'OWN',
         name: name,
+        email: email,
       };
       const newSalon = {name: salon, cnpj: cnpj, employee_qt: 0};
       const newUser = {username: email, password: password, email: email};
@@ -19,7 +20,6 @@ export const UserReducer = (state, action) => {
       };
 
     case 'SET_CURRENT_USER':
-      console.log(action.user);
       state.currentUser = action.user;
       return {
         currentUser: state.currentUser,

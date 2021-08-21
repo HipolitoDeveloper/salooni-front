@@ -7,7 +7,7 @@ export const convertFromAsyncStorage = asyncObject => {
 };
 
 export const ClientParseObjectToClientObject = clientParseObject => {
-  const clientObject = {
+  return {
     name: clientParseObject.Nome,
     email: clientParseObject.Email,
     cpf: clientParseObject.CPF,
@@ -15,6 +15,34 @@ export const ClientParseObjectToClientObject = clientParseObject => {
     born_date: clientParseObject.Aniversario,
     objectId: clientParseObject.objectId,
   };
+};
 
-  return clientObject;
+export const PartnerParseObjectToPartnerObject = partnerParseObject => {
+  return {
+    name: partnerParseObject.Nome,
+    email: partnerParseObject.Email,
+    cnpj: partnerParseObject.CNPJ,
+    tel: partnerParseObject.Telefone,
+    objectId: partnerParseObject.objectId,
+  };
+};
+
+export const ProcedureParseObjectToProcedureObject = procedureParseObject => {
+  return {
+    name: procedureParseObject.Nome,
+    objectId: procedureParseObject.objectId,
+    time: procedureParseObject.Tempo,
+    price: `$${procedureParseObject.Valor.toString()}`,
+
+    percentage:
+      procedureParseObject.ComissaoPorcentagem !== 0
+        ? `%${procedureParseObject.ComissaoPorcentagem}`
+        : 0,
+    isPercentage: procedureParseObject.ComissaoPorcentagem !== 0,
+    fixedValue:
+      procedureParseObject.ComissaoValor !== 0
+        ? `$${procedureParseObject.ComissaoValor}`
+        : 0,
+    isFixedValue: procedureParseObject.ComissaoValor !== 0,
+  };
 };

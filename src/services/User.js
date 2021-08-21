@@ -35,3 +35,21 @@ export const signUp = userObj => {
     }
   });
 };
+
+export const updateUser = userObj => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const {email, username, password, primeiroAcesso} = userObj;
+      const user = await getUserByEmail(email, true);
+
+      user.set('username', username);
+      user.set('email', email);
+      user.set('password', password);
+      user.set('primeiroAcesso', primeiroAcesso);
+
+      resolve(await user.save());
+    } catch (e) {
+      reject(`User ${JSON.stringify(e)}`);
+    }
+  });
+};

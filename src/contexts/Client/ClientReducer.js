@@ -92,20 +92,7 @@ export const ClientReducer = (state, action) => {
         registeredClients: state.registeredClients,
         ...state,
       };
-    case 'SET_CLIENT_INVIEW':
-      state.clientInView = ClientParseObjectToClientObject(action.payload);
 
-      return {
-        clientInView: state.clientInView,
-        ...state,
-      };
-
-    case 'CLEAN_CLIENT_INVIEW':
-      state.clientInView = {};
-      return {
-        clientInView: {},
-        ...state,
-      };
     case 'CLEAN_REGISTERED_CLIENTS':
       state.registeredClients = [];
       return {

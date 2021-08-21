@@ -13,4 +13,7 @@ export default {
   clientMessage:
     'Nem todas as informações relacionas ao cliente foram preenchidas',
   noClientMessage: 'Nenhum cliente foi adicionado',
+  passwordsNotMatch: 'Senhas não são idênticas',
+  notOwner:
+    'Esse e-mail não pertence à um proprietário. Tente o acesso na aba de parceiros',
 };

@@ -64,3 +64,10 @@ export const RegisterButtonText = styled.Text`
   font-size: 16px;
   color: ${global.colors.purpleColor};
 `;
+
+export const LoadingContent = styled.View`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;

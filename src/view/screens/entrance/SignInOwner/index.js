@@ -9,16 +9,18 @@ import Input from '../../../components/Input';
 import errorMessages from '../../../../common/errorMessages';
 import ErrorMessage from '../../../components/ErrorMessage';
 import global from '../../../../common/global';
-import {ClientContext} from '../../../../contexts/Client/ClientContext';
+import {ActivityIndicator} from 'react-native';
 
 const SignInOwner = () => {
-  const {doLogin} = useContext(UserContext);
-  const navigate = useNavigation();
+  const {doLogin, verifyOwner} = useContext(UserContext);
+
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [userData, setUserData] = useState({
     email: 'gabriel@gmail.com',
     password: '123',
   });
+  const navigate = useNavigation();
 
   const handleChange = (text, rawText, name) => {
     setUserData({
@@ -27,15 +29,27 @@ const SignInOwner = () => {
     });
   };
 
-  const onLogin = async () => {
-    await doLogin(userData).then(
+  const onLogin = () => {
+    setIsLoading(true);
+    verifyOwner(userData).then(
       () => {
-        navigate.push('Client');
-        setErrorMessage('');
+        doLogin(userData).then(
+          () => {
+            navigate.navigate('ApplicationStack');
+            setErrorMessage('');
+            setIsLoading(false);
+          },
+          error => {
+            setErrorMessage(errorMessages.signinMessage);
+            console.log(error);
+            setIsLoading(false);
+          },
+        );
       },
       error => {
-        setErrorMessage(errorMessages.signinMessage);
+        setErrorMessage(errorMessages.notOwner);
         console.log(error);
+        setIsLoading(false);
       },
     );
   };
@@ -74,6 +88,12 @@ const SignInOwner = () => {
         <S.PasswordResetButton>
           <S.PasswordResetText>Esqueceu a senha?</S.PasswordResetText>
         </S.PasswordResetButton>
+
+        {isLoading && (
+          <S.LoadingContent>
+            <ActivityIndicator size="large" color={global.colors.purpleColor} />
+          </S.LoadingContent>
+        )}
         <SubmitButton
           text={'Entrar'}
           onPress={() => onLogin()}
@@ -92,7 +112,7 @@ const SignInOwner = () => {
 
         <S.RegisterContent>
           <S.RegisterText>Não possui cadastro?</S.RegisterText>
-          <S.RegisterButton onPress={() => navigate.push('SignupStack')}>
+          <S.RegisterButton onPress={() => navigate.navigate('SignupStack')}>
             <S.RegisterButtonText>{''} Registre-se</S.RegisterButtonText>
           </S.RegisterButton>
         </S.RegisterContent>

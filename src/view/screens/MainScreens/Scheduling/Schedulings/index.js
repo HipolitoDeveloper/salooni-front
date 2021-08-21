@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text} from 'react-native';
 
-const SchedulingList = () => {
+const Schedulings = () => {
   return (
     <>
       <Text>Scheduling</Text>
@@ -9,4 +9,4 @@ const SchedulingList = () => {
   );
 };
 
-export default SchedulingList;
+export default Schedulings;

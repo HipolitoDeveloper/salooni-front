@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import * as S from './styled';
 import Input from '../../../components/Input';
 import SubmitButton from '../../../components/SubmitButton';
@@ -18,8 +18,12 @@ import {xorBy} from 'lodash';
 import SelectBox from 'react-native-multi-selectbox';
 
 const PartnerRegister = () => {
-  const {procedures, cleanProceduresInformation} = useContext(ProcedureContext);
-  const {addPartner, partners, cleanPartnersInformation} =
+  const {
+    registeredProcedures,
+    cleanProceduresInformation,
+    cleanRegisteredProcedures,
+  } = useContext(ProcedureContext);
+  const {addPartner, registeredPartners, cleanPartnersInformation} =
     useContext(PartnerContext);
   const {doSignup, saveSignupInformation, cleanOwnerInformation} =
     useContext(UserContext);
@@ -56,7 +60,7 @@ const PartnerRegister = () => {
       setShowWarnModal({isShowing: isShowing, text: text});
     }
 
-    if (isNavigating) navigate.push('EntranceStack');
+    if (isNavigating) navigate.navigate('EntranceStack');
   };
 
   const handleMultiSelect = item => {
@@ -71,7 +75,7 @@ const PartnerRegister = () => {
   const addNewPartner = () => {
     if (verifyInformation()) {
       addPartner(partner);
-      setPartner({});
+      setPartner({procedures: []});
       setErrorMessage('');
     }
   };
@@ -79,21 +83,22 @@ const PartnerRegister = () => {
   const saveInformations = () => {
     setIsLoadingSignup(true);
     saveSignupInformation({
-      procedures: procedures,
-      partners: partners,
+      procedures: registeredProcedures,
+      partners: registeredPartners,
     }).then(
       ownerData => {
-        doSignup(ownerData).then(
+        doSignup(ownerData, '').then(
           user => {
+            setIsLoadingSignup(false);
+            cleanRegisteredProcedures();
+            cleanProceduresInformation();
+            cleanOwnerInformation();
+            cleanPartnersInformation();
             handleModal(
               'showAlertModal',
               true,
               `Realize a entrada como proprietário com o usuário ${user.email}`,
             );
-            setIsLoadingSignup(false);
-            cleanOwnerInformation();
-            cleanProceduresInformation();
-            cleanPartnersInformation();
           },
           error => {
             handleModal('showWarnModal', false, ``);
@@ -149,10 +154,10 @@ const PartnerRegister = () => {
 
     if (Object.keys(partner).length >= 3) {
       addPartner(partner);
-      setPartner({});
+      setPartner({procedures: []});
       setErrorMessage('');
       return ableToGo;
-    } else if (partners.length === 0) {
+    } else if (registeredPartners.length === 0) {
       handleModal('showWarnModal', true, errorMessages.noPartnerMessage);
       ableToGo = false;
     }
@@ -256,7 +261,7 @@ const PartnerRegister = () => {
               width: '80%',
             }}>
             <SelectBox
-              options={procedures}
+              options={registeredProcedures}
               selectedValues={partner.procedures}
               onMultiSelect={handleMultiSelect}
               onTapClose={handleMultiSelect}

@@ -2,7 +2,7 @@ import React, {createContext, useReducer} from 'react';
 import Parse from 'parse/react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {convertToObj} from '../../common/conversor';
-import {getUserByEmail, signUp} from '../../services/User';
+import {getUserByEmail, signUp, updateUser} from '../../services/User';
 import {getEmployeeById, saveEmployee} from '../../services/Employee';
 import {UserReducer} from './UserReducer';
 import {getProcedureByName, saveProcedure} from '../../services/Procedure';
@@ -22,32 +22,75 @@ const UserProvider = ({children}) => {
   const [state, dispatch] = useReducer(UserReducer, initialState);
 
   const setCurrentUser = async user => {
-    await AsyncStorage.setItem('currentUser', JSON.stringify(user));
     dispatch({type: 'SET_CURRENT_USER', user});
   };
 
-  const verifyUser = userEmail => {
+  const verifyOwner = userData => {
     return new Promise(async (resolve, reject) => {
       try {
-        let isPartner = false;
-        let isFirstAccess = false;
-        const user = await getUserByEmail(userEmail);
+        let isOwner = false;
+
+        const user = await getUserByEmail(userData.email.trim(), false);
 
         if (user) {
-          const partner = await getEmployeeById(user.IdFuncFK.objectId);
+          const employee = await getEmployeeById(user.IdFuncFK.objectId, false);
 
-          if (partner.TipoFunc === 'PRC') {
-            isPartner = true;
+          if (employee.TipoFunc === 'OWN') {
+            isOwner = true;
           } else {
-            throw 'Não é parceiro';
+            throw 'Não é proprietário';
           }
-
-          isFirstAccess = user.firstAccess === true;
         }
 
-        resolve({isPartner: isPartner, isFirstAccess: isFirstAccess});
+        resolve(isOwner);
       } catch (e) {
-        reject(`Deu ruim ao verificar o email ${JSON.stringify(e)}`);
+        console.log(e);
+        reject(`${JSON.stringify(e)}`);
+      }
+    });
+  };
+
+  const verifyPartner = (userData, verifiedPartner) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (verifiedPartner === '') {
+          let isPartner = false;
+          let isFirstAccess = false;
+          let partner = {};
+
+          const user = await getUserByEmail(userData.email.trim(), false);
+
+          if (user) {
+            partner = await getEmployeeById(user.IdFuncFK.objectId, true);
+
+            if (partner.get('TipoFunc') === 'PRC') {
+              isPartner = true;
+            } else {
+              throw 'Não é parceiro';
+            }
+
+            isFirstAccess = user.primeiroAcesso === true;
+          }
+
+          resolve({
+            isPartner: isPartner,
+            isFirstAccess: isFirstAccess,
+            verifiedPartner: partner,
+          });
+        } else {
+          let isAbleToSignup = false;
+          if (userData.CNPJ === verifiedPartner.get('CNPJ')) {
+            isAbleToSignup = true;
+          } else {
+            throw 'CNPJ não encontrado para esse parceiro';
+          }
+          resolve({
+            isAbleToSignup: isAbleToSignup,
+          });
+        }
+      } catch (e) {
+        console.log(e);
+        reject(`${JSON.stringify(e)}`);
       }
     });
   };
@@ -55,9 +98,15 @@ const UserProvider = ({children}) => {
   const doLogin = userData => {
     return new Promise(async (resolve, reject) => {
       try {
-        await Parse.User.logIn(userData.email, userData.password).then(
+        await Parse.User.logIn(userData.email.trim(), userData.password).then(
           async user => {
             const stringfiedUser = convertToObj(user);
+
+            if (stringfiedUser.primeiroAcesso) {
+              stringfiedUser.primeiroAcesso = false;
+              await updateUser(stringfiedUser);
+            }
+
             const employeeObj = await getEmployeeById(
               stringfiedUser.IdFuncFK.objectId,
             );
@@ -65,6 +114,7 @@ const UserProvider = ({children}) => {
               id: stringfiedUser.objectId,
               idFunc: stringfiedUser.IdFuncFK.objectId,
               idSalon: employeeObj.IdSalaoFK.objectId,
+              typeEmployee: stringfiedUser.IdFuncFK.TipoFunc,
             };
 
             await setCurrentUser(currentUser);
@@ -77,25 +127,13 @@ const UserProvider = ({children}) => {
     });
   };
 
-  const doLogout = async () => {
-    await Parse.User.logOut().then(async () => {
-      dispatch({type: 'SET_CURRENT_USER', user: {}});
-
-      await AsyncStorage.clear();
-    });
-  };
-
-  const doSignup = funcFk => {
+  const doSignup = (funcFk, userData) => {
     return new Promise(async (resolve, reject) => {
-      // const {partners} = payload;
       try {
-        state.user.funcFK = funcFk;
+        const userToSignup = userData === '' ? state.user : userData;
+        userToSignup.funcFK = funcFk;
 
-        resolve(convertToObj(await signUp(state.user)));
-
-        // partners.map(async partner => {
-        //   await signUp(partner);
-        // });
+        resolve(convertToObj(await signUp(userToSignup)));
       } catch (e) {
         reject(`Deu ruim ao cadastrar os usuários ${e}`);
       }
@@ -106,24 +144,30 @@ const UserProvider = ({children}) => {
     const {procedures, partners} = payload;
     return new Promise(async (resolve, reject) => {
       try {
+        state.salon.employee_qt = partners.length;
         const salon = await saveSalon(state.salon, true);
         state.owner.salaoFK = salon;
+
         const employee = await saveEmployee(state.owner, true);
 
         procedures.map(async procedure => {
+          procedure.salaoFK = salon;
+          procedure.funcFk = employee;
           await saveProcedure(procedure, true);
         });
         partners.map(async partner => {
           partner.salaoFK = salon;
           const savedPartner = await saveEmployee(partner, true);
 
-          if (partner.procedure !== 'Nenhuma') {
-            const procedureEmployeer = {
-              IdProcFK: await getProcedureByName(partner.procedure.name, true),
-              IdFuncFK: savedPartner,
-            };
+          if (partner.procedures.length !== 0) {
+            partner.procedures.map(async procedure => {
+              const procedureEmployeer = {
+                IdProcFK: await getProcedureByName(procedure.name, true),
+                IdFuncFK: savedPartner,
+              };
 
-            await saveProcedureEmployee(procedureEmployeer, true);
+              await saveProcedureEmployee(procedureEmployeer, true);
+            });
           }
         });
 
@@ -145,8 +189,8 @@ const UserProvider = ({children}) => {
   const contextValues = {
     doLogin,
     setCurrentUser,
-    doLogout,
-    verifyUser,
+    verifyOwner,
+    verifyPartner,
     saveOwnerInformation,
     saveSignupInformation,
     doSignup,

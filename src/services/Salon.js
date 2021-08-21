@@ -42,7 +42,7 @@ export const getSalonById = (salonId, returnParseObject) => {
         resolve(convertToObj(await SalonQuery.get(salonId)));
       }
     } catch (e) {
-      reject(`Cliente ${JSON.stringify(e)}`);
+      reject(`Salão ${JSON.stringify(e)}`);
     }
   });
 };

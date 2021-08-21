@@ -1,28 +1,30 @@
 import React, {useContext, useEffect, useState} from 'react';
 import * as S from './styled';
-import Input from '../../components/Input';
-import SubmitButton from '../../components/SubmitButton';
+import Input from '../../../../components/Input';
+import SubmitButton from '../../../../components/SubmitButton';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import global from '../../../common/global';
-import ErrorMessage from '../../components/ErrorMessage';
+import global from '../../../../../common/global';
+import ErrorMessage from '../../../../components/ErrorMessage';
 import {useNavigation} from '@react-navigation/native';
-import {ClientContext} from '../../../contexts/Client/ClientContext';
-import errorMessages from '../../../common/errorMessages';
-import AlertModal from '../../components/AlertModal';
+import {ClientContext} from '../../../../../contexts/Client/ClientContext';
+import errorMessages from '../../../../../common/errorMessages';
+import AlertModal from '../../../../components/AlertModal';
 import {ClientInformationContent, InformationContent} from './styled';
 import {ActivityIndicator} from 'react-native';
-import BackButton from '../../components/BackButton';
-import {UserContext} from '../../../contexts/User/UserContext';
-import {getSalonById} from '../../../services/Salon';
+import BackButton from '../../../../components/BackButton';
+import {UserContext} from '../../../../../contexts/User/UserContext';
+import {getSalonById} from '../../../../../services/Salon';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {NavigationEvents} from 'react-navigation';
+import {ClientParseObjectToClientObject} from '../../../../../common/conversor';
 
-const ClientRegister = () => {
-  const [client, setClient] = useState({});
+const ClientRegister = ({route}) => {
   const {
     addClient,
     editClient,
     registeredClients,
     saveClient,
+
     cleanRegisteredClients,
     clientInView,
     updateClientInView,
@@ -40,15 +42,21 @@ const ClientRegister = () => {
     isShowing: false,
     text: '',
   });
-
+  const [client, setClient] = useState({});
   const navigate = useNavigation();
 
   useEffect(() => {
-    if (Object.keys(clientInView).length !== 0) {
-      setClient(clientInView);
-      setIsEditing(true);
-    }
-  }, []);
+    navigate.addListener('focus', () => {
+      const clientInView = route.params?.client
+        ? ClientParseObjectToClientObject(route.params?.client)
+        : {};
+
+      if (Object.keys(clientInView).length !== 0) {
+        setClient(clientInView);
+        setIsEditing(true);
+      }
+    });
+  }, [navigate]);
 
   useEffect(() => {
     registeredClients.forEach(client => (client.isInView = false));
@@ -65,7 +73,7 @@ const ClientRegister = () => {
     setShowAlertModal({isShowing: isShowing, text: text});
 
     if (isNavigating) {
-      navigate.push('PartnerRegister');
+      navigate.navigate('Clients');
     }
   };
 
@@ -111,7 +119,7 @@ const ClientRegister = () => {
         () => {
           setIsLoading(false);
           cleanRegisteredClients();
-          navigate.push('Client');
+          navigate.navigate('Clients');
           setErrorMessage('');
           setClient({});
         },
@@ -128,7 +136,7 @@ const ClientRegister = () => {
     updateClient(client).then(
       async () => {
         setIsLoading(false);
-        navigate.push('Client');
+        navigate.navigate('Clients');
         setErrorMessage('');
         setClient({});
       },
@@ -143,7 +151,7 @@ const ClientRegister = () => {
     deleteClient(client).then(
       () => {
         setIsLoading(false);
-        navigate.push('Client');
+        navigate.navigate('Clients');
         setErrorMessage('');
         setClient({});
       },
@@ -209,7 +217,9 @@ const ClientRegister = () => {
             positionTop={'20px'}
             positionLeft={'-35px'}
             buttonColor={`${global.colors.blueColor}`}
-            onPress={navigate.goBack}
+            onPress={() => {
+              navigate.goBack();
+            }}
           />
           <S.HeaderTitle>Registro de Clientes</S.HeaderTitle>
         </S.HeaderContent>

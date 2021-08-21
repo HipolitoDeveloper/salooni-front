@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import global from '../../../common/global';
+import global from '../../../../../common/global';
 import {StyleSheet} from 'react-native';
 
 export const Container = styled.View`
@@ -33,8 +33,8 @@ export const HeaderTitle = styled.Text`
   text-align: center;
 
   font-family: ${global.fonts.g};
-  font-size: 26px;
-  color: ${global.colors.blueColor};
+  font-size: 24px;
+  color: ${global.colors.purpleColor};
 `;
 
 export const HeaderText = styled.Text`
@@ -68,6 +68,14 @@ export const InformationContent = styled.View`
   justify-content: space-between;
   align-items: center;
 `;
+export const CheckboxContent = styled.View`
+  margin-top: 30px;
+  width: 73%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+`;
 
 export const RegisteredProceduresContent = styled.View`
   display: flex;
@@ -76,7 +84,7 @@ export const RegisteredProceduresContent = styled.View`
   margin-top: 20px;
 `;
 
-export const RegisteredProceduresBox = styled.View`
+export const RegisteredProceduresBox = styled.ScrollView`
   margin-top: 10px;
   border-width: ${StyleSheet.hairlineWidth}px;
   border-color: ${global.colors.purpleColor};
@@ -92,7 +100,7 @@ export const BoxContent = styled.TouchableOpacity`
 
 export const BoxText = styled.Text`
   font-family: ${global.fonts.s};
-  font-size: 18px;
+  font-size: 16px;
   color: ${props => (props.isInView ? 'red' : 'black')};
 `;
 
@@ -119,6 +127,7 @@ export const ButtonsContent = styled.View`
 `;
 
 export const AddButtonContent = styled.View`
+  margin-top: -25px;
   width: 100%;
   display: flex;
   align-items: center;
@@ -138,7 +147,7 @@ export const DeleteButton = styled.TouchableOpacity`
   height: 30px;
   width: 30px;
   border-radius: 30px;
-  background-color: ${global.colors.blueColor};
+  background-color: ${global.colors.purpleColor};
   display: flex;
   align-items: center;
   justify-content: center;

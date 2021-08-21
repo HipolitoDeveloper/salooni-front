@@ -38,7 +38,6 @@ const OwnerRegister = () => {
   }, []);
 
   const handleChange = (text, rawText, name) => {
-    console.log(text);
     setOwnerData({
       ...ownerData,
       [name]: text,
@@ -49,7 +48,7 @@ const OwnerRegister = () => {
     if (verifyInformation()) {
       setErrorMessage('');
       saveOwnerInformation(ownerData);
-      navigate.push('ProceduresRegister');
+      navigate.navigate('ProceduresRegister');
     }
   };
 

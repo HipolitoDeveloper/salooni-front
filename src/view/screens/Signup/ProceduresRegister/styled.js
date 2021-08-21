@@ -36,7 +36,7 @@ export const HeaderContent = styled.View`
 export const HeaderTitle = styled.Text`
   margin: 60px 0 30px 0;
   font-family: ${global.fonts.g};
-  font-size: 26px;
+  font-size: 24px;
   color: ${global.colors.purpleColor};
 `;
 
@@ -86,7 +86,7 @@ export const RegisteredProceduresContent = styled.View`
   margin-top: 20px;
 `;
 
-export const RegisteredProceduresBox = styled.View`
+export const RegisteredProceduresBox = styled.ScrollView`
   margin-top: 10px;
   border-width: ${StyleSheet.hairlineWidth}px;
   border-color: ${global.colors.purpleColor};
@@ -102,7 +102,7 @@ export const BoxContent = styled.TouchableOpacity`
 
 export const BoxText = styled.Text`
   font-family: ${global.fonts.s};
-  font-size: 18px;
+  font-size: 16px;
   color: ${props => (props.isInView ? 'red' : 'black')};
 `;
 
@@ -147,7 +147,7 @@ export const DeleteButton = styled.TouchableOpacity`
 `;
 
 export const SubmitButtonContent = styled.View`
-  margin: 30px 10px 20px 0;
+  margin: 0 10px 20px 0;
   width: 100%;
   display: flex;
   align-items: flex-end;

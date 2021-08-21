@@ -6,12 +6,12 @@ const ProcedureEmployeeObject = Parse.Object.extend('ProcedimentoXFuncionario');
 const ProcedureEmployeeQuery = new Parse.Query(ProcedureEmployeeObject);
 
 export const saveProcedureEmployee = (
-  ProcedureEmployeeObj,
+  procedureEmployeeObj,
   returnParseObject,
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const {IdProcFK, IdFuncFK} = ProcedureEmployeeObj;
+      const {IdProcFK, IdFuncFK} = procedureEmployeeObj;
 
       const newProcedureEmployee = new ProcedureEmployeeObject();
       newProcedureEmployee.set('IdFuncFK', IdFuncFK);

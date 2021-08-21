@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import global from '../../../common/global';
+import global from '../../../../../common/global';
 import {StyleSheet} from 'react-native';
 
 export const Container = styled.View`
@@ -13,19 +13,6 @@ export const Content = styled.View`
   align-items: center;
   width: 100%;
   height: 100%;
-`;
-
-export const HeaderContent = styled.View`
-  height: 10%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-export const HeaderTitle = styled.Text`
-  font-family: ${global.fonts.g};
-  font-size: 24px;
-  color: ${global.colors.blueColor};
 `;
 
 export const BodyContent = styled.ScrollView`
@@ -84,20 +71,17 @@ export const DetailsButtonText = styled.Text`
 export const FooterContent = styled.View`
   height: 15%;
   display: flex;
+  justify-content: center;
   align-items: flex-end;
-  justify-content: space-between;
   width: 100%;
 `;
 
 export const LoadingContent = styled.View`
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   margin-bottom: 10px;
 `;
 
 export const ActionButtonContainer = styled.View`
-  z-index: 5;
-  position: relative;
+  height: 100px;
+  width: 100px;
 `;

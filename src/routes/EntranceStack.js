@@ -9,7 +9,7 @@ const Stack = createStackNavigator();
 
 export default () => (
   <Stack.Navigator
-    initialRouteName="EntranceOption"
+    initialRouteName={'EntranceOption'}
     screenOptions={{
       headerShown: false,
     }}>

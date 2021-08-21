@@ -1340,6 +1340,20 @@
     query-string "^6.13.6"
     react-is "^16.13.0"
 
+"@react-navigation/drawer@^6.1.1":
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/@react-navigation/drawer/-/drawer-6.1.1.tgz#6e5b3de5327fae162a27761e7c842ab53794a200"
+  integrity sha512-c3poqkc2aQRPrHa8lZihPSqqlcmlF3LDOyaCyz7V12hAg6v0o/PrkSJqP4jgTSiTPNbRQ3Edpb+rZdpSXkO6vQ==
+  dependencies:
+    "@react-navigation/elements" "^1.0.3"
+    color "^3.1.3"
+    warn-once "^0.1.0"
+
+"@react-navigation/elements@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-1.0.3.tgz#23052dc9c9766614c629a400fc96a600176ab1a3"
+  integrity sha512-hDf55C65kD7X09r4p9Z74xuCLe2damL+i7v0YLM3AFD0TEkDiGwRczhsoZFm8gg/TIJpLqa+CjqX2gvrdQyQ+A==
+
 "@react-navigation/native@^3.8.4":
   version "3.8.4"
   resolved "https://registry.yarnpkg.com/@react-navigation/native/-/native-3.8.4.tgz#4d77f86506364ecf18b33c7f8740afb6763d0b37"
@@ -5990,6 +6004,11 @@ react-native-multiple-select@^0.5.6:
   integrity sha512-I6H7dcVZLy2ToyJ9mv0ANIDnBIcrUfVyEN3jCgPNG8sLyK6JMMNgJwqlJxrlPOaJVjiDjHkF0viu6LjohQFhhQ==
   dependencies:
     prop-types "^15.7.2"
+
+react-native-navigation-drawer-extension@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/react-native-navigation-drawer-extension/-/react-native-navigation-drawer-extension-4.0.3.tgz#e5bc4389b4680e274ae4f59a0c9d5911ad9da35c"
+  integrity sha512-zWFMXBcWG7KWk1JJdBUrcrpxe4PqoM5aveHj+lEpT2rBLdkvlGLS21MRPxcduSt7By1HPTEcW910AW/6I9wN8Q==
 
 react-native-reanimated@^2.2.0:
   version "2.2.0"

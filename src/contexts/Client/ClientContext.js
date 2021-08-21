@@ -1,11 +1,9 @@
 import React, {createContext, useReducer} from 'react';
 import {ClientReducer} from './ClientReducer';
 import {
-  deleteClient,
   deleteClientCRUD,
   getAllClientsBySalonId,
   insertClientCRUD,
-  updateClient,
   updateClientCRUD,
 } from '../../services/Client';
 
@@ -99,22 +97,14 @@ const ClientProvider = ({children}) => {
     dispatch({type: 'CLEAN_CLIENTS', payload});
   };
 
-  const cleanClientInView = payload => {
-    dispatch({type: 'CLEAN_CLIENT_INVIEW', payload});
-  };
-
-  const setClientInView = payload => {
-    dispatch({type: 'SET_CLIENT_INVIEW', payload});
-  };
-
   const contextValues = {
     loadAllClients,
     addClient,
+
     saveClient,
     cleanRegisteredClients,
     cleanClients,
-    setClientInView,
-    cleanClientInView,
+
     updateClient,
     deleteClient,
     deleteClientInView,

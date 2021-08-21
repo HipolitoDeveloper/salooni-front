@@ -1,5 +1,6 @@
 import styled from 'styled-components/native';
 import global from '../../../../common/global';
+import {StyleSheet} from 'react-native';
 
 export const Container = styled.View`
   height: 100%;
@@ -30,7 +31,7 @@ export const EmailMessage = styled.Text`
 export const Input = styled.TextInput`
   font-family: ${global.fonts.s};
   width: 70%;
-  border-bottom-width: 1px;
+  border-bottom-width: ${StyleSheet.hairlineWidth}px;
   border-bottom-color: ${global.colors.purpleColor};
   color: black;
 `;
