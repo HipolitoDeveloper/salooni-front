@@ -5,7 +5,7 @@ import {
   getAllClientsBySalonId,
   insertClientCRUD,
   updateClientCRUD,
-} from '../../services/Client';
+} from '../../services/ClientService';
 
 export const ClientContext = createContext();
 

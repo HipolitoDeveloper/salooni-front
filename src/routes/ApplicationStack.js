@@ -10,7 +10,7 @@ import Partners from '../view/screens/MainScreens/Partner/Partners';
 import SchedulingCalendar from '../view/screens/MainScreens/Calendar/SchedulingCalendar';
 import SchedulingRegister from '../view/screens/MainScreens/Calendar/SchedulingRegister';
 import PartnerRegister from '../view/screens/MainScreens/Partner/PartnerRegister';
-import ProcedureRegister from '../view/screens/MainScreens/Procedure/ProcedureRegister';
+import ProcedureForm from '../view/screens/MainScreens/Procedure/ProcedureForm';
 
 const Drawer = createDrawerNavigator();
 
@@ -29,6 +29,6 @@ export default () => (
     <Drawer.Screen name="Schedulings" component={Schedulings} />
     <Drawer.Screen name="SchedulingRegister" component={SchedulingRegister} />
     <Drawer.Screen name="PartnerRegister" component={PartnerRegister} />
-    <Drawer.Screen name="ProcedureRegister" component={ProcedureRegister} />
+    <Drawer.Screen name="ProcedureForm" component={ProcedureForm} />
   </Drawer.Navigator>
 );

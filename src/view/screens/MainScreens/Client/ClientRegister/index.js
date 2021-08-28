@@ -13,7 +13,7 @@ import {ClientInformationContent, InformationContent} from './styled';
 import {ActivityIndicator} from 'react-native';
 import BackButton from '../../../../components/BackButton';
 import {UserContext} from '../../../../../contexts/User/UserContext';
-import {getSalonById} from '../../../../../services/Salon';
+import {getSalonById} from '../../../../../services/SalonService';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {NavigationEvents} from 'react-navigation';
 import {ClientParseObjectToClientObject} from '../../../../../common/conversor';

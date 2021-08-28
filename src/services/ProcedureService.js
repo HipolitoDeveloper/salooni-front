@@ -1,8 +1,8 @@
 import Parse from 'parse/react-native';
 import {convertToObj} from '../common/conversor';
 import {saveCommission} from './Commission';
-import {getSalonById} from './Salon';
-import {getEmployeeById} from './Employee';
+import {getSalonById} from './SalonService';
+import {getEmployeeById} from './EmployeeService';
 
 const ProcedureObject = Parse.Object.extend('Procedimento');
 

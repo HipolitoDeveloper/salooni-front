@@ -1,6 +1,6 @@
 import Parse from 'parse/react-native';
 import {convertToObj} from '../common/conversor';
-import {getSalonById} from './Salon';
+import {getSalonById} from './SalonService';
 
 const ClientObject = Parse.Object.extend('Cliente');
 

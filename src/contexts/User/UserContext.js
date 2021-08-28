@@ -2,12 +2,19 @@ import React, {createContext, useReducer} from 'react';
 import Parse from 'parse/react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {convertToObj} from '../../common/conversor';
-import {getUserByEmail, signUp, updateUser} from '../../services/User';
-import {getEmployeeById, saveEmployee} from '../../services/Employee';
+import {getUsersByEmail, signUp, updateUser} from '../../services/UserService';
+import {
+  getEmployeeByEmail,
+  getEmployeeById,
+  saveEmployee,
+} from '../../services/EmployeeService';
 import {UserReducer} from './UserReducer';
-import {getProcedureByName, saveProcedure} from '../../services/Procedure';
-import {saveProcedureEmployee} from '../../services/ProcedureEmployee';
-import {saveSalon} from '../../services/Salon';
+import {
+  getProcedureByName,
+  saveProcedure,
+} from '../../services/ProcedureService';
+import {saveProcedureEmployee} from '../../services/ProcedureEmployeeService';
+import {getSalonById, saveSalon} from '../../services/SalonService';
 
 export const UserContext = createContext();
 
@@ -30,16 +37,24 @@ const UserProvider = ({children}) => {
       try {
         let isOwner = false;
 
-        const user = await getUserByEmail(userData.email.trim(), false);
+        const users = await getUsersByEmail(userData.email.trim(), false);
 
-        if (user) {
-          const employee = await getEmployeeById(user.IdFuncFK.objectId, false);
+        if (users.length > 0) {
+          const user = users[0];
+          if (user) {
+            const employee = await getEmployeeById(
+              user.IdFuncFK.objectId,
+              false,
+            );
 
-          if (employee.TipoFunc === 'OWN') {
-            isOwner = true;
-          } else {
-            throw 'Não é proprietário';
+            if (employee.TipoFunc === 'OWN') {
+              isOwner = true;
+            } else {
+              throw 'Não é proprietário';
+            }
           }
+        } else {
+          throw 'Não foi encontrado';
         }
 
         resolve(isOwner);
@@ -55,21 +70,25 @@ const UserProvider = ({children}) => {
       try {
         if (verifiedPartner === '') {
           let isPartner = false;
-          let isFirstAccess = false;
-          let partner = {};
+          let isFirstAccess = true;
 
-          const user = await getUserByEmail(userData.email.trim(), false);
+          let partner = await getEmployeeByEmail(userData.email.trim(), true);
 
-          if (user) {
-            partner = await getEmployeeById(user.IdFuncFK.objectId, true);
-
-            if (partner.get('TipoFunc') === 'PRC') {
-              isPartner = true;
-            } else {
-              throw 'Não é parceiro';
+          if (partner) {
+            if (partner) {
+              if (partner.get('TipoFunc') === 'PRC') {
+                isPartner = true;
+              } else {
+                throw 'Não é parceiro';
+              }
             }
+            const users = await getUsersByEmail(userData.email.trim(), false);
 
-            isFirstAccess = user.primeiroAcesso === true;
+            if (users.length > 0) {
+              isFirstAccess = false;
+            }
+          } else {
+            throw 'Não está no sistema';
           }
 
           resolve({
@@ -79,7 +98,9 @@ const UserProvider = ({children}) => {
           });
         } else {
           let isAbleToSignup = false;
-          if (userData.CNPJ === verifiedPartner.get('CNPJ')) {
+          let salon = verifiedPartner.get('IdSalaoFK');
+
+          if (userData.CNPJ === salon.get('CNPJ')) {
             isAbleToSignup = true;
           } else {
             throw 'CNPJ não encontrado para esse parceiro';

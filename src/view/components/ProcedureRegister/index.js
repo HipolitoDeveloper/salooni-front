@@ -1,34 +1,68 @@
 import React, {useContext, useEffect, useState} from 'react';
 import * as S from './styled';
-import Input from '../../../components/Input';
-import SubmitButton from '../../../components/SubmitButton';
+import Input from '../Input';
+import SubmitButton from '../SubmitButton';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import global from '../../../../common/global';
-import ErrorMessage from '../../../components/ErrorMessage';
+import global from '../../../common/global';
+import ErrorMessage from '../ErrorMessage';
 import {useNavigation} from '@react-navigation/native';
-import {ProcedureContext} from '../../../../contexts/Procedure/ProcedureContext';
-import errorMessages from '../../../../common/errorMessages';
-import AlertModal from '../../../components/AlertModal';
-import BackButton from '../../../components/BackButton';
+import errorMessages from '../../../common/errorMessages';
+import AlertModal from '../AlertModal';
+import {ActivityIndicator, Text} from 'react-native';
+import BackButton from '../BackButton';
+import {UserContext} from '../../../contexts/User/UserContext';
+import {getSalonById} from '../../../services/SalonService';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {ProcedureParseObjectToProcedureObject} from '../../../common/conversor';
+import {ProcedureContext} from '../../../contexts/Procedure/ProcedureContext';
 
-const ProceduresRegister = () => {
-  const [procedure, setProcedure] = useState({});
+const ProcedureRegister = ({
+  route,
+  pageTitle,
+  pageDescription,
+  goBack,
+  isSigningUp,
+}) => {
   const {
     addProcedure,
-    registeredProcedures,
-    updateProcedureInView,
     editProcedure,
+    registeredProcedures,
+    saveProcedures,
+    cleanRegisteredProcedures,
+    updateProcedureInView,
+    updateProcedure,
+    deleteProcedure,
     deleteProcedureInView,
-    cleanProceduresInformation,
   } = useContext(ProcedureContext);
+
+  const {currentUser} = useContext(UserContext);
+
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState({
     isShowing: false,
     text: '',
   });
-
+  const [procedure, setProcedure] = useState({});
   const navigate = useNavigation();
+
+  useEffect(() => {
+    navigate.addListener('focus', () => {
+      const procedureInView = route.params?.procedure
+        ? ProcedureParseObjectToProcedureObject(route.params?.procedure)
+        : {};
+
+      if (Object.keys(procedureInView).length !== 0) {
+        setProcedure(procedureInView);
+        setIsEditing(true);
+      }
+    });
+  }, [navigate]);
+
+  useEffect(() => {
+    registeredProcedures.forEach(client => (client.isInView = false));
+  }, []);
 
   const handleChange = (text, rawText, name) => {
     if (name === 'percentage') {
@@ -55,6 +89,38 @@ const ProceduresRegister = () => {
     }
   };
 
+  const handleModal = (isShowing, text, isNavigating) => {
+    setShowAlertModal({isShowing: isShowing, text: text});
+
+    if (isNavigating) {
+      navigate.navigate('SignupPartners');
+    }
+  };
+
+  const chooseAddProcedureMethod = async () => {
+    const {isInView, indexInView} = {...procedure};
+
+    if (verifyInformation() && isInView) {
+      procedure.isInView = false;
+      editProcedure({procedure: procedure, index: indexInView});
+      setErrorMessage('');
+      setProcedure({});
+    }
+
+    if (verifyInformation() && !isInView) {
+      if (!isSigningUp)
+        procedure.IdSalaoFK = await getSalonById(currentUser.idSalon, true);
+      addProcedure({
+        salonId: isSigningUp ? null : currentUser.idSalon,
+        employeeId: isSigningUp ? null : currentUser.idFunc,
+        procedure: procedure,
+        isSignup: isSigningUp,
+      });
+      setErrorMessage('');
+      setProcedure({});
+    }
+  };
+
   const handleProcedure = (procedure, index) => {
     updateProcedureInView(index);
     procedure.isInView = !procedure.isInView;
@@ -75,52 +141,78 @@ const ProceduresRegister = () => {
     return registeredProcedures.some(procedure => procedure.isInView === true);
   };
 
-  const handleModal = (isShowing, text, isNavigating) => {
-    setShowAlertModal({isShowing: isShowing, text: text});
-
-    if (isNavigating) {
-      navigate.navigate('PartnerRegister');
-    }
-  };
-
-  const chooseAddProcedureMethod = () => {
-    const {isInView, indexInView} = {...procedure};
-    if (verifyInformation() && isInView) {
-      procedure.isInView = false;
-      editProcedure({procedure: procedure, index: indexInView});
-
-      setErrorMessage('');
-      setProcedure({});
-    }
-
-    if (verifyInformation() && !isInView) {
-      addProcedure({procedure: procedure, isSignup: true});
-      setErrorMessage('');
-      setProcedure({});
-    }
-  };
-
   const goNextPage = () => {
     updateProcedureInView(-1);
     if (verifyInformationToGo()) {
-      navigate.navigate('PartnerRegister');
+      navigate.navigate('SignupPartners');
       setErrorMessage('');
       setProcedure({});
     }
+  };
+
+  const saveProcedure = () => {
+    setIsLoading(true);
+
+    if (verifyInformationToGo()) {
+      saveProcedures().then(
+        () => {
+          setIsLoading(false);
+          cleanRegisteredProcedures();
+          navigate.navigate('Procedures');
+          setErrorMessage('');
+          setProcedure({});
+        },
+        error => {
+          setIsLoading(false);
+          console.log(error);
+        },
+      );
+    }
+  };
+
+  const updateProcedures = () => {
+    setIsLoading(true);
+    updateProcedure(procedure).then(
+      async () => {
+        setIsLoading(false);
+        navigate.navigate('Procedures');
+        setErrorMessage('');
+        setProcedure({});
+      },
+      error => {
+        setIsLoading(false);
+        console.log(error);
+      },
+    );
+  };
+
+  const deleteProcedures = () => {
+    deleteProcedure(procedure).then(
+      () => {
+        setIsLoading(false);
+        navigate.navigate('Procedures');
+        setErrorMessage('');
+        setProcedure({});
+      },
+      error => {
+        setIsLoading(false);
+        console.log(error);
+      },
+    );
   };
 
   const verifyInformationToGo = () => {
     let ableToGo = true;
-    let errorMessage = '';
     if (Object.keys(procedure).length === 6) {
       addProcedure(procedure);
       return ableToGo;
     } else if (registeredProcedures.length === 0) {
       ableToGo = false;
-      handleModal(true, errorMessages.noProcedureMessage);
+      if (isSigningUp)
+        handleModal(true, errorMessages.noProcedureMessage, false);
+      else setErrorMessage(errorMessages.saveErrorProcedureMessage);
     }
-
-    setErrorMessage(errorMessage);
+    setIsLoading(false);
     return ableToGo;
   };
 
@@ -152,7 +244,7 @@ const ProceduresRegister = () => {
   };
 
   const loadBoxInformation = () =>
-    registeredProcedures.map((procedure, index) => (
+    registeredProcedures?.map((procedure, index) => (
       <S.BoxContent
         onPress={() => handleProcedure(procedure, index)}
         key={index}>
@@ -163,26 +255,27 @@ const ProceduresRegister = () => {
   return (
     <S.Container>
       <S.Content>
-        <S.HeaderContainer>
+        <S.HeaderContent isSigningUp={isSigningUp}>
           <BackButton
-            positionTop={'45px'}
+            positionTop={isSigningUp ? '30px' : '40px'}
+            positionLeft={isSigningUp ? '25px' : '-60px'}
             buttonColor={`${global.colors.purpleColor}`}
-            onPress={navigate.goBack}
+            onPress={() => goBack()}
           />
-          <S.HeaderContent>
-            <S.HeaderTitle>Procedimentos</S.HeaderTitle>
+          <S.HeaderTitle>{pageTitle}</S.HeaderTitle>
+          {pageDescription && (
             <S.HeaderText>
               Cadastre os procedimentos realizados em seu estabelecimento.
               {'\n'}
               Se precisar, você poderá mudar ou adicionar detalhes depois
             </S.HeaderText>
-          </S.HeaderContent>
-        </S.HeaderContainer>
-        <S.BodyContent>
+          )}
+        </S.HeaderContent>
+        <S.BodyContent isSigningUp={isSigningUp}>
           <Input
             handleChange={handleChange}
             name={'name'}
-            placeholder={'Procedimento'}
+            placeholder={'Nome*'}
             value={procedure.name}
             width={'80%'}
             keyboard={'default'}
@@ -195,7 +288,7 @@ const ProceduresRegister = () => {
           <Input
             handleChange={handleChange}
             name={'time'}
-            placeholder={'Hora: minutos'}
+            placeholder={'Hora: minutos*'}
             value={procedure.time}
             width={'80%'}
             keyboard={'numeric'}
@@ -205,27 +298,27 @@ const ProceduresRegister = () => {
             mask={'99:99'}
           />
 
-          <S.ProcedureInformationContent>
-            <S.PriceContent>
-              <Input
-                handleChange={handleChange}
-                name={'price'}
-                placeholder={'Preço'}
-                value={procedure.price}
-                width={'85%'}
-                keyboard={'numeric'}
-                isSecureTextEntry={false}
-                fontSize={18}
-                disabled={false}
-                type={'currency'}
-                options={{
-                  prefix: '$',
-                  decimalSeparator: '.',
-                  groupSeparator: ',',
-                  precision: 2,
-                }}
-              />
+          <Input
+            handleChange={handleChange}
+            name={'price'}
+            placeholder={'Preço*'}
+            value={procedure.price}
+            width={'80%'}
+            keyboard={'numeric'}
+            isSecureTextEntry={false}
+            fontSize={18}
+            disabled={false}
+            type={'currency'}
+            options={{
+              prefix: '$',
+              decimalSeparator: '.',
+              groupSeparator: ',',
+              precision: 2,
+            }}
+          />
 
+          <S.ClientInformationContent>
+            <S.InformationContent isEditing={isEditing}>
               <S.CheckboxContent>
                 <BouncyCheckbox
                   isChecked={procedure.isPercentage}
@@ -236,7 +329,6 @@ const ProceduresRegister = () => {
                   disableBuiltInState={true}
                   disableText={true}
                 />
-
                 <Input
                   handleChange={(text, rawText, name) =>
                     handleChange(text, rawText, name)
@@ -269,7 +361,6 @@ const ProceduresRegister = () => {
                   disableBuiltInState={true}
                   disableText={true}
                 />
-
                 <Input
                   handleChange={(text, rawText, name) =>
                     handleChange(text, rawText, name)
@@ -291,17 +382,18 @@ const ProceduresRegister = () => {
                   }}
                 />
               </S.CheckboxContent>
-            </S.PriceContent>
-
-            <S.RegisteredProceduresContent>
-              <S.RegisteredProceduresBoxTitle>
-                Já Cadastrados
-              </S.RegisteredProceduresBoxTitle>
-              <S.RegisteredProceduresBox>
-                {loadBoxInformation()}
-              </S.RegisteredProceduresBox>
-            </S.RegisteredProceduresContent>
-          </S.ProcedureInformationContent>
+            </S.InformationContent>
+            {!isEditing && (
+              <S.RegisteredProceduresContent>
+                <S.RegisteredProceduresBoxTitle>
+                  Já Cadastrados
+                </S.RegisteredProceduresBoxTitle>
+                <S.RegisteredProceduresBox>
+                  {loadBoxInformation()}
+                </S.RegisteredProceduresBox>
+              </S.RegisteredProceduresContent>
+            )}
+          </S.ClientInformationContent>
         </S.BodyContent>
         <S.FooterContent>
           <S.AddButtonContent>
@@ -313,15 +405,26 @@ const ProceduresRegister = () => {
               />
             )}
 
+            {isLoading && (
+              <S.LoadingContent>
+                <ActivityIndicator
+                  size="large"
+                  color={global.colors.purpleColor}
+                />
+              </S.LoadingContent>
+            )}
+
             <S.ButtonsContent>
-              <SubmitButton
-                text={procedure.isInView ? 'Editar' : 'Adicionar'}
-                onPress={() => chooseAddProcedureMethod()}
-                width={'40%'}
-                height={'30px'}
-                fontSize={'18px'}
-                buttonColor={`${global.colors.purpleColor}`}
-              />
+              {!isEditing && (
+                <SubmitButton
+                  text={procedure.isInView ? 'Editar' : 'Adicionar'}
+                  onPress={() => chooseAddProcedureMethod()}
+                  width={'40%'}
+                  height={'30px'}
+                  fontSize={'18px'}
+                  buttonColor={`${global.colors.purpleColor}`}
+                />
+              )}
 
               {procedure.isInView && (
                 <S.DeleteButton
@@ -335,15 +438,34 @@ const ProceduresRegister = () => {
             </S.ButtonsContent>
           </S.AddButtonContent>
           <S.SubmitButtonContent>
-            <SubmitButton
-              disabled={verifyIfIsEditing()}
-              text={'Avançar'}
-              onPress={() => goNextPage()}
-              width={'40%'}
-              height={'50px'}
-              fontSize={'18px'}
-              buttonColor={`${global.colors.purpleColor}`}
-            />
+            {isSigningUp ? (
+              <SubmitButton
+                disabled={verifyIfIsEditing()}
+                text={'Avançar'}
+                onPress={() => goNextPage()}
+                width={'40%'}
+                height={'50px'}
+                fontSize={'18px'}
+                buttonColor={`${global.colors.purpleColor}`}
+              />
+            ) : (
+              <SubmitButton
+                disabled={verifyIfIsEditing()}
+                text={'Salvar'}
+                onPress={() =>
+                  !isEditing ? saveProcedure() : updateProcedures()
+                }
+                width={'40%'}
+                height={'50px'}
+                fontSize={'18px'}
+                buttonColor={`${global.colors.purpleColor}`}
+              />
+            )}
+            {isEditing && (
+              <S.DeleteButton onPress={() => deleteProcedures(procedure)}>
+                <Icon name="trash" size={17} />
+              </S.DeleteButton>
+            )}
           </S.SubmitButtonContent>
         </S.FooterContent>
       </S.Content>
@@ -362,4 +484,5 @@ const ProceduresRegister = () => {
     </S.Container>
   );
 };
-export default ProceduresRegister;
+
+export default ProcedureRegister;

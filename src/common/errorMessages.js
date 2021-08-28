@@ -8,6 +8,8 @@ export default {
   procedureMessage: 'Nenhum procedimento foi salvo, não é possível avançar',
   noProcedureMessage:
     'Nenhum procedimento foi adicionado, tem certeza que deseja continuar?',
+  saveErrorProcedureMessage:
+    'Não é possível salvar sem procedimentos adicionados.',
   warningMessage: 'Algo deu errado, estamos trabalhando nisso!',
   commissionMessage: 'Adicione um tipo de comissão ao procedimento',
   clientMessage:

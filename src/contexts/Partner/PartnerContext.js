@@ -6,7 +6,13 @@ import {
   getAllPartnersBySalonId,
   saveEmployee,
   updateEmployeeCRUD,
-} from '../../services/Employee';
+} from '../../services/EmployeeService';
+import {getProcedureByName} from '../../services/ProcedureService';
+import {
+  getEmployeeProcedureByFuncFK,
+  getProcedureEmployeeByFuncFK,
+  saveProcedureEmployee,
+} from '../../services/ProcedureEmployeeService';
 
 export const PartnerContext = createContext();
 
@@ -53,7 +59,15 @@ const PartnerProvider = ({children}) => {
     return new Promise((resolve, reject) => {
       try {
         state.registeredPartners.forEach(async partner => {
-          saveEmployee(partner, false).then(newPartner => {
+          saveEmployee(partner, true).then(newPartner => {
+            partner.procedures.map(async procedure => {
+              const procedureEmployeer = {
+                IdProcFK: await getProcedureByName(procedure.item, true),
+                IdFuncFK: newPartner,
+              };
+
+              await saveProcedureEmployee(procedureEmployeer, true);
+            });
             dispatch({type: 'SAVE_PARTNERS', newPartner});
           });
         });
@@ -67,7 +81,14 @@ const PartnerProvider = ({children}) => {
   const updatePartner = payload => {
     return new Promise(async (resolve, reject) => {
       try {
-        updateEmployeeCRUD(payload, false).then(updatedClient => {
+        const {partner, partnerProcedures, deletedProcedures} = payload;
+
+        updateEmployeeCRUD(
+          partner,
+          partnerProcedures,
+          deletedProcedures,
+          false,
+        ).then(updatedClient => {
           dispatch({type: 'UPDATE_CLIENT', updatedClient});
         });
 

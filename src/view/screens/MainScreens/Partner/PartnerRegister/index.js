@@ -10,7 +10,7 @@ import AlertModal from '../../../../components/AlertModal';
 import {ActivityIndicator, View} from 'react-native';
 import BackButton from '../../../../components/BackButton';
 import {UserContext} from '../../../../../contexts/User/UserContext';
-import {getSalonById} from '../../../../../services/Salon';
+import {getSalonById} from '../../../../../services/SalonService';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {PartnerContext} from '../../../../../contexts/Partner/PartnerContext';
 import SelectBox from 'react-native-multi-selectbox';
@@ -20,18 +20,20 @@ import {
   ClientParseObjectToClientObject,
   PartnerParseObjectToPartnerObject,
 } from '../../../../../common/conversor';
+import {getProcedureEmployeeByFuncFK} from '../../../../../services/ProcedureEmployeeService';
 
 const PartnerRegister = ({route}) => {
-  const {registeredProcedures} = useContext(ProcedureContext);
+  const {loadAllProcedures, dropdownProcedures} = useContext(ProcedureContext);
 
-  const [partner, setPartner] = useState({});
+  const [partner, setPartner] = useState({
+    procedures: [],
+  });
   const {
     addPartner,
     editPartner,
     registeredPartners,
     savePartner,
     cleanRegisteredPartners,
-
     updatePartnerInView,
     updatePartner,
     deletePartner,
@@ -48,20 +50,52 @@ const PartnerRegister = ({route}) => {
     text: '',
   });
 
+  const [partnerProcedures, setPartnerProcedures] = useState([]);
+
   const navigate = useNavigation();
 
-  useEffect(() => {
-    navigate.addListener('focus', () => {
-      const partnerInView = route.params?.partner
-        ? PartnerParseObjectToPartnerObject(route.params?.partner)
-        : {};
+  navigate.addListener('focus', async () => {
+    const partnerInView = route.params?.partner
+      ? PartnerParseObjectToPartnerObject(route.params?.partner)
+      : {};
 
-      if (Object.keys(partnerInView).length !== 0) {
-        setPartner(partnerInView);
-        setIsEditing(true);
-      }
-    });
-  }, [navigate]);
+    if (Object.keys(partnerInView).length !== 0) {
+      const partnerProcedures = await getProcedureEmployeeByFuncFK(
+        partnerInView.objectId,
+        false,
+      );
+
+      setPartnerProcedures(partnerProcedures);
+      //
+      partnerInView.procedures = [];
+      partnerInView.deletedProcedures = [];
+      partnerInView.insertedProcedures = [];
+      partnerProcedures.forEach(pp => {
+        partnerInView.procedures.push({
+          id: pp.IdProcFK.objectId,
+          item: pp.IdProcFK.Nome,
+        });
+      });
+
+      setPartner(partnerInView);
+      setIsEditing(true);
+    }
+  });
+
+  useEffect(() => {
+    setIsLoading(true);
+    const getAllProcedures = async () => {
+      await loadAllProcedures(currentUser.idSalon).then(
+        () => setIsLoading(false),
+        error => {
+          console.log(error);
+          setIsLoading(false);
+        },
+      );
+      setIsLoading(false);
+    };
+    getAllProcedures();
+  }, []);
 
   useEffect(() => {
     registeredPartners.forEach(partner => (partner.isInView = false));
@@ -74,8 +108,30 @@ const PartnerRegister = ({route}) => {
     });
   };
 
-  const handleMultiSelect = item => {
-    let selectedItem = xorBy(partner.registeredProcedures, [item], 'name');
+  const handleMultiSelect = (item, method) => {
+    //Não funciona a edição
+    if (method === 'DEL') {
+      if (!partnerProcedures.every(pp => pp.IdProcFK.Nome !== item.item)) {
+        partner.insertedProcedures.splice(
+          partner.insertedProcedures.indexOf(item),
+          1,
+        );
+
+        partner.deletedProcedures.push(item);
+      }
+    } else if (method === 'ADD') {
+      if (partnerProcedures.every(pp => pp.IdProcFK.Nome !== item.item)) {
+        partner.deletedProcedures.splice(
+          partner.deletedProcedures.indexOf(item),
+          1,
+        );
+        partner.insertedProcedures.push(item);
+      }
+    }
+
+    console.log(partner.insertedProcedures);
+    console.log(partner.deletedProcedures);
+    let selectedItem = xorBy(partner.procedures, [item], 'item');
 
     setPartner({
       ...partner,
@@ -98,14 +154,14 @@ const PartnerRegister = ({route}) => {
       partner.isInView = false;
       editPartner({partner: partner, index: indexInView});
       setErrorMessage('');
-      setPartner({});
+      setPartner({procedures: []});
     }
 
     if (verifyInformation() && !isInView) {
       partner.IdSalaoFK = await getSalonById(currentUser.idSalon, true);
       addPartner(partner);
       setErrorMessage('');
-      setPartner({});
+      setPartner({procedures: []});
     }
   };
 
@@ -117,7 +173,7 @@ const PartnerRegister = ({route}) => {
     setPartner(partner);
 
     if (!verifyIfIsEditing()) {
-      setPartner({});
+      setPartner({procedures: []});
     }
   };
 
@@ -135,7 +191,7 @@ const PartnerRegister = ({route}) => {
           cleanRegisteredPartners();
           navigate.navigate('Partners');
           setErrorMessage('');
-          setPartner({});
+          setPartner({procedures: []});
         },
         error => {
           setIsLoading(false);
@@ -147,12 +203,15 @@ const PartnerRegister = ({route}) => {
 
   const updatePartners = () => {
     setIsLoading(true);
-    updatePartner(partner).then(
+    updatePartner({
+      partner: partner,
+      partnerProcedures: partnerProcedures,
+    }).then(
       async () => {
         setIsLoading(false);
         navigate.navigate('Partners');
         setErrorMessage('');
-        setPartner({});
+        setPartner({procedures: []});
       },
       error => {
         setIsLoading(false);
@@ -167,7 +226,7 @@ const PartnerRegister = ({route}) => {
         setIsLoading(false);
         navigate.navigate('Partners');
         setErrorMessage('');
-        setPartner({});
+        setPartner({procedures: []});
       },
       error => {
         setIsLoading(false);
@@ -224,8 +283,8 @@ const PartnerRegister = ({route}) => {
       <S.Content>
         <S.HeaderContent>
           <BackButton
-            positionTop={'20px'}
-            positionLeft={'-35px'}
+            positionTop={'23px'}
+            positionLeft={'-5px'}
             buttonColor={`${global.colors.lightBlueColor}`}
             onPress={() => navigate.navigate('Partners')}
           />
@@ -294,10 +353,10 @@ const PartnerRegister = ({route}) => {
               marginTop: 20,
             }}>
             <SelectBox
-              options={registeredProcedures}
+              options={dropdownProcedures}
               selectedValues={partner.procedures}
-              onMultiSelect={handleMultiSelect}
-              onTapClose={handleMultiSelect}
+              onMultiSelect={item => handleMultiSelect(item, 'ADD')}
+              onTapClose={item => handleMultiSelect(item, 'DEL')}
               isMulti
             />
           </View>
@@ -334,7 +393,7 @@ const PartnerRegister = ({route}) => {
               <S.DeleteButton
                 onPress={() => {
                   deletePartnerInView(partner);
-                  setPartner({});
+                  setPartner({procedures: []});
                 }}>
                 <Icon name="trash" size={17} />
               </S.DeleteButton>

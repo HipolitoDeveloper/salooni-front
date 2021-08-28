@@ -5,15 +5,16 @@ import {
   getAllProceduresBySalonId,
   saveProcedure,
   updateProcedureCRUD,
-} from '../../services/Procedure';
-import {getSalonById} from '../../services/Salon';
-import {getEmployeeById} from '../../services/Employee';
+} from '../../services/ProcedureService';
+import {getSalonById} from '../../services/SalonService';
+import {getEmployeeById} from '../../services/EmployeeService';
 
 export const ProcedureContext = createContext();
 
 const initialState = {
   procedures: [],
   registeredProcedures: [],
+  dropdownProcedures: [],
 };
 
 const ProcedureProvider = ({children}) => {

@@ -48,7 +48,7 @@ const OwnerRegister = () => {
     if (verifyInformation()) {
       setErrorMessage('');
       saveOwnerInformation(ownerData);
-      navigate.navigate('ProceduresRegister');
+      navigate.navigate('SignupProcedures');
     }
   };
 

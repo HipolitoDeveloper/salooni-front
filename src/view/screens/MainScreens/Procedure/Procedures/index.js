@@ -7,16 +7,7 @@ import ActionButton from 'react-native-circular-action-menu';
 import {UserContext} from '../../../../../contexts/User/UserContext';
 import {useNavigation} from '@react-navigation/native';
 import {ProcedureContext} from '../../../../../contexts/Procedure/ProcedureContext';
-import {
-  BoxComissionLabel,
-  BoxEmployee,
-  BoxEmployeeInformation,
-  BoxEmployeeName,
-  BoxMainInformations,
-  BoxName,
-  BoxPrice,
-  BoxTime,
-} from './styled';
+
 const Partners = () => {
   const {loadAllProcedures, procedures} = useContext(ProcedureContext);
 
@@ -47,7 +38,7 @@ const Partners = () => {
       key={index}
       onPress={() => {
         navigate.push('ApplicationStack', {
-          screen: 'ProcedureRegister',
+          screen: 'ProcedureForm',
           params: {procedure: procedure},
         });
       }}>
@@ -123,7 +114,7 @@ const Partners = () => {
               buttonColor={`${global.colors.purpleColor}`}
               onPress={() => {
                 navigate.push('ApplicationStack', {
-                  screen: 'ProcedureRegister',
+                  screen: 'ProcedureForm',
                 });
               }}
             />

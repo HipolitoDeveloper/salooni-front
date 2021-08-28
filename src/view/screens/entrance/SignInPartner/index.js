@@ -182,6 +182,7 @@ const SignInPartner = () => {
                 placeholderTextColor={'grey'}
                 placeholder={'Senha'}
                 value={userData.password}
+                secureTextEntry={true}
               />
 
               <S.Input
@@ -191,6 +192,7 @@ const SignInPartner = () => {
                 placeholderTextColor={'grey'}
                 placeholder={'Confirme a senha'}
                 value={userData.confirmPassword}
+                secureTextEntry={true}
               />
             </>
           ) : (

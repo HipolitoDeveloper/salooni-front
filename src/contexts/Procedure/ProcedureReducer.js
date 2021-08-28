@@ -1,10 +1,19 @@
+import {convertToObj} from '../../common/conversor';
+
 export const ProcedureReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_PROCEDURES':
       state.procedures = action.procedures;
+      state.dropdownProcedures = action.procedures.map(procedure => {
+        return {
+          id: procedure.objectId,
+          item: procedure.Nome,
+        };
+      });
 
       return {
         procedures: state.procedures,
+        dropdownProcedures: state.dropdownProcedures,
         ...state,
       };
     case 'ADD_PROCEDURE':
@@ -57,7 +66,7 @@ export const ProcedureReducer = (state, action) => {
         ...state,
       };
     case 'SAVE_PROCEDURES':
-      state.procedures.push(action.newProcedure);
+      state.procedures.push(convertToObj(action.newProcedure));
       return {
         procedures: state.procedures,
         ...state,
