@@ -23,6 +23,26 @@ export const getProcedureEmployeeByFuncFK = (funcfk, returnParseObject) => {
   });
 };
 
+export const getProcedureEmployeeById = (
+  procedureEmployeeId,
+  returnParseObject,
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const ProcedureEmployeeQuery = new Parse.Query(ProcedureEmployeeObject);
+      ProcedureEmployeeQuery.equalTo('objectId', procedureEmployeeId);
+
+      if (returnParseObject) {
+        resolve(await ProcedureEmployeeQuery.first());
+      } else {
+        resolve(convertToObj(await ProcedureEmployeeQuery.first()));
+      }
+    } catch (e) {
+      reject(`Procedimento ${JSON.stringify(e)}`);
+    }
+  });
+};
+
 export const saveProcedureEmployee = (
   procedureEmployeeObj,
   returnParseObject,
@@ -54,29 +74,23 @@ export const saveProcedureEmployee = (
 };
 
 export const deleteProcedureEmployee = (
-  procedureEmployeeObj,
+  procedureEmployeeId,
   returnParseObject,
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const {IdProcFK, IdFuncFK} = procedureEmployeeObj;
-
-      const newProcedureEmployee = new ProcedureEmployeeObject();
-      newProcedureEmployee.set('IdFuncFK', IdFuncFK);
-      newProcedureEmployee.set('IdProcFK', IdProcFK);
-
-      newProcedureEmployee.save().then(
-        savedProcedureEmployee => {
-          if (returnParseObject) {
-            resolve(savedProcedureEmployee);
-          } else {
-            resolve(convertToObj(savedProcedureEmployee));
-          }
-        },
-        error => {
-          reject(`Procedimento ${JSON.stringify(error)}`);
-        },
+      console.log(procedureEmployeeId);
+      const procedureEmployee = await getProcedureEmployeeById(
+        procedureEmployeeId,
+        true,
       );
+      procedureEmployee.destroy().then(deletedProcedureEmployee => {
+        if (returnParseObject) {
+          resolve(deletedProcedureEmployee);
+        } else {
+          resolve(convertToObj(deletedProcedureEmployee));
+        }
+      });
     } catch (e) {
       reject(`Procedimento ${JSON.stringify(e)}`);
     }

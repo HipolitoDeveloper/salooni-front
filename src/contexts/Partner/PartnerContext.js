@@ -8,11 +8,7 @@ import {
   updateEmployeeCRUD,
 } from '../../services/EmployeeService';
 import {getProcedureByName} from '../../services/ProcedureService';
-import {
-  getEmployeeProcedureByFuncFK,
-  getProcedureEmployeeByFuncFK,
-  saveProcedureEmployee,
-} from '../../services/ProcedureEmployeeService';
+import {saveProcedureEmployee} from '../../services/ProcedureEmployeeService';
 
 export const PartnerContext = createContext();
 

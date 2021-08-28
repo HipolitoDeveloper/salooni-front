@@ -66,10 +66,8 @@ const PartnerRegister = ({route}) => {
       );
 
       setPartnerProcedures(partnerProcedures);
-      //
       partnerInView.procedures = [];
-      partnerInView.deletedProcedures = [];
-      partnerInView.insertedProcedures = [];
+
       partnerProcedures.forEach(pp => {
         partnerInView.procedures.push({
           id: pp.IdProcFK.objectId,
@@ -108,29 +106,7 @@ const PartnerRegister = ({route}) => {
     });
   };
 
-  const handleMultiSelect = (item, method) => {
-    //Não funciona a edição
-    if (method === 'DEL') {
-      if (!partnerProcedures.every(pp => pp.IdProcFK.Nome !== item.item)) {
-        partner.insertedProcedures.splice(
-          partner.insertedProcedures.indexOf(item),
-          1,
-        );
-
-        partner.deletedProcedures.push(item);
-      }
-    } else if (method === 'ADD') {
-      if (partnerProcedures.every(pp => pp.IdProcFK.Nome !== item.item)) {
-        partner.deletedProcedures.splice(
-          partner.deletedProcedures.indexOf(item),
-          1,
-        );
-        partner.insertedProcedures.push(item);
-      }
-    }
-
-    console.log(partner.insertedProcedures);
-    console.log(partner.deletedProcedures);
+  const handleMultiSelect = item => {
     let selectedItem = xorBy(partner.procedures, [item], 'item');
 
     setPartner({
@@ -355,8 +331,8 @@ const PartnerRegister = ({route}) => {
             <SelectBox
               options={dropdownProcedures}
               selectedValues={partner.procedures}
-              onMultiSelect={item => handleMultiSelect(item, 'ADD')}
-              onTapClose={item => handleMultiSelect(item, 'DEL')}
+              onMultiSelect={item => handleMultiSelect(item)}
+              onTapClose={item => handleMultiSelect(item)}
               isMulti
             />
           </View>

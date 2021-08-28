@@ -2,7 +2,7 @@ import Parse from 'parse/react-native';
 import {convertToObj} from '../common/conversor';
 import {getSalonById} from './SalonService';
 import {
-  getProcedureEmployeeByFuncFK,
+  deleteProcedureEmployee,
   saveProcedureEmployee,
 } from './ProcedureEmployeeService';
 import {getProcedureByName} from './ProcedureService';
@@ -121,72 +121,35 @@ export const updateEmployeeCRUD = (
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const {
-        name,
-        tel,
-        cnpj,
-        email,
-        procedures,
-        objectId,
-        deletedProcedures,
-        insertedProcedures,
-      } = partnerObj;
+      const {name, tel, cnpj, email, procedures, objectId} = partnerObj;
       const employee = await getEmployeeById(objectId, true);
-      const employeeProcedures = await getProcedureEmployeeByFuncFK(
-        objectId,
-        false,
-      );
 
-      console.log(deletedProcedures);
-      let proceduresToInsert = [];
-      let proceduresToDelete = [];
+      proceduresList.map(async pl => {
+        if (!procedures.some(p => p.item === pl.IdProcFK.Nome)) {
+          await deleteProcedureEmployee(pl.objectId);
+        }
+      });
 
-      // if (employeeProcedures.length !== procedures.length) {
-      // employeeProcedures.forEach(ep => {
-      //   if (deletedProcedures.some(dp => dp.item === ep.IdProcFK.Nome))
-      //     proceduresToDelete.push(ep);
-      //
-      //   proceduresToInsert.push(
-      //     insertedProcedures.find(dp => dp.item !== ep.IdProcFK.Nome),
-      //   );
-      // });
-      //
-      // insertedProcedures.forEach(ip => {
-      //   if (proceduresToDelete.some(pd => ip === pd.IdProcFK.Nome)) {
-      //     console.log(ip.item);
-      //   }
-      // });
+      procedures.map(async p => {
+        if (!proceduresList.some(pl => pl.IdProcFK.Nome === p.item)) {
+          const procedureEmployeer = {
+            IdProcFK: await getProcedureByName(p.item, true),
+            IdFuncFK: employee,
+          };
+          await saveProcedureEmployee(procedureEmployeer, false);
+        }
+      });
 
-      // }
+      employee.set('Nome', name.trim());
+      employee.set('CNPJ', cnpj);
+      employee.set('Telefone', tel);
+      employee.set('Email', email.trim());
 
-      // let deletedProcedures = [];
-      // employeeProcedures.forEach(ep => {
-      //   deletedProcedures.push(
-      //     procedures.find(ep => p.item === ep.IdProcFK.Nome),
-      //   );
-      // });
-
-      // if (newProcedure) {
-      //   const procedureEmployeer = {
-      //     IdProcFK: await getProcedureByName(p.item, true),
-      //     IdFuncFK: employee,
-      //   };
-      //   await saveProcedureEmployee(procedureEmployeer, false);
-      // } else {
-      // }
-      // }
-
-      //
-      // employee.set('Nome', name.trim());
-      // employee.set('CNPJ', cnpj);
-      // employee.set('Telefone', tel);
-      // employee.set('Email', email.trim());
-      //
-      // if (returnParseObject) {
-      //   resolve(await employee.save());
-      // } else {
-      //   resolve(convertToObj(await employee.save()));
-      // }
+      if (returnParseObject) {
+        resolve(await employee.save());
+      } else {
+        resolve(convertToObj(await employee.save()));
+      }
     } catch (e) {
       reject(`Empregador ${JSON.stringify(e)}`);
     }
