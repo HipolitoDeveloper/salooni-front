@@ -187,6 +187,7 @@ const ProcedureRegister = ({
   };
 
   const deleteProcedures = () => {
+    setIsLoading(true);
     deleteProcedure(procedure).then(
       () => {
         setIsLoading(false);
@@ -233,10 +234,21 @@ const ProcedureRegister = ({
       errorMessage = errorMessages.procedureMessage;
     } else if (
       (procedure.percentage === undefined || procedure.percentage === '') &&
-      (procedure.fixedValue === undefined || procedure.value === '')
+      (procedure.fixedValue === undefined || procedure.fixedValue === '')
     ) {
       ableToGo = false;
       errorMessage = errorMessages.commissionMessage;
+    } else {
+      const procedureValue = parseFloat(
+        procedure.price !== 0 ? procedure.price.replace('$', '') : 0,
+      );
+      const commissionValue = parseFloat(
+        procedure.fixedValue !== 0 ? procedure.fixedValue.replace('$', '') : 0,
+      );
+      if (commissionValue > procedureValue) {
+        errorMessage = errorMessages.commissionMismatchMessage;
+        ableToGo = false;
+      }
     }
 
     setErrorMessage(errorMessage);
@@ -295,7 +307,7 @@ const ProcedureRegister = ({
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'99:99'}
+            mask={'9:99'}
           />
 
           <Input
@@ -462,7 +474,8 @@ const ProcedureRegister = ({
               />
             )}
             {isEditing && (
-              <S.DeleteButton onPress={() => deleteProcedures(procedure)}>
+              <S.DeleteButton
+                onPress={() => handleModal(true, errorMessages.deleteMessage)}>
                 <Icon name="trash" size={17} />
               </S.DeleteButton>
             )}
@@ -474,10 +487,12 @@ const ProcedureRegister = ({
         text={showAlertModal.text}
         isVisible={showAlertModal.isShowing}
         onClose={() => {
-          handleModal('', false, false);
+          handleModal(false, '', false);
         }}
         onOk={() => {
-          handleModal('', false, true);
+          isSigningUp
+            ? handleModal(false, '', true)
+            : deleteProcedures(procedure);
         }}
         title={'Atenção.'}
       />

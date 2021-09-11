@@ -1,6 +1,7 @@
 import Parse from 'parse/react-native';
 import {convertToObj} from '../common/conversor';
 import {getEmployeeById} from './EmployeeService';
+import {getProcedureById} from './ProcedureService';
 
 const ProcedureEmployeeObject = Parse.Object.extend('ProcedimentoXFuncionario');
 
@@ -12,6 +13,29 @@ export const getProcedureEmployeeByFuncFK = (funcfk, returnParseObject) => {
       const ProcedureEmployeeQuery = new Parse.Query(ProcedureEmployeeObject);
       ProcedureEmployeeQuery.equalTo('IdFuncFK', employee);
       ProcedureEmployeeQuery.include('IdProcFK');
+      if (returnParseObject) {
+        resolve(await ProcedureEmployeeQuery.find());
+      } else {
+        resolve(convertToObj(await ProcedureEmployeeQuery.find()));
+      }
+    } catch (e) {
+      reject(`Procedimento ${JSON.stringify(e)}`);
+    }
+  });
+};
+
+export const getProcedureEmployeeByProcedureId = (
+  procedureId,
+  returnParseObject,
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const procedure = await getProcedureById(procedureId, true);
+
+      const ProcedureEmployeeQuery = new Parse.Query(ProcedureEmployeeObject);
+      ProcedureEmployeeQuery.equalTo('IdProcFK', procedure);
+      ProcedureEmployeeQuery.include('IdFuncFK');
+
       if (returnParseObject) {
         resolve(await ProcedureEmployeeQuery.find());
       } else {
@@ -73,13 +97,12 @@ export const saveProcedureEmployee = (
   });
 };
 
-export const deleteProcedureEmployee = (
+export const deleteProcedureEmployeeById = (
   procedureEmployeeId,
   returnParseObject,
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log(procedureEmployeeId);
       const procedureEmployee = await getProcedureEmployeeById(
         procedureEmployeeId,
         true,
@@ -95,4 +118,33 @@ export const deleteProcedureEmployee = (
       reject(`Procedimento ${JSON.stringify(e)}`);
     }
   });
+};
+
+export const deleteProcedureEmployeeByFuncId = async employeeId => {
+  try {
+    const proceduresEmployee = await getProcedureEmployeeByFuncFK(
+      employeeId,
+      true,
+    );
+
+    proceduresEmployee.map(async pe => {
+      await pe.destroy();
+    });
+  } catch (e) {
+    console.error(`Procedimento ${JSON.stringify(e)}`);
+  }
+};
+
+export const deleteProcedureEmployeeByProcedureId = async procedureId => {
+  try {
+    const proceduresEmployee = await getProcedureEmployeeByProcedureId(
+      procedureId,
+      true,
+    );
+    proceduresEmployee.map(async pe => {
+      await pe.destroy();
+    });
+  } catch (e) {
+    console.error(`Procedimento ${JSON.stringify(e)}`);
+  }
 };

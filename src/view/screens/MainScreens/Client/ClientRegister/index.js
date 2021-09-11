@@ -69,12 +69,8 @@ const ClientRegister = ({route}) => {
     });
   };
 
-  const handleModal = (isShowing, text, isNavigating) => {
+  const handleModal = (isShowing, text) => {
     setShowAlertModal({isShowing: isShowing, text: text});
-
-    if (isNavigating) {
-      navigate.navigate('Clients');
-    }
   };
 
   const chooseAddClientMethod = async () => {
@@ -148,6 +144,7 @@ const ClientRegister = ({route}) => {
   };
 
   const deleteClients = () => {
+    setIsLoading(true);
     deleteClient(client).then(
       () => {
         setIsLoading(false);
@@ -215,7 +212,7 @@ const ClientRegister = ({route}) => {
         <S.HeaderContent>
           <BackButton
             positionTop={'20px'}
-            positionLeft={'-35px'}
+            positionLeft={'-8px'}
             buttonColor={`${global.colors.blueColor}`}
             onPress={() => {
               navigate.goBack();
@@ -370,7 +367,8 @@ const ClientRegister = ({route}) => {
               buttonColor={`${global.colors.blueColor}`}
             />
             {isEditing && (
-              <S.DeleteButton onPress={() => deleteClients(client)}>
+              <S.DeleteButton
+                onPress={() => handleModal(true, errorMessages.deleteMessage)}>
                 <Icon name="trash" size={17} />
               </S.DeleteButton>
             )}
@@ -382,10 +380,10 @@ const ClientRegister = ({route}) => {
         text={showAlertModal.text}
         isVisible={showAlertModal.isShowing}
         onClose={() => {
-          handleModal('', false, false);
+          handleModal(false, '');
         }}
         onOk={() => {
-          handleModal('', false, true);
+          deleteClients();
         }}
         title={'Atenção.'}
       />

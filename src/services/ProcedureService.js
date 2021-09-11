@@ -3,6 +3,7 @@ import {convertToObj} from '../common/conversor';
 import {saveCommission} from './Commission';
 import {getSalonById} from './SalonService';
 import {getEmployeeById} from './EmployeeService';
+import {deleteProcedureEmployeeByProcedureId} from './ProcedureEmployeeService';
 
 const ProcedureObject = Parse.Object.extend('Procedimento');
 
@@ -100,6 +101,7 @@ export const deleteProcedureCRUD = (procedureId, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
       const procedure = await getProcedureById(procedureId, true);
+      await deleteProcedureEmployeeByProcedureId(procedureId);
       procedure.destroy().then(deletedProcedure => {
         if (returnParseObject) {
           resolve(deletedProcedure);

@@ -5,8 +5,16 @@ export const ClientReducer = (state, action) => {
     case 'LOAD_CLIENTS':
       state.clients = action.clients;
 
+      state.dropdownClients = action.clients.map(client => {
+        return {
+          id: client.objectId,
+          item: client.Nome,
+        };
+      });
+
       return {
         clients: state.clients,
+        dropdownClients: state.dropdownClients,
         ...state,
       };
     case 'ADD_CLIENT':

@@ -115,12 +115,8 @@ const PartnerRegister = ({route}) => {
     });
   };
 
-  const handleModal = (isShowing, text, isNavigating) => {
+  const handleModal = (isShowing, text) => {
     setShowAlertModal({isShowing: isShowing, text: text});
-
-    if (isNavigating) {
-      navigate.navigate('PartnerRegister');
-    }
   };
 
   const chooseAddPartnerMethod = async () => {
@@ -197,6 +193,7 @@ const PartnerRegister = ({route}) => {
   };
 
   const deletePartners = () => {
+    setIsLoading(true);
     deletePartner(partner).then(
       () => {
         setIsLoading(false);
@@ -416,7 +413,8 @@ const PartnerRegister = ({route}) => {
               buttonColor={`${global.colors.lightBlueColor}`}
             />
             {isEditing && (
-              <S.DeleteButton onPress={() => deletePartners(partner)}>
+              <S.DeleteButton
+                onPress={() => handleModal(true, errorMessages.deleteMessage)}>
                 <Icon name="trash" size={17} />
               </S.DeleteButton>
             )}
@@ -428,10 +426,10 @@ const PartnerRegister = ({route}) => {
         text={showAlertModal.text}
         isVisible={showAlertModal.isShowing}
         onClose={() => {
-          handleModal('', false, false);
+          handleModal(false, '', false);
         }}
         onOk={() => {
-          handleModal('', false, true);
+          deletePartners(partner);
         }}
         title={'Atenção.'}
       />

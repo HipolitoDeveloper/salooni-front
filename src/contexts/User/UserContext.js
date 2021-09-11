@@ -1,4 +1,4 @@
-import React, {createContext, useReducer} from 'react';
+import React, {createContext, useEffect, useReducer} from 'react';
 import Parse from 'parse/react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {convertToObj} from '../../common/conversor';
@@ -15,6 +15,7 @@ import {
 } from '../../services/ProcedureService';
 import {saveProcedureEmployee} from '../../services/ProcedureEmployeeService';
 import {getSalonById, saveSalon} from '../../services/SalonService';
+import {buildCurrentUser} from '../../factory/User';
 
 export const UserContext = createContext();
 
@@ -28,8 +29,21 @@ const initialState = {
 const UserProvider = ({children}) => {
   const [state, dispatch] = useReducer(UserReducer, initialState);
 
-  const setCurrentUser = async user => {
-    dispatch({type: 'SET_CURRENT_USER', user});
+  useEffect(() => {
+    const verifyUser = async () => {
+      await setCurrentUser(true, await Parse.User.currentAsync());
+    };
+    verifyUser();
+  }, []);
+
+  const setCurrentUser = async (isLogging, user) => {
+    if (isLogging) {
+      await buildCurrentUser(user).then(currentUser => {
+        dispatch({type: 'SET_CURRENT_USER', currentUser});
+      });
+    } else {
+      dispatch({type: 'SET_CURRENT_USER', currentUser: user});
+    }
   };
 
   const verifyOwner = userData => {
@@ -121,25 +135,8 @@ const UserProvider = ({children}) => {
       try {
         await Parse.User.logIn(userData.email.trim(), userData.password).then(
           async user => {
-            const stringfiedUser = convertToObj(user);
-
-            if (stringfiedUser.primeiroAcesso) {
-              stringfiedUser.primeiroAcesso = false;
-              await updateUser(stringfiedUser);
-            }
-
-            const employeeObj = await getEmployeeById(
-              stringfiedUser.IdFuncFK.objectId,
-            );
-            const currentUser = {
-              id: stringfiedUser.objectId,
-              idFunc: stringfiedUser.IdFuncFK.objectId,
-              idSalon: employeeObj.IdSalaoFK.objectId,
-              typeEmployee: stringfiedUser.IdFuncFK.TipoFunc,
-            };
-
-            await setCurrentUser(currentUser);
-            resolve(currentUser);
+            await setCurrentUser(true, user);
+            resolve('Deu certo');
           },
         );
       } catch (e) {

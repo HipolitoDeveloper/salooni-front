@@ -15,6 +15,7 @@ export const PartnerContext = createContext();
 const initialState = {
   partners: [],
   registeredPartners: [],
+  dropdownPartners: [],
 };
 
 const PartnerProvider = ({children}) => {
@@ -99,6 +100,7 @@ const PartnerProvider = ({children}) => {
     return new Promise(async (resolve, reject) => {
       try {
         dispatch({type: 'DELETE_PARTNER', payload});
+
         resolve(await deleteEmployeeCRUD(payload.objectId));
       } catch (e) {
         reject(`Deu ruim ao excluir parceiros ${e}`);

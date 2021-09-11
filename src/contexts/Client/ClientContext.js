@@ -13,6 +13,7 @@ const initialState = {
   clients: [],
   registeredClients: [],
   clientInView: {},
+  dropdownClients: [],
 };
 
 const ClientProvider = ({children}) => {

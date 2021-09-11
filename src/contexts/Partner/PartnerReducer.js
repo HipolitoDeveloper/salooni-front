@@ -8,8 +8,16 @@ export const PartnerReducer = (state, action) => {
     case 'LOAD_PARTNERS':
       state.partners = action.partners;
 
+      state.dropdownPartners = action.partners.map(partner => {
+        return {
+          id: partner.objectId,
+          item: partner.Nome,
+        };
+      });
+
       return {
         partners: state.partners,
+        dropdownPartners: state.dropdownPartners,
         ...state,
       };
     case 'ADD_PARTNER':

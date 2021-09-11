@@ -20,7 +20,7 @@ export const UserReducer = (state, action) => {
       };
 
     case 'SET_CURRENT_USER':
-      state.currentUser = action.user;
+      state.currentUser = action.currentUser;
       return {
         currentUser: state.currentUser,
       };

@@ -5,6 +5,7 @@ import Parse from 'parse/react-native.js';
 import keys from './src/config/server_connection';
 import {NavigationContainer} from '@react-navigation/native';
 import UserProvider from './src/contexts/User/UserContext';
+import ClientProvider from './src/contexts/Client/ClientContext';
 
 Parse.setAsyncStorage(AsyncStorage);
 Parse.initialize(keys.applicationId, keys.javascriptKey, 'master');
@@ -14,7 +15,9 @@ export default () => {
   return (
     <NavigationContainer>
       <UserProvider>
-        <MainStack />
+        <ClientProvider>
+          <MainStack />
+        </ClientProvider>
       </UserProvider>
     </NavigationContainer>
   );

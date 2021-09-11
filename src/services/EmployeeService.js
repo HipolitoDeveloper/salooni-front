@@ -2,7 +2,8 @@ import Parse from 'parse/react-native';
 import {convertToObj} from '../common/conversor';
 import {getSalonById} from './SalonService';
 import {
-  deleteProcedureEmployee,
+  deleteProcedureEmployeeByFuncId,
+  deleteProcedureEmployeeById,
   saveProcedureEmployee,
 } from './ProcedureEmployeeService';
 import {getProcedureByName} from './ProcedureService';
@@ -101,6 +102,7 @@ export const deleteEmployeeCRUD = (partnerId, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
       const partner = await getEmployeeById(partnerId, true);
+      await deleteProcedureEmployeeByFuncId(partnerId);
       partner.destroy().then(deletedPartner => {
         if (returnParseObject) {
           resolve(deletedPartner);
@@ -126,7 +128,7 @@ export const updateEmployeeCRUD = (
 
       proceduresList.map(async pl => {
         if (!procedures.some(p => p.item === pl.IdProcFK.Nome)) {
-          await deleteProcedureEmployee(pl.objectId);
+          await deleteProcedureEmployeeById(pl.objectId);
         }
       });
 

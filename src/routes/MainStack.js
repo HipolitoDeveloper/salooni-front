@@ -3,15 +3,14 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Parse from 'parse/react-native';
 
 import EntranceStack from './EntranceStack';
-import UserProvider, {UserContext} from '../contexts/User/UserContext';
+import {UserContext} from '../contexts/User/UserContext';
 
-import AsyncStorage from '@react-native-community/async-storage';
 import SignupStack from './SignupStack';
-import ClientProvider, {ClientContext} from '../contexts/Client/ClientContext';
+import {ClientContext} from '../contexts/Client/ClientContext';
 import ProcedureProvider from '../contexts/Procedure/ProcedureContext';
 import PartnerProvider from '../contexts/Partner/PartnerContext';
 import ApplicationStack from './ApplicationStack';
-import SchedulingCalendar from '../view/screens/MainScreens/Calendar/SchedulingCalendar';
+import ScheduleProvider from '../contexts/Schedule/ScheduleContext';
 
 const Stack = createStackNavigator();
 
@@ -19,13 +18,14 @@ export const MainStack = () => {
   const [isLoading, setIsLoading] = useState(false); // Implementar splashscreen
 
   const {currentUser} = useContext(UserContext);
+  const {loadAllClients} = useContext(ClientContext);
 
-  const isLoggedIn = Object.keys(currentUser).length > 0;
+  const isLoggedIn = !!currentUser;
 
   return (
-    <ClientProvider>
-      <ProcedureProvider>
-        <PartnerProvider>
+    <ProcedureProvider>
+      <PartnerProvider>
+        <ScheduleProvider>
           <Stack.Navigator
             initialRouteName={'ApplicationStack'}
             screenOptions={{
@@ -43,8 +43,8 @@ export const MainStack = () => {
               </Stack.Group>
             )}
           </Stack.Navigator>
-        </PartnerProvider>
-      </ProcedureProvider>
-    </ClientProvider>
+        </ScheduleProvider>
+      </PartnerProvider>
+    </ProcedureProvider>
   );
 };

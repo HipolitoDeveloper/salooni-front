@@ -11,7 +11,7 @@ export default ({state, navigation}) => {
   const {setCurrentUser} = useContext(UserContext);
   const doLogout = async () => {
     await Parse.User.logOut().then(async () => {
-      setCurrentUser({});
+      setCurrentUser(false, null);
       await AsyncStorage.clear().then(() => {
         navigation.navigate('EntranceStack');
       });
