@@ -3,7 +3,7 @@ import global from '../../../../../common/global';
 import {StyleSheet} from 'react-native';
 
 export const Container = styled.View`
-  background-color: ${global.colors.lightGreyColor};
+  background-color: ${global.colors.backgroundColor};
 `;
 
 export const Content = styled.View`

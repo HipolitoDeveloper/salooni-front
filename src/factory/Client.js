@@ -1,14 +1,27 @@
-import {buildSalonObject} from './Salon';
-
 export const buildClientObject = client => {
   return {
     id: client.objectId,
-    bornDate: client.Aniversario,
-    tel: client.Telefone,
-    tel2: client.Telefone2,
-    cpf: client.CPF,
+    bornDate: client.birthdate,
+    tel: client.tel,
+    tel2: client.tel2,
+    cpf: client.cpf,
     // salon: buildSalonObject(client.IdSalaoFK),
-    name: client.Nome,
-    email: client.Email,
+    name: client.name,
+    email: client.email,
   };
+};
+
+export const buildClientList = clients => {
+  return clients.map(client => {
+    return {
+      id: client.objectId,
+      bornDate: client.birthdate,
+      tel: client.tel,
+      tel2: client.tel2,
+      cpf: client.cpf,
+      // salon: buildSalonObject(client.IdSalaoFK),
+      name: client.name,
+      email: client.email,
+    };
+  });
 };

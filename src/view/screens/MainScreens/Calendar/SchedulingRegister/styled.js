@@ -37,21 +37,14 @@ export const HeaderTitle = styled.View`
 `;
 
 export const HeaderText = styled.Text`
-  font-size: 16px;
+  font-size: 18px;
   font-family: ${global.fonts.s};
   text-align: center;
+  color: ${global.colors.purpleColor};
 `;
 
 export const BodyContent = styled.View`
-  height: 80%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-`;
-
-export const SelectContent = styled.View`
-  height: 68%;
+  height: 70%;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -66,11 +59,10 @@ export const RegisteredProceduresContent = styled.View`
 `;
 
 export const RegisteredProceduresBox = styled.View`
-  margin-top: 10px;
   border-width: ${StyleSheet.hairlineWidth}px;
   border-color: ${global.colors.purpleColor};
-  height: 120px;
-  width: 180px;
+  height: 80px;
+  width: 300px;
   border-radius: 10px;
 `;
 
@@ -127,7 +119,7 @@ export const DeleteButton = styled.TouchableOpacity`
   height: 30px;
   width: 30px;
   border-radius: 30px;
-  background-color: ${global.colors.blueColor};
+  background-color: ${global.colors.purpleColor};
   display: flex;
   align-items: center;
   justify-content: center;

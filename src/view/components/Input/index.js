@@ -1,9 +1,14 @@
 import React from 'react';
-import * as S from './styled';
-import {TextInputMask} from 'react-native-masked-text';
-import {StyleSheet, TextInput} from 'react-native';
+import {StyleSheet, TextInput, Text, View} from 'react-native';
 import global from '../../../common/global';
-import {MaskedTextInput} from 'react-native-mask-text';
+import {
+  maskBRL,
+  maskCNPJ,
+  maskCPF,
+  maskDate,
+  maskHour,
+  maskPhone,
+} from '../../../pipe/inputMasks';
 const Input = ({
   handleChange,
   placeholder,
@@ -15,24 +20,53 @@ const Input = ({
   disabled,
   fontSize,
   mask,
-  options,
-  type,
   borderBottomColor,
+  leftPlaceholder,
+  rightPlaceholder,
+  maxLength,
 }) => {
-  if (mask === 'none') {
-    return (
+  const chooseMask = text => {
+    switch (mask) {
+      case 'cpf':
+        return maskCPF(text);
+      case 'phone':
+        return maskPhone(text);
+      case 'cnpj':
+        return maskCNPJ(text);
+      case 'hour':
+        return text;
+      case 'date':
+        return maskDate(text);
+      case 'brl':
+        return maskBRL(text);
+      case 'percentage':
+        return text;
+      case 'email':
+        return text;
+      case 'password':
+        return text;
+      default:
+        return text;
+    }
+  };
+
+  return (
+    <View style={[styles.container, {width: width}]}>
+      {leftPlaceholder && value.length > 0 && (
+        <Text style={[styles.leftPlaceholder]}>{leftPlaceholder}</Text>
+      )}
       <TextInput
         style={[
           styles.input,
           {
+            paddingLeft: leftPlaceholder && value.length ? 30 : 0,
             fontSize: fontSize,
-            width: width,
             borderBottomColor: borderBottomColor
               ? borderBottomColor
               : `${global.colors.purpleColor}`,
           },
         ]}
-        onChangeText={(text, rawText) => handleChange(text, rawText, name)}
+        onChangeText={text => handleChange(chooseMask(text), name)}
         value={value}
         keyboardType={keyboard}
         placeholderTextColor={'grey'}
@@ -40,47 +74,37 @@ const Input = ({
         disabled={disabled}
         secureTextEntry={isSecureTextEntry}
         clearButtonMode={'always'}
-        type={type}
-        options={options}
+        maxLength={maxLength}
       />
-    );
-  } else {
-    return (
-      <>
-        <MaskedTextInput
-          mask={mask}
-          style={[
-            styles.input,
-            {
-              fontSize: fontSize,
-              width: width,
-              borderBottomColor: borderBottomColor
-                ? borderBottomColor
-                : `${global.colors.purpleColor}`,
-            },
-          ]}
-          onChangeText={(text, rawText) => handleChange(text, rawText, name)}
-          value={value}
-          keyboardType={keyboard}
-          placeholderTextColor={'grey'}
-          placeholder={placeholder}
-          disabled={disabled}
-          secureTextEntry={isSecureTextEntry}
-          clearButtonMode={'always'}
-          type={type}
-          options={options}
-        />
-      </>
-    );
-  }
+      {rightPlaceholder && value.length > 0 && (
+        <Text style={[styles.rightPlaceholder]}>{rightPlaceholder}</Text>
+      )}
+    </View>
+  );
 };
 
 export const styles = StyleSheet.create({
+  container: {
+    height: 50,
+    borderBottomWidth: 1,
+  },
   input: {
     fontFamily: `${global.fonts.s}`,
-    borderBottomWidth: 1,
-
     color: 'black',
+  },
+  leftPlaceholder: {
+    color: 'grey',
+    fontSize: 20,
+    position: 'absolute',
+    top: 10,
+    left: 0,
+  },
+  rightPlaceholder: {
+    color: 'grey',
+    fontSize: 20,
+    position: 'absolute',
+    top: 10,
+    right: 0,
   },
 });
 
@@ -97,7 +121,5 @@ Input.defaultProps = {
   disabled: false,
   fontSize: '18px',
   type: 'custom',
-  options: {},
-  mask: 'none',
   borderBottomColor: `${global.colors.purpleColor}`,
 };

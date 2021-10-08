@@ -21,3 +21,17 @@ export const ActionButtonContainer = styled.TouchableOpacity`
   border: 1px solid red;
   z-index: 5;
 `;
+
+export const List = styled.View`
+  background-color: ${global.colors.backgroundColor};
+  height: 100%;
+`;
+
+export const ItemContainer = styled.TouchableOpacity`
+  background-color: ${global.colors.backgroundColor};
+  margin-right: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;

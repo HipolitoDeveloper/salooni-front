@@ -1,10 +1,6 @@
-export const dateConverter = date => {
-  const day = date.getDate().toString(),
-    fullDay = day.length === 1 ? '0' + day : day,
-    month = (date.getMonth() + 1).toString(),
-    fullMonth = month.length === 1 ? '0' + month : month,
-    fullYear = date.getFullYear();
-  return fullDay + '/' + fullMonth + '/' + fullYear;
+export const toDate = date => {
+  let parts = date.split('/');
+  return new Date(parts[2], parts[1] - 1, parts[0]);
 };
 
 export const buildDropdown = list => {

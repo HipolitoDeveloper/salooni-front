@@ -25,9 +25,8 @@ const PartnerProvider = ({children}) => {
     return new Promise(async (resolve, reject) => {
       try {
         await getAllPartnersBySalonId(payload, false).then(partners => {
-          dispatch({type: 'LOAD_PARTNERS', partners});
+          resolve(dispatch({type: 'LOAD_PARTNERS', partners}));
 
-          resolve('Deu certo');
           // console.log((state.clients = clients));
         });
       } catch (e) {
@@ -56,15 +55,7 @@ const PartnerProvider = ({children}) => {
     return new Promise((resolve, reject) => {
       try {
         state.registeredPartners.forEach(async partner => {
-          saveEmployee(partner, true).then(newPartner => {
-            partner.procedures.map(async procedure => {
-              const procedureEmployeer = {
-                IdProcFK: await getProcedureByName(procedure.item, true),
-                IdFuncFK: newPartner,
-              };
-
-              await saveProcedureEmployee(procedureEmployeer, true);
-            });
+          saveEmployee(partner, false).then(newPartner => {
             dispatch({type: 'SAVE_PARTNERS', newPartner});
           });
         });
@@ -78,15 +69,10 @@ const PartnerProvider = ({children}) => {
   const updatePartner = payload => {
     return new Promise(async (resolve, reject) => {
       try {
-        const {partner, partnerProcedures, deletedProcedures} = payload;
+        const partner = payload;
 
-        updateEmployeeCRUD(
-          partner,
-          partnerProcedures,
-          deletedProcedures,
-          false,
-        ).then(updatedClient => {
-          dispatch({type: 'UPDATE_CLIENT', updatedClient});
+        updateEmployeeCRUD(partner, false).then(updatedPartner => {
+          dispatch({type: 'UPDATE_PARTNER', updatedPartner});
         });
 
         resolve('Deu bom');
@@ -99,9 +85,10 @@ const PartnerProvider = ({children}) => {
   const deletePartner = payload => {
     return new Promise(async (resolve, reject) => {
       try {
+        const {id} = payload;
         dispatch({type: 'DELETE_PARTNER', payload});
 
-        resolve(await deleteEmployeeCRUD(payload.objectId));
+        resolve(await deleteEmployeeCRUD(id));
       } catch (e) {
         reject(`Deu ruim ao excluir parceiros ${e}`);
       }

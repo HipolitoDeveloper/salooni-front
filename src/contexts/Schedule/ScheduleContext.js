@@ -1,14 +1,17 @@
 import React, {createContext, useReducer} from 'react';
 import {ScheduleReducer} from './ScheduleReducer';
 import {
-  getAllSchedulesByEmployeeId,
+  deleteScheduleCRUD,
+  getAllSchedules,
   insertScheduleCRUD,
+  updateScheduleCRUD,
 } from '../../services/ScheduleService';
 
 export const ScheduleContext = createContext();
 
 const initialState = {
   schedules: [],
+  calendarSchedule: [],
   registeredSchedules: [],
   scheduleInView: {},
   dropdownClients: [],
@@ -17,15 +20,17 @@ const initialState = {
 const ScheduleProvider = ({children}) => {
   const [state, dispatch] = useReducer(ScheduleReducer, initialState);
 
-  const loadAllSchedules = payload => {
+  const loadAllSchedules = (payload, refreshSchedules) => {
+    const {employeeId, salonId, employeeType} = payload;
     return new Promise(async (resolve, reject) => {
       try {
-        await getAllSchedulesByEmployeeId(payload, false).then(schedules => {
-          dispatch({type: 'LOAD_SCHEDULES', schedules});
+        await getAllSchedules(employeeId, salonId, employeeType, false).then(
+          schedules => {
+            resolve(dispatch({type: 'LOAD_SCHEDULES', schedules}));
 
-          resolve('Deu certo');
-          // console.log((state.clients = clients));
-        });
+            // console.log((state.clients = clients));
+          },
+        );
       } catch (e) {
         reject(`Deu ruim ao listar clientes ${e}`);
       }
@@ -39,9 +44,9 @@ const ScheduleProvider = ({children}) => {
   const saveSchedule = payload => {
     return new Promise((resolve, reject) => {
       try {
-        state.registeredSchedules.forEach(client => {
-          insertScheduleCRUD(client, false).then(newSchedule => {
-            dispatch({type: 'SAVE_SCHEDULES', newSchedule});
+        state.registeredSchedules.forEach(schedule => {
+          insertScheduleCRUD(schedule, false).then(newSchedule => {
+            dispatch({type: 'SAVE_SCHEDULE', newSchedule});
           });
         });
         resolve('Deu bom');
@@ -54,11 +59,9 @@ const ScheduleProvider = ({children}) => {
   const updateSchedule = payload => {
     return new Promise(async (resolve, reject) => {
       try {
-        // updateClientCRUD(payload, false).then(updatedClient => {
-        //   dispatch({type: 'UPDATE_SCHEDULE', updatedClient});
-        // });
-
-        resolve('Deu bom');
+        updateScheduleCRUD(payload, false).then(updatedSchedule => {
+          resolve(dispatch({type: 'UPDATE_SCHEDULE', updatedSchedule}));
+        });
       } catch (e) {
         reject(`Deu ruim ao editar agendamentos ${e}`);
       }
@@ -68,8 +71,10 @@ const ScheduleProvider = ({children}) => {
   const deleteSchedule = payload => {
     return new Promise(async (resolve, reject) => {
       try {
+        const schedule = payload;
+
         dispatch({type: 'DELETE_SCHEDULE', payload});
-        // resolve(await deleteClientCRUD(payload.objectId));
+        resolve(await deleteScheduleCRUD(schedule));
       } catch (e) {
         reject(`Deu ruim ao excluir agendamentos ${e}`);
       }

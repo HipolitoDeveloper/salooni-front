@@ -10,20 +10,15 @@ import AlertModal from '../../../../components/AlertModal';
 import {ActivityIndicator, View} from 'react-native';
 import BackButton from '../../../../components/BackButton';
 import {UserContext} from '../../../../../contexts/User/UserContext';
-import {getSalonById} from '../../../../../services/SalonService';
+import {SalonObject} from '../../../../../services/SalonService';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {PartnerContext} from '../../../../../contexts/Partner/PartnerContext';
-import SelectBox from 'react-native-multi-selectbox';
 import {xorBy} from 'lodash';
 import {ProcedureContext} from '../../../../../contexts/Procedure/ProcedureContext';
-import {
-  ClientParseObjectToClientObject,
-  PartnerParseObjectToPartnerObject,
-} from '../../../../../common/conversor';
-import {getProcedureEmployeeByFuncFK} from '../../../../../services/ProcedureEmployeeService';
+import MultipleSelect from '../../../../components/MultipleSelect';
 
 const PartnerRegister = ({route}) => {
-  const {loadAllProcedures, dropdownProcedures} = useContext(ProcedureContext);
+  const {procedures} = useContext(ProcedureContext);
 
   const [partner, setPartner] = useState({
     procedures: [],
@@ -50,56 +45,25 @@ const PartnerRegister = ({route}) => {
     text: '',
   });
 
-  const [partnerProcedures, setPartnerProcedures] = useState([]);
-
   const navigate = useNavigation();
 
   navigate.addListener('focus', async () => {
-    const partnerInView = route.params?.partner
-      ? PartnerParseObjectToPartnerObject(route.params?.partner)
-      : {};
+    const partnerInView = route.params?.partner;
 
     if (Object.keys(partnerInView).length !== 0) {
-      const partnerProcedures = await getProcedureEmployeeByFuncFK(
-        partnerInView.objectId,
-        false,
-      );
-
-      setPartnerProcedures(partnerProcedures);
-      partnerInView.procedures = [];
-
-      partnerProcedures.forEach(pp => {
-        partnerInView.procedures.push({
-          id: pp.IdProcFK.objectId,
-          item: pp.IdProcFK.Nome,
-        });
+      setPartner({
+        ...partnerInView,
+        procedureListWithoutChanges: partnerInView.procedures,
       });
-
-      setPartner(partnerInView);
       setIsEditing(true);
     }
   });
 
   useEffect(() => {
-    setIsLoading(true);
-    const getAllProcedures = async () => {
-      await loadAllProcedures(currentUser.idSalon).then(
-        () => setIsLoading(false),
-        error => {
-          console.log(error);
-          setIsLoading(false);
-        },
-      );
-      setIsLoading(false);
-    };
-    getAllProcedures();
-  }, []);
-
-  useEffect(() => {
     registeredPartners.forEach(partner => (partner.isInView = false));
   }, []);
 
-  const handleChange = (text, rawText, name) => {
+  const handleChange = (text, name) => {
     setPartner({
       ...partner,
       [name]: text,
@@ -107,7 +71,7 @@ const PartnerRegister = ({route}) => {
   };
 
   const handleMultiSelect = item => {
-    let selectedItem = xorBy(partner.procedures, [item], 'item');
+    let selectedItem = xorBy(partner.procedures, [item], 'name');
 
     setPartner({
       ...partner,
@@ -130,7 +94,7 @@ const PartnerRegister = ({route}) => {
     }
 
     if (verifyInformation() && !isInView) {
-      partner.IdSalaoFK = await getSalonById(currentUser.idSalon, true);
+      partner.salonId = new SalonObject({objectId: currentUser.idSalon});
       addPartner(partner);
       setErrorMessage('');
       setPartner({procedures: []});
@@ -157,13 +121,16 @@ const PartnerRegister = ({route}) => {
     setIsLoading(true);
 
     if (verifyInformationToGo()) {
-      savePartner(currentUser.idSalon).then(
+      savePartner().then(
         () => {
-          setIsLoading(false);
-          cleanRegisteredPartners();
-          navigate.navigate('Partners');
+          setTimeout(() => {
+            setIsLoading(false);
+            navigate.navigate('Partners');
+            setPartner({procedures: []});
+            cleanRegisteredPartners();
+          }, 3000);
+
           setErrorMessage('');
-          setPartner({procedures: []});
         },
         error => {
           setIsLoading(false);
@@ -175,15 +142,15 @@ const PartnerRegister = ({route}) => {
 
   const updatePartners = () => {
     setIsLoading(true);
-    updatePartner({
-      partner: partner,
-      partnerProcedures: partnerProcedures,
-    }).then(
-      async () => {
-        setIsLoading(false);
-        navigate.navigate('Partners');
+    updatePartner(partner).then(
+      () => {
+        setTimeout(() => {
+          setIsLoading(false);
+          navigate.navigate('Partners');
+          setPartner({procedures: []});
+        }, 500);
+
         setErrorMessage('');
-        setPartner({procedures: []});
       },
       error => {
         setIsLoading(false);
@@ -216,10 +183,9 @@ const PartnerRegister = ({route}) => {
       return ableToGo;
     } else if (registeredPartners.length === 0) {
       ableToGo = false;
-
       setErrorMessage(errorMessages.noClientMessage);
+      setIsLoading(false);
     }
-    setIsLoading(false);
     return ableToGo;
   };
 
@@ -238,6 +204,7 @@ const PartnerRegister = ({route}) => {
     ) {
       ableToGo = false;
       errorMessage = errorMessages.partnerMessage;
+      setIsLoading(false);
     }
 
     setErrorMessage(errorMessage);
@@ -302,7 +269,7 @@ const PartnerRegister = ({route}) => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'(99) 99999-9999'}
+            mask={'phone'}
             borderBottomColor={global.colors.lightBlueColor}
           />
 
@@ -316,7 +283,7 @@ const PartnerRegister = ({route}) => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'99.999.999/9999-99'}
+            mask={'cnpj'}
             borderBottomColor={global.colors.lightBlueColor}
           />
 
@@ -325,12 +292,15 @@ const PartnerRegister = ({route}) => {
               width: '80%',
               marginTop: 20,
             }}>
-            <SelectBox
-              options={dropdownProcedures}
-              selectedValues={partner.procedures}
-              onMultiSelect={item => handleMultiSelect(item)}
-              onTapClose={item => handleMultiSelect(item)}
-              isMulti
+            <MultipleSelect
+              iconColor={global.colors.lightBlueColor}
+              plusIconColor={global.colors.lightBlueColor}
+              modalHeaderText={'Escolha os procedimentos'}
+              options={procedures}
+              selectTextColor={'black'}
+              selectedItemBorderColor={global.colors.lightBlueColor}
+              value={partner.procedures}
+              handleMultiSelect={handleMultiSelect}
             />
           </View>
 
@@ -348,7 +318,7 @@ const PartnerRegister = ({route}) => {
           {/*  /!*  mask={'(99) 99999-9999'}*!/*/}
           {/*  /!*/
           /*/}
-            {/*</S.InformationContent>*/}
+                {/*</S.InformationContent>*/}
 
           <S.ButtonsContent>
             {!isEditing && (

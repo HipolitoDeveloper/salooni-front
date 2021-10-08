@@ -5,7 +5,7 @@ export const UserReducer = (state, action) => {
       const newOwner = {
         cnpj: cnpj,
         tel: tel,
-        employee_type: 'OWN',
+        employeeType: 'OWN',
         name: name,
         email: email,
       };

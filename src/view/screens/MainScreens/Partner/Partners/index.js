@@ -1,5 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {ActivityIndicator, RefreshControl, Text} from 'react-native';
+import {
+  ActivityIndicator,
+  RefreshControl,
+  Pressable,
+  TouchableOpacity,
+  TouchableNativeFeedback,
+  TouchableHighlight,
+} from 'react-native';
 import global from '../../../../../common/global';
 import Header from '../../../../components/Header';
 import * as S from './styled';
@@ -7,54 +14,80 @@ import ActionButton from 'react-native-circular-action-menu';
 import {UserContext} from '../../../../../contexts/User/UserContext';
 import {useNavigation} from '@react-navigation/native';
 import {PartnerContext} from '../../../../../contexts/Partner/PartnerContext';
+import {Swipeable} from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import {ScheduleContext} from '../../../../../contexts/Schedule/ScheduleContext';
 const Partners = () => {
-  const {loadAllPartners, partners} = useContext(PartnerContext);
-
-  const {doLogout, currentUser} = useContext(UserContext);
+  const {partners, loadAllPartners} = useContext(PartnerContext);
+  const {loadAllSchedules} = useContext(ScheduleContext);
+  const {currentUser} = useContext(UserContext);
 
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const navigate = useNavigation();
 
-  useEffect(() => {
+  const loadSchedule = idFunc => {
     setLoading(true);
-    const getAllPartners = async () => {
-      await loadAllPartners(currentUser.idSalon).then(
-        () => setLoading(false),
-        error => {
-          console.log(error);
-          setLoading(false);
-        },
-      );
-      setLoading(false);
-    };
-    getAllPartners();
-  }, []);
+    loadAllSchedules({
+      salonId: currentUser.idSalon,
+      employeeId: idFunc,
+      employeeType: currentUser.employeeType,
+    }).then(
+      () => {
+        setLoading(false);
+        navigate.push('ApplicationStack', {
+          screen: 'SchedulingCalendar',
+          params: {
+            typeView: 'AGN',
+          },
+        });
+      },
+      error => {
+        console.log(error);
+        setLoading(false);
+      },
+    );
+    setLoading(false);
+  };
 
-  const loadPartners = partners.map((partner, index) => (
-    <S.BoxContainer key={index}>
-      <S.BoxContent>
-        <S.BoxLabel>Nome</S.BoxLabel>
-        <S.BoxText>{partner.Nome}</S.BoxText>
-      </S.BoxContent>
-      <S.BoxContent>
-        <S.BoxLabel>Telefone</S.BoxLabel>
-        <S.BoxText>{partner.Telefone}</S.BoxText>
-      </S.BoxContent>
-      <S.DetailsContent>
-        <S.DetailsButton
-          onPress={() => {
-            navigate.push('ApplicationStack', {
-              screen: 'PartnerRegister',
-              params: {partner: partner},
-            });
-          }}>
-          <S.DetailsButtonText>Detalhes</S.DetailsButtonText>
-        </S.DetailsButton>
-      </S.DetailsContent>
-    </S.BoxContainer>
-  ));
+  const getLeftContent = () => (
+    <S.LeftContent>
+      <Icon name="calendar" size={20} color="#FFF" style={{marginLeft: 20}} />
+    </S.LeftContent>
+  );
+
+  const loadPartners = partners.map(
+    (partner, index) =>
+      partner.employeeType === 'PRC' && (
+        <Swipeable
+          key={index}
+          renderLeftActions={getLeftContent}
+          onSwipeableLeftOpen={() => loadSchedule(partner.objectId)}>
+          <S.BoxContainer>
+            <S.BoxContent>
+              <S.BoxLabel>Nome</S.BoxLabel>
+              <S.BoxText>{partner.name}</S.BoxText>
+            </S.BoxContent>
+            <S.BoxContent>
+              <S.BoxLabel>Telefone</S.BoxLabel>
+              <S.BoxText>{partner.tel}</S.BoxText>
+            </S.BoxContent>
+            <S.DetailsContent>
+              <S.DetailsButton
+                onPress={() => {
+                  navigate.push('ApplicationStack', {
+                    screen: 'PartnerRegister',
+                    params: {partner: partner},
+                  });
+                }}>
+                <S.DetailsButtonText>Detalhes</S.DetailsButtonText>
+              </S.DetailsButton>
+            </S.DetailsContent>
+          </S.BoxContainer>
+        </Swipeable>
+      ),
+  );
 
   return (
     <S.Container>
@@ -88,6 +121,7 @@ const Partners = () => {
               onPress={() => {
                 navigate.push('ApplicationStack', {
                   screen: 'PartnerRegister',
+                  params: {partner: []},
                 });
               }}
             />

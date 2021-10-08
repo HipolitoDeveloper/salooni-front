@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import * as S from './styled';
 import SalooniLogo from '../../../assets/icone11-nobackground.png';
 import {UserContext} from '../../../contexts/User/UserContext';
@@ -7,11 +7,15 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {ExitButton} from './styled';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import global from '../../../common/global';
+import {ScheduleContext} from '../../../contexts/Schedule/ScheduleContext';
+import {ClientContext} from '../../../contexts/Client/ClientContext';
+import {PartnerContext} from '../../../contexts/Partner/PartnerContext';
 export default ({state, navigation}) => {
   const {setCurrentUser} = useContext(UserContext);
+
   const doLogout = async () => {
     await Parse.User.logOut().then(async () => {
-      setCurrentUser(false, null);
+      setCurrentUser(false, {});
       await AsyncStorage.clear().then(() => {
         navigation.navigate('EntranceStack');
       });
@@ -32,8 +36,10 @@ export default ({state, navigation}) => {
           size={24}
         />
       </ExitButton>
-      <S.DrawerContent onPress={() => goTo('Clients')}>
-        <S.DrawerContentText color={state.index === 0}>
+      <S.DrawerContent>
+        <S.DrawerContentText
+          color={state.index === 0}
+          onPress={() => goTo('Clients')}>
           Clientes
         </S.DrawerContentText>
       </S.DrawerContent>
@@ -47,7 +53,15 @@ export default ({state, navigation}) => {
           Parceiros
         </S.DrawerContentText>
       </S.DrawerContent>
-      <S.DrawerContent onPress={() => goTo('SchedulingCalendar')}>
+      <S.DrawerContent
+        onPress={() =>
+          navigation.push('ApplicationStack', {
+            screen: 'SchedulingCalendar',
+            params: {
+              typeView: 'AGN',
+            },
+          })
+        }>
         <S.DrawerContentText color={state.index === 3}>
           Calendário
         </S.DrawerContentText>

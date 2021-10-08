@@ -1,12 +1,11 @@
 import React, {createContext, useEffect, useReducer} from 'react';
 import Parse from 'parse/react-native';
-import AsyncStorage from '@react-native-community/async-storage';
-import {convertToObj} from '../../common/conversor';
-import {getUsersByEmail, signUp, updateUser} from '../../services/UserService';
+import {convertToObj} from '../../pipe/conversor';
+import {getUsersByEmail, signUp} from '../../services/UserService';
 import {
   getEmployeeByEmail,
   getEmployeeById,
-  saveEmployee,
+  saveEmployeeWithoutProcedures,
 } from '../../services/EmployeeService';
 import {UserReducer} from './UserReducer';
 import {
@@ -14,7 +13,7 @@ import {
   saveProcedure,
 } from '../../services/ProcedureService';
 import {saveProcedureEmployee} from '../../services/ProcedureEmployeeService';
-import {getSalonById, saveSalon} from '../../services/SalonService';
+import {saveSalon} from '../../services/SalonService';
 import {buildCurrentUser} from '../../factory/User';
 
 export const UserContext = createContext();
@@ -37,12 +36,11 @@ const UserProvider = ({children}) => {
   }, []);
 
   const setCurrentUser = async (isLogging, user) => {
-    if (isLogging) {
-      await buildCurrentUser(user).then(currentUser => {
-        dispatch({type: 'SET_CURRENT_USER', currentUser});
-      });
+    if (isLogging && user !== null) {
+      const currentUser = buildCurrentUser(user);
+      dispatch({type: 'SET_CURRENT_USER', currentUser});
     } else {
-      dispatch({type: 'SET_CURRENT_USER', currentUser: user});
+      dispatch({type: 'SET_CURRENT_USER', currentUser: {}});
     }
   };
 
@@ -56,12 +54,9 @@ const UserProvider = ({children}) => {
         if (users.length > 0) {
           const user = users[0];
           if (user) {
-            const employee = await getEmployeeById(
-              user.IdFuncFK.objectId,
-              false,
-            );
+            const employee = await getEmployeeById(user.employee.id, false);
 
-            if (employee.TipoFunc === 'OWN') {
+            if (employee.employeeType === 'OWN') {
               isOwner = true;
             } else {
               throw 'Não é proprietário';
@@ -86,11 +81,11 @@ const UserProvider = ({children}) => {
           let isPartner = false;
           let isFirstAccess = true;
 
-          let partner = await getEmployeeByEmail(userData.email.trim(), true);
+          let partner = await getEmployeeByEmail(userData.email.trim(), false);
 
           if (partner) {
             if (partner) {
-              if (partner.get('TipoFunc') === 'PRC') {
+              if (partner.typeEmployee === 'PRC') {
                 isPartner = true;
               } else {
                 throw 'Não é parceiro';
@@ -112,9 +107,8 @@ const UserProvider = ({children}) => {
           });
         } else {
           let isAbleToSignup = false;
-          let salon = verifiedPartner.get('IdSalaoFK');
 
-          if (userData.CNPJ === salon.get('CNPJ')) {
+          if (userData.cnpj === verifiedPartner.salon.cnpj) {
             isAbleToSignup = true;
           } else {
             throw 'CNPJ não encontrado para esse parceiro';
@@ -145,11 +139,11 @@ const UserProvider = ({children}) => {
     });
   };
 
-  const doSignup = (funcFk, userData) => {
+  const doSignup = (employeeId, userData) => {
     return new Promise(async (resolve, reject) => {
       try {
         const userToSignup = userData === '' ? state.user : userData;
-        userToSignup.funcFK = funcFk;
+        userToSignup.employeeId = employeeId;
 
         resolve(convertToObj(await signUp(userToSignup)));
       } catch (e) {
@@ -162,35 +156,44 @@ const UserProvider = ({children}) => {
     const {procedures, partners} = payload;
     return new Promise(async (resolve, reject) => {
       try {
-        state.salon.employee_qt = partners.length;
+        state.salon.employeeQt = partners.length;
         const salon = await saveSalon(state.salon, true);
-        state.owner.salaoFK = salon;
+        state.owner.salonId = salon;
 
-        const employee = await saveEmployee(state.owner, true);
+        const employee = await saveEmployeeWithoutProcedures(state.owner, true);
 
-        procedures.map(async procedure => {
-          procedure.salaoFK = salon;
-          procedure.funcFk = employee;
-          await saveProcedure(procedure, true);
-        });
-        partners.map(async partner => {
-          partner.salaoFK = salon;
-          const savedPartner = await saveEmployee(partner, true);
+        if (procedures.length > 0) {
+          procedures.map(async procedure => {
+            procedure.salonId = salon;
+            procedure.employeeId = employee;
+            await saveProcedure(procedure, true);
+          });
+        }
 
-          if (partner.procedures.length !== 0) {
-            partner.procedures.map(async procedure => {
-              const procedureEmployeer = {
-                IdProcFK: await getProcedureByName(procedure.name, true),
-                IdFuncFK: savedPartner,
-              };
+        if (partners.length > 0) {
+          partners.map(async partner => {
+            partner.salonId = salon;
+            const savedPartner = await saveEmployeeWithoutProcedures(
+              partner,
+              true,
+            );
 
-              await saveProcedureEmployee(procedureEmployeer, true);
-            });
-          }
-        });
+            if (partner.procedures.length !== 0) {
+              partner.procedures.map(async procedure => {
+                const procedureEmployeer = {
+                  procedureId: await getProcedureByName(procedure.name, true),
+                  employeeId: savedPartner,
+                };
+
+                await saveProcedureEmployee(procedureEmployeer, true);
+              });
+            }
+          });
+        }
 
         resolve(employee);
       } catch (e) {
+        console.log(e);
         reject(`Deu ruim ao salvar as informações do Salão ${e}`);
       }
     });

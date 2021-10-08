@@ -11,27 +11,27 @@ import {ProcedureContext} from '../../../../../contexts/Procedure/ProcedureConte
 const Partners = () => {
   const {loadAllProcedures, procedures} = useContext(ProcedureContext);
 
-  const {doLogout, currentUser} = useContext(UserContext);
+  const {currentUser} = useContext(UserContext);
 
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const navigate = useNavigation();
 
-  useEffect(() => {
-    setLoading(true);
-    const getAllProcedures = async () => {
-      await loadAllProcedures(currentUser.idSalon).then(
-        () => setLoading(false),
-        error => {
-          console.log(error);
-          setLoading(false);
-        },
-      );
-      setLoading(false);
-    };
-    getAllProcedures();
-  }, []);
+  // useEffect(() => {
+  //   setLoading(true);
+  //   const getAllProcedures = async () => {
+  //     await loadAllProcedures(currentUser.idSalon).then(
+  //       () => setLoading(false),
+  //       error => {
+  //         console.log(error);
+  //         setLoading(false);
+  //       },
+  //     );
+  //     setLoading(false);
+  //   };
+  //   getAllProcedures();
+  // }, []);
 
   const loadProcedures = procedures?.map((procedure, index) => (
     <S.BoxContainer
@@ -46,26 +46,26 @@ const Partners = () => {
         <S.BoxMainInformation>
           <S.BoxPrice>
             <S.PrefixBold>R$</S.PrefixBold>
-            {procedure.Valor.toString().replace('.', ',')}
+            {procedure.value}
           </S.BoxPrice>
           <S.BoxTime>
             <S.PrefixBold>Hr. </S.PrefixBold>
-            {procedure.Tempo}
+            {procedure.time}
           </S.BoxTime>
         </S.BoxMainInformation>
         <S.BoxText>
-          <S.BoxName>{procedure.Nome}</S.BoxName>
+          <S.BoxName>{procedure.name}</S.BoxName>
         </S.BoxText>
         <S.BoxEmployeeInformation>
-          <S.BoxEmployee>Inserido por: </S.BoxEmployee>
-          <S.BoxEmployeeName>{procedure.IdFuncFK.Nome}</S.BoxEmployeeName>
+          {/*<S.BoxEmployee>Inserido por: </S.BoxEmployee>*/}
+          {/*<S.BoxEmployeeName>{procedure.IdFuncFK.Nome}</S.BoxEmployeeName>*/}
           <S.BoxComission>
-            {procedure.ComissaoPorcentagem !== 0 ? (
+            {procedure.commissionPercentage !== '0' ? (
               <>
                 <S.BoxComissionLabel>Porcen.</S.BoxComissionLabel>
                 <S.BoxComissionText>
                   {' '}
-                  %{procedure.ComissaoPorcentagem}
+                  %{procedure.commissionPercentage}
                 </S.BoxComissionText>
               </>
             ) : (
@@ -73,7 +73,7 @@ const Partners = () => {
                 <S.BoxComissionLabel>Valor Fixo</S.BoxComissionLabel>
                 <S.BoxComissionText>
                   {' '}
-                  R${procedure.ComissaoValor.toString().replace('.', ',')}
+                  R${procedure.commissionValue}
                 </S.BoxComissionText>
               </>
             )}
@@ -115,6 +115,7 @@ const Partners = () => {
               onPress={() => {
                 navigate.push('ApplicationStack', {
                   screen: 'ProcedureForm',
+                  params: {procedure: []},
                 });
               }}
             />

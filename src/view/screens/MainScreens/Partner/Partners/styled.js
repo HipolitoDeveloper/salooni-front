@@ -3,7 +3,7 @@ import global from '../../../../../common/global';
 import {StyleSheet} from 'react-native';
 
 export const Container = styled.View`
-  background-color: ${global.colors.lightGreyColor};
+  background-color: ${global.colors.backgroundColor};
 `;
 
 export const Content = styled.View`
@@ -84,4 +84,17 @@ export const LoadingContent = styled.View`
 export const ActionButtonContainer = styled.View`
   height: 100px;
   width: 100px;
+`;
+
+export const LeftContent = styled.View`
+  flex: 1;
+  background-color: #68caca;
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const LeftContentText = styled.Text`
+  color: #fff;
+  font-size: 20px;
+  margin: 10px;
 `;

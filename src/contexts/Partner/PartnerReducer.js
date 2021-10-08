@@ -1,8 +1,3 @@
-import {
-  ClientParseObjectToClientObject,
-  PartnerParseObjectToPartnerObject,
-} from '../../common/conversor';
-
 export const PartnerReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_PARTNERS':
@@ -10,8 +5,8 @@ export const PartnerReducer = (state, action) => {
 
       state.dropdownPartners = action.partners.map(partner => {
         return {
-          id: partner.objectId,
-          item: partner.Nome,
+          id: partner.id,
+          item: partner.name,
         };
       });
 
@@ -21,16 +16,16 @@ export const PartnerReducer = (state, action) => {
         ...state,
       };
     case 'ADD_PARTNER':
-      const {cnpj, name, tel, email, procedures, IdSalaoFK} = action.payload;
+      const {cnpj, name, tel, email, procedures, salonId} = action.payload;
       let newPartners = state.registeredPartners;
       const newPartner = {
         cnpj: cnpj,
         tel: tel,
-        employee_type: 'PRC',
+        employeeType: 'PRC',
         name: name,
         email: email,
         procedures: procedures !== undefined > 0 ? procedures : [],
-        salaoFK: IdSalaoFK,
+        salonId: salonId,
       };
       newPartners.push(newPartner);
 
@@ -80,9 +75,19 @@ export const PartnerReducer = (state, action) => {
         partners: state.partners,
         ...state,
       };
-    case 'UPDATE_CLIENT':
+    case 'UPDATE_PARTNER':
+      const updatedPartner = action.updatedPartner;
+      let updatedPartners = state.partners.map(partner => {
+        if (partner.id === updatedPartner.id) {
+          partner = {...updatedPartner};
+        }
+        return partner;
+      });
+
+      state.partners = updatedPartners;
       return {
-        clientInView: {},
+        partners: state.partners,
+
         ...state,
       };
     case 'DELETE_PARTNER':

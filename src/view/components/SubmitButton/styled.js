@@ -18,6 +18,7 @@ export const ContentButton = styled.TouchableOpacity`
   border-radius: 30px;
   background-color: ${props => props.buttonColor};
   opacity: ${props => (props.disabled ? 0.5 : 1)};
+  elevation: 10;
 `;
 
 export const ContentButtonText = styled.Text`

@@ -1,24 +1,29 @@
 import Parse from 'parse/react-native';
-import {convertToObj} from '../common/conversor';
-import {saveCommission} from './Commission';
-import {getSalonById} from './SalonService';
-import {getEmployeeById} from './EmployeeService';
+import {convertToObj} from '../pipe/conversor';
+import {SalonObject} from './SalonService';
 import {deleteProcedureEmployeeByProcedureId} from './ProcedureEmployeeService';
+import {buildProcedure, buildProcedureList} from '../factory/Procedure';
+import {deleteScheduleProcedureByProcedureId} from './ScheduleProcedureService';
 
-const ProcedureObject = Parse.Object.extend('Procedimento');
+export const ProcedureObject = Parse.Object.extend('procedure');
 
 export const getAllProceduresBySalonId = (salonId, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const salon = await getSalonById(salonId, true);
+      const salon = new SalonObject({objectId: salonId});
       const ProcedureQuery = new Parse.Query(ProcedureObject);
-      ProcedureQuery.equalTo('IdSalaoFK', salon);
+      ProcedureQuery.equalTo('salon_id', salon);
       if (returnParseObject) {
         resolve(await ProcedureQuery.find());
       } else {
-        resolve(convertToObj(await ProcedureQuery.find()));
+        const procedures = await ProcedureQuery.find();
+
+        if (procedures.length > 0)
+          resolve(buildProcedureList(convertToObj(procedures)));
+        else resolve([]);
       }
     } catch (e) {
+      console.error(`Procedimento ${e}`);
       reject(`Procedimento ${JSON.stringify(e)}`);
     }
   });
@@ -44,37 +49,60 @@ export const getProcedureById = (procedureId, returnParseObject) => {
 export const saveProcedure = (procedureObj, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const {name, time, price, fixedValue, percentage, funcFk, salaoFK} =
-        procedureObj;
+      const {
+        maintenanceValue,
+        maintenanceDays,
+        name,
+        time,
+        value,
+        commissionValue,
+        commissionPercentage,
+        employeeId,
+        salonId,
+      } = procedureObj;
 
       const newProcedure = new ProcedureObject();
-      newProcedure.set('Nome', name);
-      newProcedure.set('Tempo', time);
-      newProcedure.set('Valor', parseFloat(price.replace('$', '')));
+
+      if (maintenanceValue !== undefined && maintenanceDays !== undefined) {
+        newProcedure.set(
+          'maintenance_value',
+          parseFloat(maintenanceValue.replace(',', '')),
+        );
+        newProcedure.set('maintenance_days', parseInt(maintenanceDays));
+      }
+      newProcedure.set('name', name);
+      newProcedure.set('time', parseInt(time));
       newProcedure.set(
-        'ComissaoValor',
-        parseFloat(fixedValue !== 0 ? fixedValue.replace('$', '') : 0),
+        'value',
+        parseFloat(value.replace('.', '').replace(',', '.')),
       );
       newProcedure.set(
-        'ComissaoPorcentagem',
-        parseFloat(percentage !== 0 ? percentage.replace('%', '') : 0),
+        'commission_value',
+        parseFloat(
+          commissionValue !== 0
+            ? commissionValue.replace('.', '').replace(',', '.')
+            : 0,
+        ),
       );
-      newProcedure.set('IdFuncFK', funcFk);
-      newProcedure.set('IdSalaoFK', salaoFK);
+      newProcedure.set('commission_percentage', parseInt(commissionPercentage));
+      newProcedure.set('employee_id', employeeId);
+      newProcedure.set('salon_id', salonId);
 
       newProcedure.save().then(
         savedProcedure => {
           if (returnParseObject) {
             resolve(savedProcedure);
           } else {
-            resolve(convertToObj(savedProcedure));
+            resolve(buildProcedure(convertToObj(savedProcedure)));
           }
         },
         error => {
-          reject(`Procedimento salvar${JSON.stringify(error)}`);
+          console.error(`Procedimento ${error}`);
+          reject(`Procedimento ${JSON.stringify(error)}`);
         },
       );
     } catch (e) {
+      console.error(`Procedimento ${e}`);
       reject(`Procedimento ${JSON.stringify(e)}`);
     }
   });
@@ -84,7 +112,7 @@ export const getProcedureByName = (procedureName, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
       const ProcedureQuery = new Parse.Query(ProcedureObject);
-      ProcedureQuery.equalTo('Nome', procedureName);
+      ProcedureQuery.equalTo('name', procedureName);
 
       if (returnParseObject) {
         resolve(await ProcedureQuery.first());
@@ -92,6 +120,7 @@ export const getProcedureByName = (procedureName, returnParseObject) => {
         resolve(convertToObj(await ProcedureQuery.first()));
       }
     } catch (e) {
+      console.error(`Procedimento   ${e}`);
       reject(`Procedimento ${JSON.stringify(e)}`);
     }
   });
@@ -100,16 +129,19 @@ export const getProcedureByName = (procedureName, returnParseObject) => {
 export const deleteProcedureCRUD = (procedureId, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const procedure = await getProcedureById(procedureId, true);
-      await deleteProcedureEmployeeByProcedureId(procedureId);
-      procedure.destroy().then(deletedProcedure => {
+      const procedure = new ProcedureObject({objectId: procedureId});
+
+      procedure.destroy().then(async deletedProcedure => {
+        await deleteProcedureEmployeeByProcedureId(deletedProcedure.id);
+        await deleteScheduleProcedureByProcedureId(procedureId, false);
         if (returnParseObject) {
           resolve(deletedProcedure);
         } else {
-          resolve(convertToObj(deletedProcedure));
+          resolve(buildProcedure(convertToObj(deletedProcedure)));
         }
       });
     } catch (e) {
+      console.error(`Procedimento   ${e}`);
       reject(`Procedimento ${JSON.stringify(e)}`);
     }
   });
@@ -118,29 +150,49 @@ export const deleteProcedureCRUD = (procedureId, returnParseObject) => {
 export const updateProcedureCRUD = (procedureObj, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const {name, time, price, fixedValue, percentage, objectId} =
-        procedureObj;
+      const {
+        name,
+        time,
+        value,
+        commissionValue,
+        commissionPercentage,
+        maintenanceValue,
+        maintenanceDays,
+        id,
+      } = procedureObj;
 
-      const procedure = await getProcedureById(objectId, true);
+      const procedure = new ProcedureObject({objectId: id});
 
-      procedure.set('Nome', name);
-      procedure.set('Tempo', time);
-      procedure.set('Valor', parseFloat(price.replace('$', '')));
+      if (maintenanceValue !== undefined && maintenanceDays !== undefined) {
+        procedure.set(
+          'maintenance_value',
+          parseFloat(maintenanceValue.replace(',', '')),
+        );
+        procedure.set('maintenance_days', parseInt(maintenanceDays));
+      }
+      procedure.set('name', name);
+      procedure.set('time', parseInt(time));
       procedure.set(
-        'ComissaoValor',
-        parseFloat(fixedValue !== 0 ? fixedValue.replace('$', '') : 0),
+        'value',
+        parseFloat(value.replace('.', '').replace(',', '.')),
       );
       procedure.set(
-        'ComissaoPorcentagem',
-        parseFloat(percentage !== 0 ? percentage.replace('%', '') : 0),
+        'commission_value',
+        parseFloat(
+          commissionValue !== 0
+            ? commissionValue.replace('.', '').replace(',', '.')
+            : 0,
+        ),
       );
+      procedure.set('commission_percentage', parseInt(commissionPercentage));
 
       if (returnParseObject) {
         resolve(await procedure.save());
       } else {
-        resolve(convertToObj(await procedure.save()));
+        resolve(buildProcedure(convertToObj(await procedure.save())));
       }
     } catch (e) {
+      console.error(`Procedimento   ${e}`);
       reject(`Procedimento ${JSON.stringify(e)}`);
     }
   });

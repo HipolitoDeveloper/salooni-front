@@ -1,29 +1,27 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {ActivityIndicator, StyleSheet} from 'react-native';
+import React, {useContext, useState} from 'react';
+import {ActivityIndicator, Platform} from 'react-native';
 
-import {buildDropdown, dateConverter} from '../../../../../factory/common';
 import * as S from './styled';
 import BackButton from '../../../../components/BackButton';
 import global from '../../../../../common/global';
 import {useNavigation} from '@react-navigation/native';
-import DatePicker from 'react-native-datepicker';
-import SelectBox from 'react-native-multi-selectbox';
+import RNDateTimePicker from '@react-native-community/datetimepicker';
 import {ProcedureContext} from '../../../../../contexts/Procedure/ProcedureContext';
 import {xorBy} from 'lodash';
-import AutocompleteInput from '../../../../components/AutocompleteInput';
 import SubmitButton from '../../../../components/SubmitButton';
 import errorMessages from '../../../../../common/errorMessages';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import {ScheduleContext} from '../../../../../contexts/Schedule/ScheduleContext';
 import AlertModal from '../../../../components/AlertModal';
 import ErrorMessage from '../../../../components/ErrorMessage';
-import {getSalonById} from '../../../../../services/SalonService';
 import {UserContext} from '../../../../../contexts/User/UserContext';
 import {PartnerContext} from '../../../../../contexts/Partner/PartnerContext';
 import {ClientContext} from '../../../../../contexts/Client/ClientContext';
+import AutoComplete from '../../../../components/AutoComplete';
+import MultipleSelect from '../../../../components/MultipleSelect';
+import moment from 'moment';
 
 const SchedulingRegister = ({route}) => {
-  const {dropdownProcedures, loadAllProcedures} = useContext(ProcedureContext);
   const {
     saveSchedule,
     registeredSchedules,
@@ -34,10 +32,13 @@ const SchedulingRegister = ({route}) => {
     updateSchedule,
     deleteSchedule,
     deleteScheduleInView,
+    loadAllSchedules,
   } = useContext(ScheduleContext);
+
+  const {partners} = useContext(PartnerContext);
+  const {clients} = useContext(ClientContext);
+  const {procedures} = useContext(ProcedureContext);
   const {currentUser} = useContext(UserContext);
-  const {loadAllPartners, partners} = useContext(PartnerContext);
-  const {loadAllClients, clients} = useContext(ClientContext);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -46,42 +47,56 @@ const SchedulingRegister = ({route}) => {
     isShowing: false,
     text: '',
   });
-  const [selectedDate, setSelectedDate] = useState(
-    dateConverter(route.params.date),
-  );
 
-  const [schedule, setSchedule] = useState({procedures: []});
-  const [dropdownClients, setDropdownClients] = useState([]);
-  const [dropdownPartners, setDropdownPartners] = useState([]);
+  const [schedule, setSchedule] = useState({
+    client: '',
+    employee: '',
+    procedures: [],
+    scheduleDate: new Date(route.params.date),
+  });
+
+  const [mode, setMode] = useState('date');
+  const [show, setShow] = useState(false);
+
   const navigate = useNavigation();
 
-  useEffect(() => {
-    const loadProcedureDropdown = async () => {
-      await Promise.all([
-        loadAllProcedures(currentUser.idSalon),
-        loadAllClients(currentUser.idSalon),
-        loadAllPartners(currentUser.idSalon),
-      ]).then(
-        () => {
-          setIsLoading(false);
-          setDropdownClients(buildDropdown(clients));
-          setDropdownPartners(buildDropdown(partners));
+  navigate.addListener('focus', () => {
+    const scheduleInView = route.params?.schedule ? route.params?.schedule : {};
+    console.log('scheduleinView', scheduleInView);
 
-          console.log(dropdownPartners);
-        },
-        error => setIsLoading(false),
-      );
-      setIsLoading(false);
-    };
-    loadProcedureDropdown();
-  }, []);
+    if (Object.keys(scheduleInView).length !== 0) {
+      setSchedule({
+        ...scheduleInView,
+        procedureListWithoutChanges: scheduleInView.procedures,
+      });
+      setIsEditing(true);
+    }
+  });
 
-  const handleMultiSelect = item => {
-    let selectedItem = xorBy(schedule.procedures, [item], 'item');
+  const clearSchedule = () => {
+    const scheduleDate = schedule.scheduleDate;
+
+    setSchedule({
+      client: '',
+      employee: '',
+      procedures: [],
+      scheduleDate: scheduleDate,
+    });
+  };
+
+  const handleMultiSelect = items => {
+    let selectedItem = xorBy(schedule.procedures, [items], 'name');
 
     setSchedule({
       ...schedule,
       ['procedures']: selectedItem,
+    });
+  };
+
+  const handleChange = (name, value) => {
+    setSchedule({
+      ...schedule,
+      [name]: value,
     });
   };
 
@@ -90,19 +105,18 @@ const SchedulingRegister = ({route}) => {
   };
 
   const chooseAddClientMethod = async () => {
-    const {isInView, indexInView} = {...schedule};
-
+    const {isInView, indexInView} = schedule;
     if (verifyInformation() && isInView) {
       schedule.isInView = false;
       editSchedule({schedule: schedule, index: indexInView});
       setErrorMessage('');
-      setSchedule({procedures: []});
+      clearSchedule();
     }
-
     if (verifyInformation() && !isInView) {
+      schedule.salonId = currentUser.idSalon;
       addSchedule(schedule);
       setErrorMessage('');
-      setSchedule({procedures: []});
+      clearSchedule();
     }
   };
 
@@ -114,9 +128,14 @@ const SchedulingRegister = ({route}) => {
         () => {
           setIsLoading(false);
           cleanRegisteredSchedules();
-          navigate.navigate('SchedulingCalendar');
           setErrorMessage('');
-          setSchedule({procedures: []});
+          clearSchedule();
+          navigate.push('ApplicationStack', {
+            screen: 'SchedulingCalendar',
+            params: {
+              typeView: 'AGN',
+            },
+          });
         },
         error => {
           setIsLoading(false);
@@ -129,12 +148,18 @@ const SchedulingRegister = ({route}) => {
   const updateSchedules = () => {
     setIsLoading(true);
     updateSchedule(schedule).then(
-      async () => {
+      () => {
         setIsLoading(false);
-        navigate.navigate('SchedulingCalendar');
+        navigate.push('ApplicationStack', {
+          screen: 'SchedulingCalendar',
+          params: {
+            typeView: 'LST',
+          },
+        });
         setErrorMessage('');
-        setSchedule({procedures: []});
+        clearSchedule();
       },
+
       error => {
         setIsLoading(false);
         console.log(error);
@@ -147,9 +172,14 @@ const SchedulingRegister = ({route}) => {
     deleteSchedule(schedule).then(
       () => {
         setIsLoading(false);
-        navigate.navigate('SchedulingCalendar');
+        navigate.push('ApplicationStack', {
+          screen: 'SchedulingCalendar',
+          params: {
+            typeView: 'LST',
+          },
+        });
         setErrorMessage('');
-        setSchedule({procedures: []});
+        clearSchedule();
       },
       error => {
         setIsLoading(false);
@@ -158,14 +188,14 @@ const SchedulingRegister = ({route}) => {
     );
   };
 
-  const handleClient = (schedule, index) => {
+  const handleSchedule = (schedule, index) => {
     updateScheduleInView(index);
     schedule.isInView = !schedule.isInView;
     schedule.indexInView = index;
 
     setSchedule(schedule);
 
-    if (!verifyIfIsEditing()) setSchedule({procedures: []});
+    if (!verifyIfIsEditing()) clearSchedule();
   };
 
   const verifyIfIsEditing = () => {
@@ -176,13 +206,13 @@ const SchedulingRegister = ({route}) => {
     let ableToGo = true;
 
     if (Object.keys(schedule).length === 3) {
-      addSchedule(schedule);
+      // addSchedule(schedule);
       return ableToGo;
     } else if (registeredSchedules.length === 0) {
       ableToGo = false;
       setErrorMessage(errorMessages.noClientMessage);
+      setIsLoading(false);
     }
-    setIsLoading(false);
     return ableToGo;
   };
 
@@ -192,25 +222,48 @@ const SchedulingRegister = ({route}) => {
 
     if (
       schedule === {} ||
+      schedule.client === undefined ||
+      Object.keys(schedule.client).length === 0 ||
       schedule.employee === undefined ||
-      schedule.employee === '' ||
-      schedule.partner === undefined ||
-      schedule.partner === '' ||
+      Object.keys(schedule.employee).length === 0 ||
       schedule.procedures === undefined ||
-      schedule.procedures.length !== 0
+      schedule.procedures.length === 0
     ) {
       ableToGo = false;
-      errorMessage = errorMessages.clientMessage;
+      errorMessage = errorMessages.scheduleMessage;
+      setIsLoading(false);
     }
 
     setErrorMessage(errorMessage);
     return ableToGo;
   };
 
+  const onChange = (event, selectedDate) => {
+    if (mode === 'date') showTimepicker();
+    const currentDate = selectedDate || schedule.scheduleDate;
+    setShow(Platform.OS === 'ios');
+    handleChange('scheduleDate', currentDate);
+  };
+
+  const showMode = currentMode => {
+    setShow(true);
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode('date');
+  };
+
+  const showTimepicker = () => {
+    showMode('time');
+  };
+
   const loadBoxInformation = () =>
     registeredSchedules.map((schedule, index) => (
-      <S.BoxContent onPress={() => handleClient(schedule, index)} key={index}>
-        <S.BoxText isInView={schedule.isInView}>{schedule.name}</S.BoxText>
+      <S.BoxContent onPress={() => handleSchedule(schedule, index)} key={index}>
+        <S.BoxText isInView={schedule.isInView}>
+          {schedule.client.name}
+        </S.BoxText>
       </S.BoxContent>
     ));
 
@@ -221,63 +274,78 @@ const SchedulingRegister = ({route}) => {
           <BackButton
             positionTop={'23px'}
             positionLeft={'-5px'}
-            buttonColor={`${global.colors.lightBlueColor}`}
-            onPress={() => navigate.navigate('Schedulings')}
+            buttonColor={`${global.colors.purpleColor}`}
+            onPress={() =>
+              navigate.push('ApplicationStack', {
+                screen: 'SchedulingCalendar',
+                params: {
+                  typeView: 'LST',
+                },
+              })
+            }
           />
           <S.HeaderTitle>
-            <DatePicker
-              style={{}}
-              date={selectedDate}
-              mode="date"
-              placeholder="Selecione uma data"
-              format="DD/MM/YYYY"
-              confirmBtnText="OK"
-              cancelBtnText="Cancelar"
-              onDateChange={date => {
-                setSelectedDate(date);
-              }}
-              showIcon={false}
-              customStyles={{
-                dateInput: {
-                  borderWidth: 0,
-                },
-                dateText: {
-                  color: `${global.colors.lightBlueColor}`,
-                  fontSize: 20,
-                },
-
-                // ... You can check the source to find the other keys.
-              }}
-            />
+            {show && (
+              <RNDateTimePicker
+                value={schedule.scheduleDate}
+                mode={mode}
+                is24Hour={true}
+                display="default"
+                minimumDate={new Date(1950, 0, 1)}
+                maximumDate={new Date(2300, 10, 20)}
+                minuteInterval={10}
+                onChange={onChange}
+                locale="pt-BR"
+              />
+            )}
+            <S.HeaderText onPress={showDatepicker}>
+              {moment(schedule.scheduleDate).format('DD/MM/YYYY HH:mm')}
+            </S.HeaderText>
           </S.HeaderTitle>
+          {isLoading && (
+            <S.LoadingContent>
+              <ActivityIndicator
+                size="large"
+                color={global.colors.purpleColor}
+              />
+            </S.LoadingContent>
+          )}
         </S.HeaderContent>
         <S.BodyContent>
-          <S.SelectContent>
-            {/*<AutocompleteInput placeholder={'Cliente'} data={[]} />*/}
-            {/*<AutocompleteInput*/}
-            {/*  placeholder={'Parceiro'}*/}
-            {/*  data={dropdownPartners}*/}
-            {/*/>*/}
-            <SelectBox
-              label={'Procedimentos'}
-              inputPlaceholder={'Procure pelo seu procedimento'}
-              listEmptyText={'Nenhum procedimento foi encontrado'}
-              options={dropdownProcedures}
-              selectedValues={schedule.procedures}
-              onMultiSelect={item => handleMultiSelect(item)}
-              onTapClose={item => handleMultiSelect(item)}
-              isMulti
-              arrowIconColor={`${global.colors.lightBlueColor}`}
-              searchIconColor={`${global.colors.lightBlueColor}`}
-              toggleIconColor={`${global.colors.lightBlueColor}`}
-              labelStyle={{
-                color: `${global.colors.lightBlueColor}`,
-              }}
-              listEmptyLabelStyle={{
-                marginBottom: 20,
-              }}
-            />
-          </S.SelectContent>
+          <AutoComplete
+            placeholder={'Cliente'}
+            iconName={'user'}
+            textColor={'black'}
+            iconColor={global.colors.purpleColor}
+            searchLengthToSuggest={2}
+            options={clients}
+            name={'client'}
+            value={schedule.client}
+            handleChange={handleChange}
+          />
+
+          <AutoComplete
+            placeholder={'Parceiros'}
+            textColor={'black'}
+            iconName={'cut'}
+            iconColor={global.colors.purpleColor}
+            searchLengthToSuggest={2}
+            options={partners}
+            name={'employee'}
+            value={schedule.employee}
+            handleChange={handleChange}
+          />
+          <MultipleSelect
+            iconColor={global.colors.purpleColor}
+            plusIconColor={global.colors.purpleColor}
+            modalHeaderText={'Escolha os procedimentos'}
+            options={procedures}
+            selectTextColor={'black'}
+            selectedItemBorderColor={global.colors.purpleColor}
+            value={schedule.procedures}
+            handleMultiSelect={handleMultiSelect}
+          />
+
           {!isEditing && (
             <S.RegisteredProceduresContent>
               <S.RegisteredProceduresBoxTitle>
@@ -295,17 +363,8 @@ const SchedulingRegister = ({route}) => {
               <ErrorMessage
                 text={errorMessage}
                 width={'70%'}
-                textColor={`${global.colors.blueColor}`}
+                textColor={`${global.colors.purpleColor}`}
               />
-            )}
-
-            {isLoading && (
-              <S.LoadingContent>
-                <ActivityIndicator
-                  size="large"
-                  color={global.colors.blueColor}
-                />
-              </S.LoadingContent>
             )}
 
             <S.ButtonsContent>
@@ -316,7 +375,7 @@ const SchedulingRegister = ({route}) => {
                   width={'40%'}
                   height={'30px'}
                   fontSize={'18px'}
-                  buttonColor={`${global.colors.blueColor}`}
+                  buttonColor={`${global.colors.purpleColor}`}
                 />
               )}
 
@@ -324,7 +383,7 @@ const SchedulingRegister = ({route}) => {
                 <S.DeleteButton
                   onPress={() => {
                     deleteScheduleInView(schedule);
-                    setSchedule({});
+                    clearSchedule();
                   }}>
                   <Icon name="trash" size={17} />
                 </S.DeleteButton>
@@ -339,7 +398,7 @@ const SchedulingRegister = ({route}) => {
               width={'40%'}
               height={'50px'}
               fontSize={'18px'}
-              buttonColor={`${global.colors.blueColor}`}
+              buttonColor={`${global.colors.purpleColor}`}
             />
             {isEditing && (
               <S.DeleteButton

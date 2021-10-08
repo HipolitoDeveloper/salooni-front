@@ -6,15 +6,12 @@ import {
   saveProcedure,
   updateProcedureCRUD,
 } from '../../services/ProcedureService';
-import {getSalonById} from '../../services/SalonService';
-import {getEmployeeById} from '../../services/EmployeeService';
 
 export const ProcedureContext = createContext();
 
 const initialState = {
   procedures: [],
   registeredProcedures: [],
-  dropdownProcedures: [],
 };
 
 const ProcedureProvider = ({children}) => {
@@ -24,22 +21,17 @@ const ProcedureProvider = ({children}) => {
     return new Promise(async (resolve, reject) => {
       try {
         await getAllProceduresBySalonId(payload, false).then(procedures => {
-          dispatch({type: 'LOAD_PROCEDURES', procedures});
-
-          resolve('Deu certo');
+          resolve(dispatch({type: 'LOAD_PROCEDURES', procedures}));
         });
       } catch (e) {
-        reject(`Deu ruim ao listar clientes ${e}`);
+        reject(`Deu ruim ao listar procedimentos ${e}`);
       }
     });
   };
 
   const addProcedure = async payload => {
-    const {salonId, employeeId, procedure, isSignup} = payload;
-    if (!isSignup) {
-      procedure.salaoFK = await getSalonById(salonId, true);
-      procedure.funcFk = await getEmployeeById(employeeId, true);
-    }
+    const procedure = payload;
+
     dispatch({type: 'ADD_PROCEDURE', procedure});
   };
 
@@ -64,7 +56,7 @@ const ProcedureProvider = ({children}) => {
         });
         resolve('Deu bom');
       } catch (e) {
-        reject(`Deu ruim ao salvar parceiros ${e}`);
+        reject(`Deu ruim ao salvar procedimentos ${e}`);
       }
     });
   };
@@ -73,10 +65,8 @@ const ProcedureProvider = ({children}) => {
     return new Promise(async (resolve, reject) => {
       try {
         updateProcedureCRUD(payload, false).then(updatedProcedure => {
-          dispatch({type: 'UPDATE_CLIENT', updatedProcedure});
+          resolve(dispatch({type: 'UPDATE_PROCEDURE', updatedProcedure}));
         });
-
-        resolve('Deu bom');
       } catch (e) {
         reject(`Deu ruim ao atualizar procedimentos ${e}`);
       }
@@ -85,9 +75,11 @@ const ProcedureProvider = ({children}) => {
 
   const deleteProcedure = payload => {
     return new Promise(async (resolve, reject) => {
+      const {id} = payload;
       try {
-        dispatch({type: 'DELETE_PROCEDURE', payload});
-        resolve(await deleteProcedureCRUD(payload.objectId));
+        deleteProcedureCRUD(id, false).then(deletedProcedures => {
+          resolve(dispatch({type: 'DELETE_PROCEDURE', deletedProcedures}));
+        });
       } catch (e) {
         reject(`Deu ruim ao excluir procedimento ${e}`);
       }

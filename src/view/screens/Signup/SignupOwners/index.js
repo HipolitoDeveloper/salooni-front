@@ -37,7 +37,7 @@ const OwnerRegister = () => {
     }
   }, []);
 
-  const handleChange = (text, rawText, name) => {
+  const handleChange = (text, name) => {
     setOwnerData({
       ...ownerData,
       [name]: text,
@@ -48,7 +48,10 @@ const OwnerRegister = () => {
     if (verifyInformation()) {
       setErrorMessage('');
       saveOwnerInformation(ownerData);
-      navigate.navigate('SignupProcedures');
+      navigate.navigate('SignupStack', {
+        screen: 'SignupProcedures',
+        params: {procedure: []},
+      });
     }
   };
 
@@ -121,7 +124,7 @@ const OwnerRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'99.999.999/9999-99'}
+            mask={'cnpj'}
           />
           <Input
             handleChange={handleChange}
@@ -145,7 +148,7 @@ const OwnerRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'(99) 99999-9999'}
+            mask={'phone'}
           />
           <Input
             handleChange={handleChange}

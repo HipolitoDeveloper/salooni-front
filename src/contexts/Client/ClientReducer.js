@@ -1,39 +1,20 @@
-import {ClientParseObjectToClientObject} from '../../common/conversor';
+import {ClientParseObjectToClientObject} from '../../pipe/conversor';
 
 export const ClientReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_CLIENTS':
       state.clients = action.clients;
-
-      state.dropdownClients = action.clients.map(client => {
-        return {
-          id: client.objectId,
-          item: client.Nome,
-        };
-      });
-
       return {
         clients: state.clients,
         dropdownClients: state.dropdownClients,
         ...state,
       };
     case 'ADD_CLIENT':
-      const {name, email, cpf, tel, tel2, born_date, IdSalaoFK} =
-        action.payload;
-      let newClients = state.registeredClients;
-      const newClient = {
-        name: name,
-        email: email,
-        cpf: cpf,
-        tel: tel,
-        tel2: tel2,
-        born_date: born_date,
-        IdSalaoFK: IdSalaoFK,
-      };
-      newClients.push(newClient);
+      const clientToAdd = action.payload;
+      state.registeredClients.push(clientToAdd);
 
       return {
-        registeredClients: newClients,
+        registeredClients: state.registeredClients,
         ...state,
       };
 
@@ -45,14 +26,24 @@ export const ClientReducer = (state, action) => {
       };
 
     case 'UPDATE_CLIENT':
+      const updatedClient = action.updatedClient;
+      let updatedClients = state.clients.map(client => {
+        if (client.id === updatedClient.id) {
+          client = {...updatedClient};
+        }
+        return client;
+      });
+
+      state.clients = updatedClients;
       return {
-        clientInView: {},
+        clients: state.clients,
+
         ...state,
       };
     case 'DELETE_CLIENT':
-      const {objectId} = action.payload;
+      const {id} = action.deletedClient;
       state.clients.forEach((client, index) => {
-        if (client.objectId === objectId) {
+        if (client.id === id) {
           state.clients.splice(index, 1);
         }
       });

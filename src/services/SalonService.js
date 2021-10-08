@@ -1,17 +1,17 @@
 import Parse from 'parse/react-native';
-import {convertToObj} from '../common/conversor';
+import {convertToObj} from '../pipe/conversor';
 
-const SalonObject = Parse.Object.extend('Salao');
+export const SalonObject = Parse.Object.extend('salon');
 
 export const saveSalon = (salonObj, returnParseObject) => {
   return new Promise((resolve, reject) => {
     try {
-      const {name, cnpj, employee_qt} = salonObj;
+      const {name, cnpj, employeeQt} = salonObj;
 
       const newSalon = new SalonObject();
-      newSalon.set('Nome', name);
-      newSalon.set('CNPJ', cnpj);
-      newSalon.set('QuantidadeFunc', employee_qt);
+      newSalon.set('name', name);
+      newSalon.set('cnpj', cnpj);
+      newSalon.set('employee_qt', employeeQt);
 
       newSalon.save().then(
         savedSalon => {
@@ -22,26 +22,12 @@ export const saveSalon = (salonObj, returnParseObject) => {
           }
         },
         error => {
+          console.error(`Salão   ${error}`);
           reject(`Salão ${JSON.stringify(error)}`);
         },
       );
     } catch (e) {
-      reject(`Salão ${JSON.stringify(e)}`);
-    }
-  });
-};
-
-export const getSalonById = (salonId, returnParseObject) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const SalonQuery = new Parse.Query(SalonObject);
-
-      if (returnParseObject) {
-        resolve(await SalonQuery.get(salonId));
-      } else {
-        resolve(convertToObj(await SalonQuery.get(salonId)));
-      }
-    } catch (e) {
+      console.error(`Salão   ${e}`);
       reject(`Salão ${JSON.stringify(e)}`);
     }
   });

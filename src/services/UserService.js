@@ -1,5 +1,6 @@
 import Parse from 'parse/react-native';
-import {convertToObj} from '../common/conversor';
+import {convertToObj} from '../pipe/conversor';
+import {buildUserList, buildUserObject} from '../factory/User';
 
 const UserObject = Parse.Object.extend('User');
 const UserQuery = new Parse.Query(UserObject);
@@ -8,12 +9,14 @@ export const getUsersByEmail = (userEmail, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
       UserQuery.equalTo('username', userEmail.trim());
+      UserQuery.include('employee_id');
       if (returnParseObject) {
         resolve(await UserQuery.find());
       } else {
-        resolve(convertToObj(await UserQuery.find()));
+        resolve(buildUserList(convertToObj(await UserQuery.find())));
       }
     } catch (e) {
+      console.error(`User ${e}`);
       reject(`User ${JSON.stringify(e)}`);
     }
   });
@@ -23,14 +26,15 @@ export const signUp = userObj => {
   return new Promise(async (resolve, reject) => {
     try {
       const user = new Parse.User();
-      const {email, password, funcFK} = userObj;
+      const {email, password, employeeId} = userObj;
       user.set('username', email.trim());
       user.set('email', email.trim());
       user.set('password', password.trim());
-      user.set('IdFuncFK', funcFK);
+      user.set('employee_id', employeeId);
 
       resolve(await user.signUp());
     } catch (e) {
+      console.error(`User ${e}`);
       reject(`User ${JSON.stringify(e)}`);
     }
   });
@@ -48,6 +52,7 @@ export const updateUser = userObj => {
 
       resolve(await user.save());
     } catch (e) {
+      console.error(`User ${e}`);
       reject(`User ${JSON.stringify(e)}`);
     }
   });

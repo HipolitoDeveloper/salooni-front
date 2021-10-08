@@ -1,32 +1,37 @@
 import Parse from 'parse/react-native';
-import {convertToObj} from '../common/conversor';
-import {getSalonById} from './SalonService';
+import {convertToObj} from '../pipe/conversor';
+import {SalonObject} from './SalonService';
 import {
-  deleteProcedureEmployeeByFuncId,
-  deleteProcedureEmployeeById,
+  deleteProcedureEmployee,
+  deleteProcedureEmployeeByEmployeeId,
   saveProcedureEmployee,
 } from './ProcedureEmployeeService';
-import {getProcedureByName} from './ProcedureService';
+import {ProcedureObject} from './ProcedureService';
+import {buildEmployeeList, buildEmployeeObject} from '../factory/Employee';
+import {deleteScheduleByEmployeeId} from './ScheduleService';
 
-const EmployeeObject = Parse.Object.extend('Funcionario');
+export const EmployeeObject = Parse.Object.extend('employee');
 
-export const getAllPartnersBySalonId = (
-  salonId,
-  returnParseObject,
-  isToBuildPartnerList,
-) => {
+export const getAllPartnersBySalonId = (salonId, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const salon = await getSalonById(salonId, true);
+      const salon = new SalonObject({objectId: salonId});
       const EmployeeQuery = new Parse.Query(EmployeeObject);
-      EmployeeQuery.equalTo('TipoFunc', 'PRC');
-      EmployeeQuery.equalTo('IdSalaoFK', salon);
+      // EmployeeQuery.equalTo('employee_type', 'PRC');
+      EmployeeQuery.equalTo('salon_id', salon);
       if (returnParseObject) {
         resolve(await EmployeeQuery.find());
       } else {
-        resolve(convertToObj(await EmployeeQuery.find()));
+        const partners = await EmployeeQuery.find();
+
+        if (partners.length > 0)
+          resolve(
+            await buildEmployeeList(convertToObj(await EmployeeQuery.find())),
+          );
+        else resolve([]);
       }
     } catch (e) {
+      console.error(`Empregador ${e}`);
       reject(`Empregador ${JSON.stringify(e)}`);
     }
   });
@@ -36,15 +41,18 @@ export const getEmployeeByEmail = (employeeEmail, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
       const EmployeeQuery = new Parse.Query(EmployeeObject);
-      EmployeeQuery.equalTo('Email', employeeEmail.trim());
-      EmployeeQuery.include('IdSalaoFK');
+      EmployeeQuery.equalTo('email', employeeEmail.trim());
+      // EmployeeQuery.include('salon_id');
 
       if (returnParseObject) {
         resolve(await EmployeeQuery.first());
       } else {
-        resolve(convertToObj(await EmployeeQuery.first()));
+        resolve(
+          buildEmployeeObject(convertToObj(await EmployeeQuery.first()), []),
+        );
       }
     } catch (e) {
+      console.error(`Empregador ${e}`);
       reject(`Empregador ${JSON.stringify(e)}`);
     }
   });
@@ -59,50 +67,110 @@ export const getEmployeeById = (employeeId, returnParseObject) => {
       if (returnParseObject) {
         resolve(await EmployeeQuery.first());
       } else {
-        resolve(convertToObj(await EmployeeQuery.first()));
+        resolve(
+          buildEmployeeObject(convertToObj(await EmployeeQuery.first()), []),
+        );
       }
     } catch (e) {
+      console.error(`Empregador ${e}`);
       reject(`Empregador ${JSON.stringify(e)}`);
     }
   });
 };
 
-export const saveEmployee = (employeeObj, returnParseObject) => {
+export const saveEmployee = (employeeObj, returnParseObject, currentUser) => {
   return new Promise((resolve, reject) => {
     try {
-      const {cnpj, tel, employee_type, name, salaoFK, email} = employeeObj;
+      const {cnpj, tel, tel2, employeeType, name, salonId, email, procedures} =
+        employeeObj;
 
       const newEmployee = new EmployeeObject();
-      newEmployee.set('Nome', name.trim());
-      newEmployee.set('CNPJ', cnpj);
-      newEmployee.set('TipoFunc', employee_type);
-      newEmployee.set('Telefone', tel);
-      newEmployee.set('IdSalaoFK', salaoFK);
-      newEmployee.set('Email', email.trim());
+      newEmployee.set('name', name.trim());
+      newEmployee.set('cnpj', cnpj);
+      newEmployee.set('employee_type', employeeType);
+      newEmployee.set('tel', tel);
+      newEmployee.set('tel2', tel2);
+      newEmployee.set('salon_id', salonId);
+      newEmployee.set('email', email.trim());
 
       newEmployee.save().then(
-        savedEmployee => {
+        async savedEmployee => {
+          if (procedures !== undefined) {
+            for (const procedure of procedures) {
+              const procedureEmployee = await saveProcedureEmployee({
+                procedureId: new ProcedureObject({objectId: procedure.id}),
+                employeeId: new EmployeeObject({objectId: savedEmployee.id}),
+              });
+
+              procedure.procedureEmployeeId = procedureEmployee.objectId;
+            }
+          }
+
           if (returnParseObject) {
             resolve(savedEmployee);
           } else {
-            resolve(convertToObj(savedEmployee));
+            resolve(
+              await buildEmployeeObject(
+                convertToObj(savedEmployee),
+                procedures,
+              ),
+            );
           }
         },
         error => {
+          console.error(`Empregador ${error}`);
           reject(`Empregador ${JSON.stringify(error)}`);
         },
       );
     } catch (e) {
+      console.error(`Empregador ${e}`);
       reject(`Empregador ${JSON.stringify(e)}`);
     }
   });
 };
 
-export const deleteEmployeeCRUD = (partnerId, returnParseObject) => {
+export const saveEmployeeWithoutProcedures = (
+  employeeObj,
+  returnParseObject,
+) => {
+  return new Promise((resolve, reject) => {
+    try {
+      let {cnpj, tel, tel2, employeeType, name, salonId, email} = employeeObj;
+
+      const newEmployee = new EmployeeObject();
+      newEmployee.set('name', name.trim());
+      newEmployee.set('cnpj', cnpj);
+      newEmployee.set('employee_type', employeeType);
+      newEmployee.set('tel', tel);
+      newEmployee.set('tel2', tel2);
+      newEmployee.set('salon_id', salonId);
+      newEmployee.set('email', email.trim());
+
+      newEmployee.save().then(
+        async savedEmployee => {
+          if (returnParseObject) {
+            resolve(savedEmployee);
+          } else {
+            resolve(await buildEmployeeObject(convertToObj(savedEmployee), []));
+          }
+        },
+        error => {
+          console.error(`Empregador ${error}`);
+          reject(`Empregador ${JSON.stringify(error)}`);
+        },
+      );
+    } catch (e) {
+      console.error(`Empregador ${e}`);
+      reject(`Empregador ${JSON.stringify(e)}`);
+    }
+  });
+};
+export const deleteEmployeeCRUD = (employeeId, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const partner = await getEmployeeById(partnerId, true);
-      await deleteProcedureEmployeeByFuncId(partnerId);
+      const partner = new EmployeeObject({objectId: employeeId});
+      await deleteProcedureEmployeeByEmployeeId(employeeId);
+      await deleteScheduleByEmployeeId(employeeId, false);
       partner.destroy().then(deletedPartner => {
         if (returnParseObject) {
           resolve(deletedPartner);
@@ -111,6 +179,7 @@ export const deleteEmployeeCRUD = (partnerId, returnParseObject) => {
         }
       });
     } catch (e) {
+      console.error(`Empregador ${e}`);
       reject(`Empregador ${JSON.stringify(e)}`);
     }
   });
@@ -123,36 +192,56 @@ export const updateEmployeeCRUD = (
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const {name, tel, cnpj, email, procedures, objectId} = partnerObj;
-      const employee = await getEmployeeById(objectId, true);
+      const {
+        name,
+        tel,
+        tel2,
+        cnpj,
+        email,
+        procedures,
+        procedureListWithoutChanges,
+        id,
+      } = partnerObj;
+      const employee = new EmployeeObject({objectId: id});
 
-      proceduresList.map(async pl => {
-        if (!procedures.some(p => p.item === pl.IdProcFK.Nome)) {
-          await deleteProcedureEmployeeById(pl.objectId);
+      employee.set('name', name.trim());
+      employee.set('cnpj', cnpj);
+      employee.set('tel', tel);
+      employee.set('tel2', tel2);
+      employee.set('email', email.trim());
+
+      employee.save().then(async employee => {
+        if (returnParseObject) {
+          resolve(employee);
+        } else {
+          procedureListWithoutChanges.map(async pl => {
+            if (!procedures.some(p => p.name === pl.name)) {
+              await deleteProcedureEmployee(pl.procedureEmployeeId);
+            }
+          });
+
+          for (const procedure of procedures) {
+            if (
+              !procedureListWithoutChanges.some(pl => pl.id === procedure.id)
+            ) {
+              const procedureEmployeer = {
+                procedureId: new ProcedureObject({objectId: procedure.id}),
+                employeeId: employee,
+              };
+              const procedureEmployee = await saveProcedureEmployee(
+                procedureEmployeer,
+                false,
+              );
+              procedure.procedureEmployeeId = procedureEmployee.objectId;
+            }
+          }
+          resolve(
+            await buildEmployeeObject(convertToObj(employee), procedures),
+          );
         }
       });
-
-      procedures.map(async p => {
-        if (!proceduresList.some(pl => pl.IdProcFK.Nome === p.item)) {
-          const procedureEmployeer = {
-            IdProcFK: await getProcedureByName(p.item, true),
-            IdFuncFK: employee,
-          };
-          await saveProcedureEmployee(procedureEmployeer, false);
-        }
-      });
-
-      employee.set('Nome', name.trim());
-      employee.set('CNPJ', cnpj);
-      employee.set('Telefone', tel);
-      employee.set('Email', email.trim());
-
-      if (returnParseObject) {
-        resolve(await employee.save());
-      } else {
-        resolve(convertToObj(await employee.save()));
-      }
     } catch (e) {
+      console.error(`Empregador ${e}`);
       reject(`Empregador ${JSON.stringify(e)}`);
     }
   });

@@ -12,8 +12,6 @@ export const ClientContext = createContext();
 const initialState = {
   clients: [],
   registeredClients: [],
-  clientInView: {},
-  dropdownClients: [],
 };
 
 const ClientProvider = ({children}) => {
@@ -23,9 +21,8 @@ const ClientProvider = ({children}) => {
     return new Promise(async (resolve, reject) => {
       try {
         await getAllClientsBySalonId(payload, false).then(clients => {
-          dispatch({type: 'LOAD_CLIENTS', clients});
+          resolve(dispatch({type: 'LOAD_CLIENTS', clients}));
 
-          resolve('Deu certo');
           // console.log((state.clients = clients));
         });
       } catch (e) {
@@ -54,7 +51,7 @@ const ClientProvider = ({children}) => {
             dispatch({type: 'SAVE_CLIENTS', newClient});
           });
         });
-        resolve('Deu bom');
+        resolve('OK');
       } catch (e) {
         reject(`Deu ruim ao salvar clientes ${e}`);
       }
@@ -77,9 +74,11 @@ const ClientProvider = ({children}) => {
 
   const deleteClient = payload => {
     return new Promise(async (resolve, reject) => {
+      const {id} = payload;
       try {
-        dispatch({type: 'DELETE_CLIENT', payload});
-        resolve(await deleteClientCRUD(payload.objectId));
+        deleteClientCRUD(id).then(deletedClient => {
+          resolve(dispatch({type: 'DELETE_CLIENT', deletedClient}));
+        });
       } catch (e) {
         reject(`Deu ruim ao excluir clientes ${e}`);
       }

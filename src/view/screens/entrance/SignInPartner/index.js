@@ -30,7 +30,7 @@ const SignInPartner = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (value, rawValue, name) => {
+  const handleChange = (value, name) => {
     setUserData({
       ...userData,
       [name]: value,

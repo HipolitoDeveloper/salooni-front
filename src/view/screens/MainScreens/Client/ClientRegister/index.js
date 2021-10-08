@@ -2,21 +2,17 @@ import React, {useContext, useEffect, useState} from 'react';
 import * as S from './styled';
 import Input from '../../../../components/Input';
 import SubmitButton from '../../../../components/SubmitButton';
-import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import global from '../../../../../common/global';
 import ErrorMessage from '../../../../components/ErrorMessage';
 import {useNavigation} from '@react-navigation/native';
 import {ClientContext} from '../../../../../contexts/Client/ClientContext';
 import errorMessages from '../../../../../common/errorMessages';
 import AlertModal from '../../../../components/AlertModal';
-import {ClientInformationContent, InformationContent} from './styled';
 import {ActivityIndicator} from 'react-native';
 import BackButton from '../../../../components/BackButton';
 import {UserContext} from '../../../../../contexts/User/UserContext';
-import {getSalonById} from '../../../../../services/SalonService';
+import {SalonObject} from '../../../../../services/SalonService';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {NavigationEvents} from 'react-navigation';
-import {ClientParseObjectToClientObject} from '../../../../../common/conversor';
 
 const ClientRegister = ({route}) => {
   const {
@@ -26,7 +22,6 @@ const ClientRegister = ({route}) => {
     saveClient,
 
     cleanRegisteredClients,
-    clientInView,
     updateClientInView,
     updateClient,
     deleteClient,
@@ -47,11 +42,9 @@ const ClientRegister = ({route}) => {
 
   useEffect(() => {
     navigate.addListener('focus', () => {
-      const clientInView = route.params?.client
-        ? ClientParseObjectToClientObject(route.params?.client)
-        : {};
+      if (Object.keys(route.params?.client).length !== 0) {
+        const clientInView = route.params?.client;
 
-      if (Object.keys(clientInView).length !== 0) {
         setClient(clientInView);
         setIsEditing(true);
       }
@@ -62,7 +55,7 @@ const ClientRegister = ({route}) => {
     registeredClients.forEach(client => (client.isInView = false));
   }, []);
 
-  const handleChange = (text, rawText, name) => {
+  const handleChange = (text, name) => {
     setClient({
       ...client,
       [name]: text,
@@ -84,7 +77,7 @@ const ClientRegister = ({route}) => {
     }
 
     if (verifyInformation() && !isInView) {
-      client.IdSalaoFK = await getSalonById(currentUser.idSalon, true);
+      client.salonId = new SalonObject({objectId: currentUser.idSalon});
       addClient(client);
       setErrorMessage('');
       setClient({});
@@ -109,15 +102,16 @@ const ClientRegister = ({route}) => {
 
   const saveClients = () => {
     setIsLoading(true);
-
     if (verifyInformationToGo()) {
       saveClient().then(
         () => {
-          setIsLoading(false);
+          setTimeout(() => {
+            setIsLoading(false);
+            navigate.navigate('Clients');
+            setClient({});
+          }, 3000);
           cleanRegisteredClients();
-          navigate.navigate('Clients');
           setErrorMessage('');
-          setClient({});
         },
         error => {
           setIsLoading(false);
@@ -131,10 +125,12 @@ const ClientRegister = ({route}) => {
     setIsLoading(true);
     updateClient(client).then(
       async () => {
-        setIsLoading(false);
-        navigate.navigate('Clients');
+        setTimeout(() => {
+          setIsLoading(false);
+          navigate.navigate('Clients');
+          setClient({});
+        }, 500);
         setErrorMessage('');
-        setClient({});
       },
       error => {
         setIsLoading(false);
@@ -167,10 +163,9 @@ const ClientRegister = ({route}) => {
       return ableToGo;
     } else if (registeredClients.length === 0) {
       ableToGo = false;
-
       setErrorMessage(errorMessages.noClientMessage);
+      setIsLoading(false);
     }
-    setIsLoading(false);
     return ableToGo;
   };
 
@@ -188,11 +183,12 @@ const ClientRegister = ({route}) => {
       client.cpf === '' ||
       client.tel === undefined ||
       client.tel === '' ||
-      client.born_date === undefined ||
-      client.born_date === ''
+      client.bornDate === undefined ||
+      client.bornDate === ''
     ) {
       ableToGo = false;
       errorMessage = errorMessages.clientMessage;
+      setIsLoading(false);
     }
 
     setErrorMessage(errorMessage);
@@ -257,20 +253,20 @@ const ClientRegister = ({route}) => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'999.999.999-99'}
+            mask={'cpf'}
           />
 
           <Input
             handleChange={handleChange}
-            name={'born_date'}
+            name={'bornDate'}
             placeholder={'Data de Nascimento*'}
-            value={client.born_date}
+            value={client.bornDate}
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'99/99/9999'}
+            mask={'date'}
           />
 
           <S.ClientInformationContent>
@@ -285,7 +281,7 @@ const ClientRegister = ({route}) => {
                 isSecureTextEntry={false}
                 fontSize={18}
                 disabled={false}
-                mask={'(99) 99999-9999'}
+                mask={'phone'}
               />
 
               <Input
@@ -298,7 +294,7 @@ const ClientRegister = ({route}) => {
                 isSecureTextEntry={false}
                 fontSize={18}
                 disabled={false}
-                mask={'(99) 99999-9999'}
+                mask={'phone'}
               />
             </S.InformationContent>
 

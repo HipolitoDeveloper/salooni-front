@@ -1,16 +1,23 @@
-import {convertToObj} from '../common/conversor';
+import {convertToObj} from '../pipe/conversor';
 import {getEmployeeById} from '../services/EmployeeService';
+import {buildEmployeeObject} from './Employee';
 
 export const buildCurrentUser = user => {
-  return new Promise(async resolve => {
-    const currentUser = convertToObj(user);
-    const employeeObj = await getEmployeeById(currentUser.IdFuncFK.objectId);
+  const currentUser = convertToObj(user);
+  return {
+    id: currentUser.objectId,
+    idFunc: currentUser.employee_id.objectId,
+    idSalon: currentUser.employee_id.salon_id.objectId,
+    employeeType: currentUser.employee_id.employee_type,
+  };
+};
 
-    resolve({
-      id: currentUser.objectId,
-      idFunc: currentUser.IdFuncFK.objectId,
-      idSalon: employeeObj.IdSalaoFK.objectId,
-      typeEmployee: currentUser.IdFuncFK.TipoFunc,
-    });
+export const buildUserList = users => {
+  return users.map(user => {
+    return {
+      employee: buildEmployeeObject(user.employee_id, []),
+      username: user.username,
+      email: user.email,
+    };
   });
 };

@@ -6,6 +6,9 @@ import keys from './src/config/server_connection';
 import {NavigationContainer} from '@react-navigation/native';
 import UserProvider from './src/contexts/User/UserContext';
 import ClientProvider from './src/contexts/Client/ClientContext';
+import PartnerProvider from './src/contexts/Partner/PartnerContext';
+import ScheduleProvider from './src/contexts/Schedule/ScheduleContext';
+import ProcedureProvider from './src/contexts/Procedure/ProcedureContext';
 
 Parse.setAsyncStorage(AsyncStorage);
 Parse.initialize(keys.applicationId, keys.javascriptKey, 'master');
@@ -16,7 +19,13 @@ export default () => {
     <NavigationContainer>
       <UserProvider>
         <ClientProvider>
-          <MainStack />
+          <ProcedureProvider>
+            <PartnerProvider>
+              <ScheduleProvider>
+                <MainStack />
+              </ScheduleProvider>
+            </PartnerProvider>
+          </ProcedureProvider>
         </ClientProvider>
       </UserProvider>
     </NavigationContainer>

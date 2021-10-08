@@ -1,18 +1,18 @@
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {LocaleConfig, Agenda} from 'react-native-calendars';
 import global from '../../../../src/common/global';
 import {Alert, Text, TouchableOpacity, View, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import {UserContext} from '../../../contexts/User/UserContext';
+import {ScheduleContext} from '../../../contexts/Schedule/ScheduleContext';
+import moment from 'moment';
 
-const Calendar = () => {
+const Calendar = ({calendarSchedule}) => {
   const navigate = useNavigation();
 
-  const [items, setItems] = useState({
-    '2021-08-16': [{name: 'item 1 - any js object'}],
-    '2012-05-23': [{name: 'item 2 - any js object', height: 80}],
-    '2012-05-24': [],
-    '2021-08-18': [{name: 'item 3 - any js object'}, {name: 'any js object'}],
-  });
+  const [items, setItems] = useState(calendarSchedule);
+  const {currentUser} = useContext(UserContext);
+  const {loadAllSchedules} = useContext(ScheduleContext);
 
   LocaleConfig.locales['br'] = {
     monthNames: [
@@ -58,12 +58,12 @@ const Calendar = () => {
   LocaleConfig.defaultLocale = 'br';
 
   const theme = {
-    backgroundColor: `${global.colors.lightGreyColor}`,
-    calendarBackground: `${global.colors.lightGreyColor}`,
+    backgroundColor: `${global.colors.backgroundColor}`,
+    calendarBackground: `${global.colors.backgroundColor}`,
     textSectionTitleColor: '#b6c1cd',
     textSectionTitleDisabledColor: '#d9e1e8',
     selectedDayBackgroundColor: `${global.colors.blueColor}`,
-    selectedDayTextColor: `${global.colors.lightGreyColor}`,
+    selectedDayTextColor: `${global.colors.backgroundColor}`,
     todayTextColor: '#00adf5',
     dayTextColor: '#000',
     textDisabledColor: '#d9e1e8',
@@ -112,11 +112,44 @@ const Calendar = () => {
   };
 
   const renderItems = (item, firstItemInDay) => (
-    <TouchableOpacity
-      style={[styles.item, {height: item.height}]}
-      onPress={() => Alert.alert(item.name)}>
-      <Text>{item.name}</Text>
-    </TouchableOpacity>
+    <>
+      <TouchableOpacity
+        style={[
+          styles.item,
+          {
+            backgroundColor: item.nextHour
+              ? `${global.colors.purpleColor}`
+              : 'white',
+          },
+        ]}
+        onPress={() => Alert.alert(JSON.stringify(item.nextHour))}>
+        <View style={[styles.itemContent]}>
+          <View>
+            <Text
+              style={{
+                color: item.nextHour ? 'white' : `${global.colors.purpleColor}`,
+                opacity: item.passedHour ? 0.6 : 1,
+              }}>
+              {item.formattedHour}
+            </Text>
+            <Text
+              style={{
+                opacity: item.passedHour ? 0.6 : 1,
+              }}>
+              {item.clientName}
+            </Text>
+          </View>
+          <View style={{color: global.colors.lightGreyColor}}>
+            <Text
+              style={{
+                opacity: item.passedHour ? 0.6 : 1,
+              }}>
+              {item.clientTel}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </>
   );
 
   const renderEmptyDate = () => (
@@ -143,7 +176,7 @@ const Calendar = () => {
         onPress={date =>
           navigate.navigate('ApplicationStack', {
             screen: 'SchedulingRegister',
-            params: {date: date},
+            params: {date: moment(date).format()},
           })
         }
         items={items}
@@ -162,14 +195,32 @@ const Calendar = () => {
         // renderDay={renderDay}
         pastScrollRange={50}
         futureScrollRange={50}
-        renderItem={renderItems}
+        renderItem={(item, firstItemInDay) => (
+          <>
+            {firstItemInDay && (
+              <View
+                style={[
+                  styles.firtsItemDay,
+                  {backgroundColor: global.colors.backgroundColor},
+                ]}
+              />
+            )}
+            {renderItems(item)}
+          </>
+        )}
         renderEmptyDate={renderEmptyDate}
         renderKnob={renderKnob}
         rowHasChanged={(r1, r2) => {
           return r1.name !== r2.name;
         }}
         showClosingKnob={true}
-        onRefresh={() => console.log('refreshing...')}
+        onRefresh={async () =>
+          await loadAllSchedules({
+            salonId: currentUser.idSalon,
+            employeeId: currentUser.idFunc,
+            employeeType: currentUser.employeeType,
+          })
+        }
         refreshing={false}
         refreshControl={null}
         theme={{
@@ -185,14 +236,19 @@ const Calendar = () => {
 };
 
 const styles = StyleSheet.create({
-  item: {
-    backgroundColor: 'white',
-    flex: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginRight: 10,
-    marginTop: 17,
+  firtsItemDay: {
+    height: 40,
   },
+  item: {
+    marginRight: 10,
+  },
+  itemContent: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+
   emptyDate: {
     height: 15,
     flex: 1,

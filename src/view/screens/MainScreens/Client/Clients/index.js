@@ -9,44 +9,26 @@ import {UserContext} from '../../../../../contexts/User/UserContext';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ActionButton from 'react-native-circular-action-menu';
 import Header from '../../../../components/Header';
-import {ActionButtonContainer} from './styled';
 
 const Clients = () => {
-  const {clients, loadAllClients, setClientInView, cleanClientInView} =
-    useContext(ClientContext);
+  const {clients, loadAllClients} = useContext(ClientContext);
 
-  const {doLogout, currentUser} = useContext(UserContext);
+  const {currentUser} = useContext(UserContext);
 
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const navigate = useNavigation();
 
-  useEffect(() => {
-    setLoading(true);
-    const getAllClients = async () => {
-      await loadAllClients(currentUser.idSalon).then(
-        () => setLoading(false),
-        error => {
-          console.log(error);
-          setLoading(false);
-        },
-      );
-      setLoading(false);
-    };
-
-    getAllClients();
-  }, []);
-
   const loadClients = clients.map((client, index) => (
     <S.BoxContainer key={index}>
       <S.BoxContent>
         <S.BoxLabel>Nome</S.BoxLabel>
-        <S.BoxText>{client.Nome}</S.BoxText>
+        <S.BoxText>{client?.name}</S.BoxText>
       </S.BoxContent>
       <S.BoxContent>
         <S.BoxLabel>Telefone</S.BoxLabel>
-        <S.BoxText>{client.Telefone}</S.BoxText>
+        <S.BoxText>{client?.tel}</S.BoxText>
       </S.BoxContent>
       <S.DetailsContent>
         <S.DetailsButton
@@ -94,6 +76,7 @@ const Clients = () => {
               onPress={() => {
                 navigate.push('ApplicationStack', {
                   screen: 'ClientRegister',
+                  params: {client: {}},
                 });
               }}
             />

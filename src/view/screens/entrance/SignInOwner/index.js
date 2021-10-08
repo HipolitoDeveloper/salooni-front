@@ -22,7 +22,7 @@ const SignInOwner = () => {
   });
   const navigate = useNavigation();
 
-  const handleChange = (text, rawText, name) => {
+  const handleChange = (text, name) => {
     setUserData({
       ...userData,
       [name]: text,

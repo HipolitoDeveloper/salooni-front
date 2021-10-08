@@ -1,15 +1,7 @@
-import {convertToObj} from '../../common/conversor';
-
 export const ProcedureReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_PROCEDURES':
       state.procedures = action.procedures;
-      state.dropdownProcedures = action.procedures.map(procedure => {
-        return {
-          id: procedure.objectId,
-          item: procedure.Nome,
-        };
-      });
 
       return {
         procedures: state.procedures,
@@ -17,18 +9,30 @@ export const ProcedureReducer = (state, action) => {
         ...state,
       };
     case 'ADD_PROCEDURE':
-      const {name, time, price, fixedValue, percentage, funcFk, salaoFK} =
-        action.procedure;
+      const {
+        name,
+        time,
+        value,
+        commissionValue,
+        commissionPercentage,
+        maintenanceValue,
+        maintenanceDays,
+        employeeId,
+        salonId,
+      } = action.procedure;
       let newProcedures = state.registeredProcedures;
 
       const newProcedure = {
+        id: name,
         name: name,
         time: time,
-        price: price,
-        fixedValue: fixedValue,
-        percentage: percentage,
-        funcFk: funcFk !== undefined && funcFk,
-        salaoFK: salaoFK !== undefined && salaoFK,
+        value: value,
+        maintenanceValue: maintenanceValue,
+        maintenanceDays: maintenanceDays,
+        commissionValue: commissionValue,
+        commissionPercentage: commissionPercentage,
+        employeeId: employeeId,
+        salonId: salonId,
       };
       newProcedures.push(newProcedure);
 
@@ -66,20 +70,29 @@ export const ProcedureReducer = (state, action) => {
         ...state,
       };
     case 'SAVE_PROCEDURES':
-      state.procedures.push(convertToObj(action.newProcedure));
+      state.procedures.push(action.newProcedure);
       return {
         procedures: state.procedures,
         ...state,
       };
     case 'UPDATE_PROCEDURE':
+      const updatedProcedure = action.updatedProcedure;
+      let updatedProcedures = state.procedures.map(procedure => {
+        if (procedure.id === updatedProcedure.id) {
+          procedure = {...updatedProcedure};
+        }
+        return procedure;
+      });
+
+      state.procedures = updatedProcedures;
       return {
-        procedureInView: {},
+        procedures: state.procedures,
         ...state,
       };
     case 'DELETE_PROCEDURE':
-      const {objectId} = action.payload;
+      const {id} = action.deletedProcedures;
       state.procedures.forEach((procedure, index) => {
-        if (procedure.objectId === objectId) {
+        if (procedure.id === id) {
           state.procedures.splice(index, 1);
         }
       });

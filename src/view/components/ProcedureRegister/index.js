@@ -11,10 +11,12 @@ import AlertModal from '../AlertModal';
 import {ActivityIndicator, Text} from 'react-native';
 import BackButton from '../BackButton';
 import {UserContext} from '../../../contexts/User/UserContext';
-import {getSalonById} from '../../../services/SalonService';
+import {SalonObject} from '../../../services/SalonService';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {ProcedureParseObjectToProcedureObject} from '../../../common/conversor';
 import {ProcedureContext} from '../../../contexts/Procedure/ProcedureContext';
+import {EmployeeObject} from '../../../services/EmployeeService';
+import {InputModal} from '../InputModal';
+import {MaskedTextInput} from 'react-native-mask-text';
 
 const ProcedureRegister = ({
   route,
@@ -44,14 +46,20 @@ const ProcedureRegister = ({
     isShowing: false,
     text: '',
   });
-  const [procedure, setProcedure] = useState({});
+  const [procedure, setProcedure] = useState({
+    name: '',
+    time: '',
+    value: '',
+    maintenanceValue: '',
+    maintenanceDays: '',
+    commissionPercentage: '',
+    commissionValue: '',
+  });
   const navigate = useNavigation();
 
   useEffect(() => {
     navigate.addListener('focus', () => {
-      const procedureInView = route.params?.procedure
-        ? ProcedureParseObjectToProcedureObject(route.params?.procedure)
-        : {};
+      const procedureInView = route.params?.procedure;
 
       if (Object.keys(procedureInView).length !== 0) {
         setProcedure(procedureInView);
@@ -61,21 +69,33 @@ const ProcedureRegister = ({
   }, [navigate]);
 
   useEffect(() => {
-    registeredProcedures.forEach(client => (client.isInView = false));
+    registeredProcedures.forEach(procedure => (procedure.isInView = false));
   }, []);
 
-  const handleChange = (text, rawText, name) => {
-    if (name === 'percentage') {
+  const clearProcedure = () => {
+    setProcedure({
+      name: '',
+      time: '',
+      value: '',
+      maintenanceValue: '',
+      maintenanceDays: '',
+      commissionPercentage: '',
+      commissionValue: '',
+    });
+  };
+
+  const handleChange = (text, name) => {
+    if (name === 'commissionPercentage') {
       delete procedure.isFixedValue;
-      procedure.fixedValue = 0;
+      procedure.commissionValue = 0;
       setProcedure({
         ...procedure,
         ['isPercentage']: !!text,
         [name]: text,
       });
-    } else if (name === 'fixedValue') {
+    } else if (name === 'commissionValue') {
       delete procedure.isPercentage;
-      procedure.percentage = 0;
+      procedure.commissionPercentage = 0;
       setProcedure({
         ...procedure,
         ['isFixedValue']: !!text,
@@ -104,20 +124,20 @@ const ProcedureRegister = ({
       procedure.isInView = false;
       editProcedure({procedure: procedure, index: indexInView});
       setErrorMessage('');
-      setProcedure({});
+      clearProcedure();
     }
 
     if (verifyInformation() && !isInView) {
-      if (!isSigningUp)
-        procedure.IdSalaoFK = await getSalonById(currentUser.idSalon, true);
-      addProcedure({
-        salonId: isSigningUp ? null : currentUser.idSalon,
-        employeeId: isSigningUp ? null : currentUser.idFunc,
-        procedure: procedure,
-        isSignup: isSigningUp,
-      });
+      if (!isSigningUp) {
+        procedure.salonId = new SalonObject({objectId: currentUser.idSalon});
+        procedure.employeeId = new EmployeeObject({
+          objectId: currentUser.idFunc,
+        });
+      }
+
+      addProcedure(procedure);
       setErrorMessage('');
-      setProcedure({});
+      clearProcedure();
     }
   };
 
@@ -126,14 +146,14 @@ const ProcedureRegister = ({
     procedure.isInView = !procedure.isInView;
     procedure.indexInView = index;
 
-    procedure.isFixedValue = !!procedure.value;
+    procedure.isFixedValue = !!procedure.commissionValue;
 
-    procedure.isPercentage = !!procedure.percentage;
+    procedure.isPercentage = !!procedure.commissionPercentage;
 
     setProcedure(procedure);
 
     if (!verifyIfIsEditing()) {
-      setProcedure({});
+      clearProcedure();
     }
   };
 
@@ -146,7 +166,7 @@ const ProcedureRegister = ({
     if (verifyInformationToGo()) {
       navigate.navigate('SignupPartners');
       setErrorMessage('');
-      setProcedure({});
+      clearProcedure();
     }
   };
 
@@ -156,11 +176,13 @@ const ProcedureRegister = ({
     if (verifyInformationToGo()) {
       saveProcedures().then(
         () => {
-          setIsLoading(false);
-          cleanRegisteredProcedures();
-          navigate.navigate('Procedures');
+          setTimeout(() => {
+            setIsLoading(false);
+            navigate.navigate('Procedures');
+            clearProcedure();
+            cleanRegisteredProcedures();
+          }, 3000);
           setErrorMessage('');
-          setProcedure({});
         },
         error => {
           setIsLoading(false);
@@ -174,10 +196,12 @@ const ProcedureRegister = ({
     setIsLoading(true);
     updateProcedure(procedure).then(
       async () => {
-        setIsLoading(false);
-        navigate.navigate('Procedures');
+        setTimeout(() => {
+          setIsLoading(false);
+          navigate.navigate('Procedures');
+          clearProcedure();
+        }, 1000);
         setErrorMessage('');
-        setProcedure({});
       },
       error => {
         setIsLoading(false);
@@ -193,7 +217,7 @@ const ProcedureRegister = ({
         setIsLoading(false);
         navigate.navigate('Procedures');
         setErrorMessage('');
-        setProcedure({});
+        clearProcedure();
       },
       error => {
         setIsLoading(false);
@@ -212,8 +236,8 @@ const ProcedureRegister = ({
       if (isSigningUp)
         handleModal(true, errorMessages.noProcedureMessage, false);
       else setErrorMessage(errorMessages.saveErrorProcedureMessage);
+      setIsLoading(false);
     }
-    setIsLoading(false);
     return ableToGo;
   };
 
@@ -227,27 +251,35 @@ const ProcedureRegister = ({
       procedure.name === '' ||
       procedure.time === undefined ||
       procedure.time === '' ||
-      procedure.price === undefined ||
-      procedure.price === ''
+      procedure.value === undefined ||
+      procedure.value === ''
     ) {
       ableToGo = false;
       errorMessage = errorMessages.procedureMessage;
+      setIsLoading(false);
     } else if (
-      (procedure.percentage === undefined || procedure.percentage === '') &&
-      (procedure.fixedValue === undefined || procedure.fixedValue === '')
+      (procedure.commissionPercentage === undefined ||
+        procedure.commissionPercentage === '') &&
+      (procedure.commissionValue === undefined ||
+        procedure.commissionValue === '')
     ) {
       ableToGo = false;
       errorMessage = errorMessages.commissionMessage;
+      setIsLoading(false);
     } else {
       const procedureValue = parseFloat(
-        procedure.price !== 0 ? procedure.price.replace('$', '') : 0,
+        procedure.value !== 0 ? procedure.value.replace(',', '') : 0,
       );
       const commissionValue = parseFloat(
-        procedure.fixedValue !== 0 ? procedure.fixedValue.replace('$', '') : 0,
+        procedure.commissionValue !== 0
+          ? procedure.commissionValue.replace(',', '')
+          : 0,
       );
+
       if (commissionValue > procedureValue) {
         errorMessage = errorMessages.commissionMismatchMessage;
         ableToGo = false;
+        setIsLoading(false);
       }
     }
 
@@ -307,26 +339,55 @@ const ProcedureRegister = ({
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'9:99'}
+            mask={'hour'}
+            maxLength={3}
+            rightPlaceholder={'minutos'}
           />
 
           <Input
             handleChange={handleChange}
-            name={'price'}
+            name={'value'}
             placeholder={'Preço*'}
-            value={procedure.price}
+            value={procedure.value}
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            type={'currency'}
-            options={{
-              prefix: '$',
-              decimalSeparator: '.',
-              groupSeparator: ',',
-              precision: 2,
-            }}
+            mask={'brl'}
+            leftPlaceholder={'R$'}
+          />
+
+          <InputModal
+            renderInputs={() => (
+              <>
+                <Input
+                  handleChange={handleChange}
+                  name={'maintenanceValue'}
+                  placeholder={'Valor'}
+                  value={procedure.maintenanceValue}
+                  width={'80%'}
+                  keyboard={'numeric'}
+                  isSecureTextEntry={false}
+                  fontSize={18}
+                  disabled={false}
+                  mask="brl"
+                  leftPlaceholder={'R$'}
+                />
+                <Input
+                  handleChange={handleChange}
+                  name={'maintenanceDays'}
+                  placeholder={'Dias'}
+                  value={procedure.maintenanceDays}
+                  width={'80%'}
+                  keyboard={'numeric'}
+                  isSecureTextEntry={false}
+                  fontSize={18}
+                  disabled={false}
+                  mask="none"
+                />
+              </>
+            )}
           />
 
           <S.ClientInformationContent>
@@ -335,31 +396,29 @@ const ProcedureRegister = ({
                 <BouncyCheckbox
                   isChecked={procedure.isPercentage}
                   onPress={isChecked =>
-                    handleChange(!procedure.isPercentage, '', 'percentage')
+                    handleChange(
+                      !procedure.isPercentage,
+
+                      'commissionPercentage',
+                    )
                   }
                   fillColor={`${global.colors.purpleColor}`}
                   disableBuiltInState={true}
                   disableText={true}
                 />
                 <Input
-                  handleChange={(text, rawText, name) =>
-                    handleChange(text, rawText, name)
-                  }
-                  name={'percentage'}
-                  placeholder={'%'}
-                  value={procedure.percentage}
+                  handleChange={handleChange}
+                  name={'commissionPercentage'}
+                  value={procedure.commissionPercentage}
                   width={'73%'}
                   keyboard={'numeric'}
+                  placeholder={'Porc.'}
                   isSecureTextEntry={false}
                   fontSize={18}
                   disabled={false}
-                  type={'currency'}
-                  options={{
-                    prefix: '%',
-                    decimalSeparator: '.',
-                    groupSeparator: ',',
-                    precision: 2,
-                  }}
+                  mask={'percentage'}
+                  maxLength={3}
+                  rightPlaceholder={'%'}
                 />
               </S.CheckboxContent>
               <S.CheckboxContent>
@@ -367,31 +426,24 @@ const ProcedureRegister = ({
                   style={{borderColor: global.colors.purpleColor}}
                   isChecked={procedure.isFixedValue}
                   onPress={isChecked =>
-                    handleChange(!procedure.isFixedValue, '', 'fixedValue')
+                    handleChange(!procedure.isFixedValue, 'commissionValue')
                   }
                   fillColor={`${global.colors.purpleColor}`}
                   disableBuiltInState={true}
                   disableText={true}
                 />
                 <Input
-                  handleChange={(text, rawText, name) =>
-                    handleChange(text, rawText, name)
-                  }
-                  name={'fixedValue'}
-                  placeholder={'R$'}
-                  value={procedure.fixedValue}
+                  handleChange={handleChange}
+                  name={'commissionValue'}
+                  value={procedure.commissionValue}
                   width={'73%'}
+                  placeholder={'Valor.'}
                   keyboard={'numeric'}
                   isSecureTextEntry={false}
                   fontSize={18}
                   disabled={false}
-                  type={'currency'}
-                  options={{
-                    prefix: '$',
-                    decimalSeparator: '.',
-                    groupSeparator: ',',
-                    precision: 2,
-                  }}
+                  mask={'brl'}
+                  leftPlaceholder={'R$'}
                 />
               </S.CheckboxContent>
             </S.InformationContent>
@@ -442,7 +494,7 @@ const ProcedureRegister = ({
                 <S.DeleteButton
                   onPress={() => {
                     deleteProcedureInView(procedure);
-                    setProcedure({});
+                    clearProcedure();
                   }}>
                   <Icon name="trash" size={17} />
                 </S.DeleteButton>

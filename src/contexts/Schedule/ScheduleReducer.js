@@ -1,48 +1,83 @@
+import {
+  buildCalendar,
+  setNextHour,
+  sortSchedules,
+} from '../../factory/Schedule';
+
 export const ScheduleReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_SCHEDULES':
       state.schedules = action.schedules;
+
+      state.calendarSchedule = buildCalendar(action.schedules);
+
       return {
         schedules: state.schedules,
+        calendarSchedule: state.calendarSchedule,
         ...state,
       };
     case 'ADD_SCHEDULE':
-      const {employee, client, procedures} = action.payload;
+      const {client, employee, procedures, scheduleDate, salonId} =
+        action.payload;
+
       let newSchedules = state.registeredSchedules;
       const newSchedule = {
-        IdFuncFK: employee,
-        IdClient: client,
-        IdProcFK: procedures,
+        employee: employee,
+        client: client,
+        procedures: procedures,
+        scheduleDate: scheduleDate,
+        salonId: salonId,
       };
       newSchedules.push(newSchedule);
 
+      state.registeredSchedules = newSchedules;
       return {
-        registeredSchedules: newSchedules,
+        registeredSchedules: state.registeredSchedules,
         ...state,
       };
 
-    case 'SAVE_SCHEDULES':
+    case 'SAVE_SCHEDULE':
       state.schedules.push(action.newSchedule);
+      state.schedules = sortSchedules(state.schedules);
+      state.calendarSchedule = buildCalendar(state.schedules);
+
       return {
         schedules: state.schedules,
+        calendarSchedule: state.calendarSchedule,
         ...state,
       };
 
     case 'UPDATE_SCHEDULE':
+      const updatedSchedule = action.updatedSchedule;
+      state.schedules = state.schedules.map(schedule => {
+        if (schedule.id === updatedSchedule.id) {
+          schedule = {...updatedSchedule};
+        }
+        return schedule;
+      });
+
+      state.schedules = sortSchedules(state.schedules);
+      state.calendarSchedule = buildCalendar(state.schedules);
+
       return {
-        scheduleInView: {},
+        schedules: state.schedules,
+        calendarSchedule: state.calendarSchedule,
         ...state,
       };
     case 'DELETE_SCHEDULE':
-      const {objectId} = action.payload;
-      state.schedules.forEach((client, index) => {
-        if (client.objectId === objectId) {
+      const {id} = action.payload;
+      state.schedules.forEach((schedule, index) => {
+        if (schedule.id === id) {
           state.schedules.splice(index, 1);
         }
       });
 
+      state.schedules = sortSchedules(state.schedules);
+      state.calendarSchedule = buildCalendar(state.schedules);
+
       return {
         schedules: state.schedules,
+        calendarSchedule: state.calendarSchedule,
         ...state,
       };
 
@@ -59,12 +94,10 @@ export const ScheduleReducer = (state, action) => {
 
     case 'UPDATE_SCHEDULE_INVIEW':
       const scheduleInViewIndex = action.payload;
-      state.registeredSchedules.map((schedule, index) => {
+      state.registeredSchedules.forEach((schedule, index) => {
         if (schedule.isInView === true && index !== scheduleInViewIndex) {
           schedule.isInView = false;
         }
-
-        return schedule;
       });
       return {
         registeredSchedules: state.registeredSchedules,
@@ -86,7 +119,7 @@ export const ScheduleReducer = (state, action) => {
       };
 
     case 'CLEAN_REGISTERED_SCHEDULES':
-      state.registeredClients = [];
+      state.registeredSchedules = [];
       return {
         registeredSchedules: state.registeredSchedules,
         ...state,

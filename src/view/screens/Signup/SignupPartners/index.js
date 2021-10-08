@@ -16,6 +16,7 @@ import BackButton from '../../../components/BackButton';
 import {xorBy} from 'lodash';
 
 import SelectBox from 'react-native-multi-selectbox';
+import MultipleSelect from '../../../components/MultipleSelect';
 
 const PartnerRegister = () => {
   const {
@@ -46,7 +47,7 @@ const PartnerRegister = () => {
 
   const navigate = useNavigation();
 
-  const handleChange = (text, rawText, name) => {
+  const handleChange = (text, name) => {
     setPartner({
       ...partner,
       [name]: text,
@@ -103,14 +104,14 @@ const PartnerRegister = () => {
           error => {
             handleModal('showWarnModal', false, ``);
             setIsLoadingSignup(false);
-            setErrorMessage(errorMessages.warningMessage);
+            setErrorMessage(errorMessages.salonWarningMessage);
           },
         );
       },
       error => {
         console.log(error);
         setIsLoadingSignup(false);
-        setErrorMessage(errorMessages.warningMessage);
+        setErrorMessage(errorMessages.userWarningMessage);
       },
     );
   };
@@ -221,7 +222,7 @@ const PartnerRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'(99) 99999-9999'}
+            mask={'phone'}
           />
 
           <Input
@@ -234,7 +235,7 @@ const PartnerRegister = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask={'99.999.999/9999-99'}
+            mask={'cnpj'}
           />
 
           {/*<Picker*/}
@@ -260,13 +261,23 @@ const PartnerRegister = () => {
             style={{
               width: '80%',
             }}>
-            <SelectBox
+            <MultipleSelect
+              iconColor={global.colors.purpleColor}
+              plusIconColor={global.colors.purpleColor}
+              modalHeaderText={'Escolha os procedimentos'}
               options={registeredProcedures}
-              selectedValues={partner.procedures}
-              onMultiSelect={handleMultiSelect}
-              onTapClose={handleMultiSelect}
-              isMulti
+              selectTextColor={'black'}
+              selectedItemBorderColor={global.colors.purpleColor}
+              value={partner.procedures}
+              handleMultiSelect={handleMultiSelect}
             />
+            {/*<SelectBox*/}
+            {/*  options={registeredProcedures}*/}
+            {/*  selectedValues={partner.procedures}*/}
+            {/*  onMultiSelect={handleMultiSelect}*/}
+            {/*  onTapClose={handleMultiSelect}*/}
+            {/*  isMulti*/}
+            {/*/>*/}
           </View>
         </S.BodyContent>
         <S.FooterContent>

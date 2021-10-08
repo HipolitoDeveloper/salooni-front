@@ -1,25 +1,35 @@
 import Parse from 'parse/react-native';
-import {convertToObj} from '../common/conversor';
-import {getEmployeeById} from './EmployeeService';
-import {getProcedureById} from './ProcedureService';
+import {convertToObj} from '../pipe/conversor';
+import {EmployeeObject} from './EmployeeService';
+import {ProcedureObject} from './ProcedureService';
+import {buildProcedureEmployee} from '../factory/Employee';
 
-const ProcedureEmployeeObject = Parse.Object.extend('ProcedimentoXFuncionario');
+const ProcedureEmployeeObject = Parse.Object.extend('employee_procedure');
 
-export const getProcedureEmployeeByFuncFK = (funcfk, returnParseObject) => {
+export const getProcedureEmployeeByEmployeeId = (
+  employeeId,
+  returnParseObject,
+) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const employee = await getEmployeeById(funcfk, true);
+      const employee = new EmployeeObject({objectId: employeeId});
 
       const ProcedureEmployeeQuery = new Parse.Query(ProcedureEmployeeObject);
-      ProcedureEmployeeQuery.equalTo('IdFuncFK', employee);
-      ProcedureEmployeeQuery.include('IdProcFK');
+      ProcedureEmployeeQuery.equalTo('employee_id', employee);
+      ProcedureEmployeeQuery.include('procedure_id');
+
       if (returnParseObject) {
         resolve(await ProcedureEmployeeQuery.find());
       } else {
-        resolve(convertToObj(await ProcedureEmployeeQuery.find()));
+        resolve(
+          buildProcedureEmployee(
+            convertToObj(await ProcedureEmployeeQuery.find()),
+          ),
+        );
       }
     } catch (e) {
-      reject(`Procedimento ${JSON.stringify(e)}`);
+      console.error(`Procedimento do empregado ${e}`);
+      reject(`Procedimento do empregador ${JSON.stringify(e)}`);
     }
   });
 };
@@ -30,11 +40,11 @@ export const getProcedureEmployeeByProcedureId = (
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const procedure = await getProcedureById(procedureId, true);
+      const procedure = new ProcedureObject({objectId: procedureId});
 
       const ProcedureEmployeeQuery = new Parse.Query(ProcedureEmployeeObject);
-      ProcedureEmployeeQuery.equalTo('IdProcFK', procedure);
-      ProcedureEmployeeQuery.include('IdFuncFK');
+      ProcedureEmployeeQuery.equalTo('procedure_id', procedure);
+      ProcedureEmployeeQuery.include('employee_id');
 
       if (returnParseObject) {
         resolve(await ProcedureEmployeeQuery.find());
@@ -42,7 +52,8 @@ export const getProcedureEmployeeByProcedureId = (
         resolve(convertToObj(await ProcedureEmployeeQuery.find()));
       }
     } catch (e) {
-      reject(`Procedimento ${JSON.stringify(e)}`);
+      console.error(`Procedimento do empregado ${e}`);
+      reject(`Procedimento do empregador ${JSON.stringify(e)}`);
     }
   });
 };
@@ -62,7 +73,8 @@ export const getProcedureEmployeeById = (
         resolve(convertToObj(await ProcedureEmployeeQuery.first()));
       }
     } catch (e) {
-      reject(`Procedimento ${JSON.stringify(e)}`);
+      console.error(`Procedimento do empregado ${e}`);
+      reject(`Procedimento do empregador ${JSON.stringify(e)}`);
     }
   });
 };
@@ -73,11 +85,11 @@ export const saveProcedureEmployee = (
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const {IdProcFK, IdFuncFK} = procedureEmployeeObj;
+      const {procedureId, employeeId} = procedureEmployeeObj;
 
       const newProcedureEmployee = new ProcedureEmployeeObject();
-      newProcedureEmployee.set('IdFuncFK', IdFuncFK);
-      newProcedureEmployee.set('IdProcFK', IdProcFK);
+      newProcedureEmployee.set('employee_id', employeeId);
+      newProcedureEmployee.set('procedure_id', procedureId);
 
       newProcedureEmployee.save().then(
         savedProcedureEmployee => {
@@ -88,25 +100,27 @@ export const saveProcedureEmployee = (
           }
         },
         error => {
-          reject(`Procedimento ${JSON.stringify(error)}`);
+          console.error(`Procedimento do empregado ${e}`);
+          reject(`Procedimento do empregador ${JSON.stringify(error)}`);
         },
       );
     } catch (e) {
-      reject(`Procedimento ${JSON.stringify(e)}`);
+      console.error(`Procedimento do empregado ${e}`);
+      reject(`Procedimento do empregador ${JSON.stringify(e)}`);
     }
   });
 };
 
-export const deleteProcedureEmployeeById = (
+export const deleteProcedureEmployee = (
   procedureEmployeeId,
   returnParseObject,
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const procedureEmployee = await getProcedureEmployeeById(
-        procedureEmployeeId,
-        true,
-      );
+      const procedureEmployee = new ProcedureEmployeeObject({
+        objectId: procedureEmployeeId,
+      });
+
       procedureEmployee.destroy().then(deletedProcedureEmployee => {
         if (returnParseObject) {
           resolve(deletedProcedureEmployee);
@@ -115,14 +129,15 @@ export const deleteProcedureEmployeeById = (
         }
       });
     } catch (e) {
-      reject(`Procedimento ${JSON.stringify(e)}`);
+      console.error(`Procedimento do empregado ${e}`);
+      reject(`Procedimento do empregador ${JSON.stringify(e)}`);
     }
   });
 };
 
-export const deleteProcedureEmployeeByFuncId = async employeeId => {
+export const deleteProcedureEmployeeByEmployeeId = async employeeId => {
   try {
-    const proceduresEmployee = await getProcedureEmployeeByFuncFK(
+    const proceduresEmployee = await getProcedureEmployeeByEmployeeId(
       employeeId,
       true,
     );
@@ -145,6 +160,6 @@ export const deleteProcedureEmployeeByProcedureId = async procedureId => {
       await pe.destroy();
     });
   } catch (e) {
-    console.error(`Procedimento ${JSON.stringify(e)}`);
+    console.error(`Procedimento do empregador ${JSON.stringify(e)}`);
   }
 };

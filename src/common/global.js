@@ -1,7 +1,8 @@
 export default {
   colors: {
-    purpleColor: '#8c6eb0',
+    purpleColor: '#A177AF',
     lightGreyColor: '#ededed',
+    backgroundColor: '#f8f8f8',
     blueColor: '#6ebedb',
     lightBlueColor: '#88d1ce',
   },
