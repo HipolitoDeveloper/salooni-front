@@ -16,20 +16,9 @@ export const PartnerReducer = (state, action) => {
         ...state,
       };
     case 'ADD_PARTNER':
-      const {cnpj, name, tel, email, procedures, salonId} = action.payload;
-      let newPartners = state.registeredPartners;
-      const newPartner = {
-        cnpj: cnpj,
-        tel: tel,
-        employeeType: 'PRC',
-        name: name,
-        email: email,
-        procedures: procedures !== undefined > 0 ? procedures : [],
-        salonId: salonId,
-      };
-      newPartners.push(newPartner);
+      const procedureToAdd = action.payload;
+      state.registeredPartners.push({...procedureToAdd, employeeType: 'PRC'});
 
-      state.registeredPartners = newPartners;
       return {
         registeredPartners: state.registeredPartners,
         ...state,

@@ -5,7 +5,7 @@ import {buildProcedure} from './Procedure';
 export const buildEmployeeObject = (employee, procedures) => {
   return {
     id: employee.objectId,
-    // salon: buildSalonObject(employee.salon_id),
+    salon: buildSalonObject(employee.salon_id),
     cnpj: employee.cnpj,
     tel2: employee.tel2,
     tel: employee.tel,

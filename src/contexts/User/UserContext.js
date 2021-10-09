@@ -5,6 +5,7 @@ import {getUsersByEmail, signUp} from '../../services/UserService';
 import {
   getEmployeeByEmail,
   getEmployeeById,
+  saveEmployee,
   saveEmployeeWithoutProcedures,
 } from '../../services/EmployeeService';
 import {UserReducer} from './UserReducer';
@@ -80,12 +81,11 @@ const UserProvider = ({children}) => {
         if (verifiedPartner === '') {
           let isPartner = false;
           let isFirstAccess = true;
-
           let partner = await getEmployeeByEmail(userData.email.trim(), false);
 
           if (partner) {
             if (partner) {
-              if (partner.typeEmployee === 'PRC') {
+              if (partner.employeeType === 'PRC') {
                 isPartner = true;
               } else {
                 throw 'Não é parceiro';
@@ -107,6 +107,8 @@ const UserProvider = ({children}) => {
           });
         } else {
           let isAbleToSignup = false;
+          console.log('Cnpj Digitado >', userData.cnpj);
+          console.log('Partner sendo verificado>', verifiedPartner);
 
           if (userData.cnpj === verifiedPartner.salon.cnpj) {
             isAbleToSignup = true;
@@ -139,11 +141,11 @@ const UserProvider = ({children}) => {
     });
   };
 
-  const doSignup = (employeeId, userData) => {
+  const doSignup = (employee, userData) => {
     return new Promise(async (resolve, reject) => {
       try {
         const userToSignup = userData === '' ? state.user : userData;
-        userToSignup.employeeId = employeeId;
+        userToSignup.employeeId = employee.id;
 
         resolve(convertToObj(await signUp(userToSignup)));
       } catch (e) {
@@ -154,44 +156,41 @@ const UserProvider = ({children}) => {
 
   const saveSignupInformation = payload => {
     const {procedures, partners} = payload;
+    const salonInformation = state.salon;
+    const ownerInformation = state.owner;
+
     return new Promise(async (resolve, reject) => {
       try {
-        state.salon.employeeQt = partners.length;
-        const salon = await saveSalon(state.salon, true);
-        state.owner.salonId = salon;
+        salonInformation.employeeQt = partners.length;
+        const salon = await saveSalon(salonInformation, false);
+        ownerInformation.salonId = salon.id;
 
-        const employee = await saveEmployeeWithoutProcedures(state.owner, true);
+        const ownerEmployee = await saveEmployeeWithoutProcedures(
+          ownerInformation,
+          false,
+        );
 
         if (procedures.length > 0) {
           procedures.map(async procedure => {
-            procedure.salonId = salon;
-            procedure.employeeId = employee;
+            procedure.salonId = salon.id;
+            procedure.employeeId = ownerEmployee.id;
             await saveProcedure(procedure, true);
           });
         }
 
         if (partners.length > 0) {
           partners.map(async partner => {
-            partner.salonId = salon;
-            const savedPartner = await saveEmployeeWithoutProcedures(
-              partner,
-              true,
-            );
-
+            partner.salonId = salon.id;
             if (partner.procedures.length !== 0) {
-              partner.procedures.map(async procedure => {
-                const procedureEmployeer = {
-                  procedureId: await getProcedureByName(procedure.name, true),
-                  employeeId: savedPartner,
-                };
-
-                await saveProcedureEmployee(procedureEmployeer, true);
-              });
+              for (let procedure of partner.procedures) {
+                procedure = await getProcedureByName(procedure.name, false);
+              }
             }
+            await saveEmployee(partner, true);
           });
         }
 
-        resolve(employee);
+        resolve(ownerEmployee);
       } catch (e) {
         console.log(e);
         reject(`Deu ruim ao salvar as informações do Salão ${e}`);

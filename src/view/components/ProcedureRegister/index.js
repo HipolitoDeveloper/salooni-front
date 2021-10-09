@@ -47,12 +47,12 @@ const ProcedureRegister = ({
     text: '',
   });
   const [procedure, setProcedure] = useState({
-    name: '',
-    time: '',
-    value: '',
-    maintenanceValue: '',
-    maintenanceDays: '',
-    commissionPercentage: '',
+    name: 'teste',
+    time: '120',
+    value: '10',
+    maintenanceValue: '22',
+    maintenanceDays: '22',
+    commissionPercentage: '1',
     commissionValue: '',
   });
   const navigate = useNavigation();
@@ -129,10 +129,8 @@ const ProcedureRegister = ({
 
     if (verifyInformation() && !isInView) {
       if (!isSigningUp) {
-        procedure.salonId = new SalonObject({objectId: currentUser.idSalon});
-        procedure.employeeId = new EmployeeObject({
-          objectId: currentUser.idFunc,
-        });
+        procedure.salonId = currentUser.idSalon;
+        procedure.employeeId = currentUser.idFunc;
       }
 
       addProcedure(procedure);

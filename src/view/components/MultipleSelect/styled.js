@@ -96,7 +96,7 @@ export const SuggestionContent = styled.View`
   elevation: 30;
 `;
 
-export const CloseButton = styled.View`
+export const CloseButton = styled.TouchableOpacity`
   position: absolute;
   right: 10px;
   top: 10px;

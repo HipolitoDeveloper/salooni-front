@@ -113,11 +113,11 @@ export const updateScheduleCRUD = (scheduleObj, returnParseObject) => {
         if (returnParseObject) {
           resolve(schedule);
         } else {
-          procedureListWithoutChanges.map(async pl => {
-            if (!procedures.some(p => p.name === pl.name)) {
-              await deleteScheduleProcedureById(pl.scheduleProcedureId);
+          for (const procedure of procedureListWithoutChanges) {
+            if (!procedures.some(p => p.name === procedure.name)) {
+              await deleteScheduleProcedureById(procedure.scheduleProcedureId);
             }
-          });
+          }
 
           for (const procedure of procedures) {
             if (

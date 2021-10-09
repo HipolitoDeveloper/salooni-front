@@ -29,7 +29,13 @@ const PartnerRegister = () => {
   const {doSignup, saveSignupInformation, cleanOwnerInformation} =
     useContext(UserContext);
 
-  const [partner, setPartner] = useState({procedures: []});
+  const [partner, setPartner] = useState({
+    name: 'teste',
+    email: 'email@email',
+    tel: '22222',
+    cnpj: '22222',
+    procedures: [],
+  });
   const [isLoadingSignup, setIsLoadingSignup] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -87,8 +93,8 @@ const PartnerRegister = () => {
       procedures: registeredProcedures,
       partners: registeredPartners,
     }).then(
-      ownerData => {
-        doSignup(ownerData, '').then(
+      ownerEmployee => {
+        doSignup(ownerEmployee, '').then(
           user => {
             setIsLoadingSignup(false);
             cleanRegisteredProcedures();
@@ -109,7 +115,7 @@ const PartnerRegister = () => {
         );
       },
       error => {
-        console.log(error);
+        console.error(error);
         setIsLoadingSignup(false);
         setErrorMessage(errorMessages.userWarningMessage);
       },

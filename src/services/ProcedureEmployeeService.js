@@ -88,8 +88,14 @@ export const saveProcedureEmployee = (
       const {procedureId, employeeId} = procedureEmployeeObj;
 
       const newProcedureEmployee = new ProcedureEmployeeObject();
-      newProcedureEmployee.set('employee_id', employeeId);
-      newProcedureEmployee.set('procedure_id', procedureId);
+      newProcedureEmployee.set(
+        'employee_id',
+        new EmployeeObject({objectId: employeeId}),
+      );
+      newProcedureEmployee.set(
+        'procedure_id',
+        new ProcedureObject({objectId: procedureId}),
+      );
 
       newProcedureEmployee.save().then(
         savedProcedureEmployee => {
@@ -100,7 +106,7 @@ export const saveProcedureEmployee = (
           }
         },
         error => {
-          console.error(`Procedimento do empregado ${e}`);
+          console.error(`Procedimento do empregado ${error}`);
           reject(`Procedimento do empregador ${JSON.stringify(error)}`);
         },
       );

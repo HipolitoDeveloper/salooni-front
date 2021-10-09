@@ -1,5 +1,6 @@
 import Parse from 'parse/react-native';
 import {convertToObj} from '../pipe/conversor';
+import {buildSalonObject} from '../factory/Salon';
 
 export const SalonObject = Parse.Object.extend('salon');
 
@@ -18,7 +19,7 @@ export const saveSalon = (salonObj, returnParseObject) => {
           if (returnParseObject) {
             resolve(savedSalon);
           } else {
-            resolve(convertToObj(savedSalon));
+            resolve(buildSalonObject(convertToObj(savedSalon)));
           }
         },
         error => {

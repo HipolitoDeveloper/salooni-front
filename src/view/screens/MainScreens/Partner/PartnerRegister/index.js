@@ -94,7 +94,7 @@ const PartnerRegister = ({route}) => {
     }
 
     if (verifyInformation() && !isInView) {
-      partner.salonId = new SalonObject({objectId: currentUser.idSalon});
+      partner.salonId = currentUser.idSalon;
       addPartner(partner);
       setErrorMessage('');
       setPartner({procedures: []});

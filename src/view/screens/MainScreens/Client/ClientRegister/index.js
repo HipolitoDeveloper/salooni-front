@@ -77,7 +77,7 @@ const ClientRegister = ({route}) => {
     }
 
     if (verifyInformation() && !isInView) {
-      client.salonId = new SalonObject({objectId: currentUser.idSalon});
+      client.salonId = currentUser.idSalon;
       addClient(client);
       setErrorMessage('');
       setClient({});

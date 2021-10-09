@@ -9,35 +9,14 @@ export const ProcedureReducer = (state, action) => {
         ...state,
       };
     case 'ADD_PROCEDURE':
-      const {
-        name,
-        time,
-        value,
-        commissionValue,
-        commissionPercentage,
-        maintenanceValue,
-        maintenanceDays,
-        employeeId,
-        salonId,
-      } = action.procedure;
-      let newProcedures = state.registeredProcedures;
-
-      const newProcedure = {
-        id: name,
-        name: name,
-        time: time,
-        value: value,
-        maintenanceValue: maintenanceValue,
-        maintenanceDays: maintenanceDays,
-        commissionValue: commissionValue,
-        commissionPercentage: commissionPercentage,
-        employeeId: employeeId,
-        salonId: salonId,
-      };
-      newProcedures.push(newProcedure);
+      const newProcedures = action.procedure;
+      state.registeredProcedures.push({
+        ...newProcedures,
+        id: newProcedures.name,
+      });
 
       return {
-        registeredProcedures: newProcedures,
+        registeredProcedures: state.registeredProcedures,
         ...state,
       };
     case 'UPDATE_PROCEDURE_INVIEW':

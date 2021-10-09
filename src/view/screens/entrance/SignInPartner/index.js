@@ -11,6 +11,7 @@ import {ActivityIndicator, StyleSheet} from 'react-native';
 import global from '../../../../common/global';
 import {MaskedTextInput} from 'react-native-mask-text';
 import ErrorMessage from '../../../components/ErrorMessage';
+import Input from '../../../components/Input';
 
 const SignInPartner = () => {
   const {doLogin, verifyPartner, doSignup} = useContext(UserContext);
@@ -163,11 +164,13 @@ const SignInPartner = () => {
           />
         )}
 
-        <S.Input
-          onChangeText={value => handleChange(value, '', 'email')}
+        <Input
+          handleChange={handleChange}
           placeholderTextColor={'grey'}
           placeholder={'E-mail'}
+          name={'email'}
           value={userData.email}
+          width={'70%'}
         />
 
         {isLoading && (
@@ -177,48 +180,48 @@ const SignInPartner = () => {
         {isPartnerFirstAccess ? (
           isAbleToSignup ? (
             <>
-              <S.Input
-                onChangeText={value => handleChange(value, '', 'password')}
-                placeholderTextColor={'grey'}
+              <Input
+                handleChange={handleChange}
+                name={'password'}
                 placeholder={'Senha'}
                 value={userData.password}
-                secureTextEntry={true}
+                isSecureTextEntry={true}
+                keyboard={'numeric'}
+                width={'70%'}
               />
 
-              <S.Input
-                onChangeText={value =>
-                  handleChange(value, '', 'confirmPassword')
-                }
-                placeholderTextColor={'grey'}
-                placeholder={'Confirme a senha'}
+              <Input
+                handleChange={handleChange}
+                name={'confirmPassword'}
+                placeholder={'Confirme sua senha'}
                 value={userData.confirmPassword}
-                secureTextEntry={true}
+                isSecureTextEntry={true}
+                keyboard={'numeric'}
+                width={'70%'}
               />
             </>
           ) : (
-            <MaskedTextInput
-              mask={'99.999.999/9999-99'}
-              style={[styles.input, {fontSize: 14, width: '70%'}]}
-              onChangeText={(text, rawText) =>
-                handleChange(text, rawText, 'CNPJ')
-              }
-              value={userData.CNPJ}
-              keyboardType={'numeric'}
-              placeholderTextColor={'grey'}
+            <Input
+              handleChange={handleChange}
+              name={'cnpj'}
               placeholder={'CNPJ'}
-              secureTextEntry={false}
-              clearButtonMode={'always'}
+              value={userData.cnpj}
+              isSecureTextEntry={false}
+              mask={'cnpj'}
+              keyboard={'numeric'}
+              width={'70%'}
             />
           )
         ) : (
-          <S.Input
-            onChangeText={value => handleChange(value, '', 'password')}
-            placeholderTextColor={'grey'}
+          <Input
+            handleChange={handleChange}
+            name={'password'}
             placeholder={'Senha'}
             value={userData.password}
             editable={isPartner}
             selectTextOnFocus={isPartner}
-            secureTextEntry={true}
+            isSecureTextEntry={true}
+            width={'70%'}
           />
         )}
 

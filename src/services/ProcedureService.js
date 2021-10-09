@@ -4,6 +4,7 @@ import {SalonObject} from './SalonService';
 import {deleteProcedureEmployeeByProcedureId} from './ProcedureEmployeeService';
 import {buildProcedure, buildProcedureList} from '../factory/Procedure';
 import {deleteScheduleProcedureByProcedureId} from './ScheduleProcedureService';
+import {EmployeeObject} from './EmployeeService';
 
 export const ProcedureObject = Parse.Object.extend('procedure');
 
@@ -66,7 +67,7 @@ export const saveProcedure = (procedureObj, returnParseObject) => {
       if (maintenanceValue !== undefined && maintenanceDays !== undefined) {
         newProcedure.set(
           'maintenance_value',
-          parseFloat(maintenanceValue.replace(',', '')),
+          parseFloat(maintenanceValue.replace('.', '').replace(',', '.')),
         );
         newProcedure.set('maintenance_days', parseInt(maintenanceDays));
       }
@@ -85,8 +86,11 @@ export const saveProcedure = (procedureObj, returnParseObject) => {
         ),
       );
       newProcedure.set('commission_percentage', parseInt(commissionPercentage));
-      newProcedure.set('employee_id', employeeId);
-      newProcedure.set('salon_id', salonId);
+      newProcedure.set(
+        'employee_id',
+        new EmployeeObject({objectId: employeeId}),
+      );
+      newProcedure.set('salon_id', new SalonObject({objectId: salonId}));
 
       newProcedure.save().then(
         savedProcedure => {
@@ -97,13 +101,13 @@ export const saveProcedure = (procedureObj, returnParseObject) => {
           }
         },
         error => {
-          console.error(`Procedimento ${error}`);
-          reject(`Procedimento ${JSON.stringify(error)}`);
+          console.error(`Procedimentoee ${error}`);
+          reject(`Procedimentoeee ${JSON.stringify(error)}`);
         },
       );
     } catch (e) {
-      console.error(`Procedimento ${e}`);
-      reject(`Procedimento ${JSON.stringify(e)}`);
+      console.error(`Procedimentoeee ${e}`);
+      reject(`Procedimentoeee ${JSON.stringify(e)}`);
     }
   });
 };
@@ -117,7 +121,7 @@ export const getProcedureByName = (procedureName, returnParseObject) => {
       if (returnParseObject) {
         resolve(await ProcedureQuery.first());
       } else {
-        resolve(convertToObj(await ProcedureQuery.first()));
+        resolve(buildProcedure(convertToObj(await ProcedureQuery.first())));
       }
     } catch (e) {
       console.error(`Procedimento   ${e}`);

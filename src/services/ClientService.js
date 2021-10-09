@@ -18,7 +18,7 @@ export const insertClientCRUD = (clientObj, returnParseObject) => {
       client.set('tel', tel);
       client.set('tel2', tel2);
       client.set('birthdate', bornDate);
-      client.set('salon_id', salonId);
+      client.set('salon_id', new SalonObject({objectId: salonId}));
       if (returnParseObject) {
         resolve(await client.save());
       } else {
@@ -60,9 +60,8 @@ export const updateClientCRUD = (clientObj, returnParseObject) => {
 export const getAllClientsBySalonId = (salonId, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const salon = new SalonObject({objectId: salonId});
       const ClientQuery = new Parse.Query(ClientObject);
-      ClientQuery.equalTo('salon_id', salon);
+      ClientQuery.equalTo('salon_id', new SalonObject({objectId: salonId}));
       if (returnParseObject) {
         resolve(await ClientQuery.find());
       } else {

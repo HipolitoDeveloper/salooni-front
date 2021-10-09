@@ -62,7 +62,6 @@ const SchedulingRegister = ({route}) => {
 
   navigate.addListener('focus', () => {
     const scheduleInView = route.params?.schedule ? route.params?.schedule : {};
-    console.log('scheduleinView', scheduleInView);
 
     if (Object.keys(scheduleInView).length !== 0) {
       setSchedule({
@@ -139,7 +138,7 @@ const SchedulingRegister = ({route}) => {
         },
         error => {
           setIsLoading(false);
-          console.log(error);
+          console.error(error);
         },
       );
     }
@@ -162,7 +161,7 @@ const SchedulingRegister = ({route}) => {
 
       error => {
         setIsLoading(false);
-        console.log(error);
+        console.error(error);
       },
     );
   };
@@ -183,7 +182,7 @@ const SchedulingRegister = ({route}) => {
       },
       error => {
         setIsLoading(false);
-        console.log(error);
+        console.error(error);
       },
     );
   };

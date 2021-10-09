@@ -11,7 +11,14 @@ import BackButton from '../../../components/BackButton';
 
 const OwnerRegister = () => {
   const {saveOwnerInformation, salon, owner, user} = useContext(UserContext);
-  const [ownerData, setOwnerData] = useState({});
+  const [ownerData, setOwnerData] = useState({
+    salon: `Teste`,
+    cnpj: '111.999',
+    name: 'Teste',
+    tel: '222222',
+    email: '2222@222',
+    password: '123',
+  });
   const [errorMessage, setErrorMessage] = useState('');
 
   const navigate = useNavigation();

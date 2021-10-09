@@ -28,6 +28,7 @@ const MultipleSelect = ({
     setSuggestions(
       options.map(option => {
         option.selected = false;
+
         return option;
       }),
     );
@@ -99,10 +100,7 @@ const MultipleSelect = ({
       </S.SelectContent>
       <SuggestionModal
         isVisible={isShowingSuggestionBox}
-        onClose={() => {
-          console.log('Fechando');
-          setIsShowingSuggestionBox(!isShowingSuggestionBox);
-        }}
+        onClose={() => setIsShowingSuggestionBox(!isShowingSuggestionBox)}
         options={suggestions}
         value={value}
         modalHeaderText={modalHeaderText}
@@ -117,6 +115,7 @@ const SuggestionModal = ({
   isVisible,
   onClose,
   options,
+  value,
   modalHeaderText,
   plusIconColor,
   handleSelect,
@@ -124,7 +123,13 @@ const SuggestionModal = ({
   const [suggestions, setSuggestions] = useState([]);
 
   const onShow = () => {
-    setSuggestions(options);
+    setSuggestions(
+      options.map(option => {
+        option.selected = value.some(procedure => procedure.id === option.id);
+
+        return option;
+      }),
+    );
   };
 
   const selectItem = item => {
@@ -141,7 +146,7 @@ const SuggestionModal = ({
         onShow={onShow}>
         <S.SuggestionContainer>
           <S.SuggestionContent>
-            <S.CloseButton>
+            <S.CloseButton onPress={() => onClose()}>
               <Icon name={'times'} size={20} />
             </S.CloseButton>
             <S.SuggestionHeader>

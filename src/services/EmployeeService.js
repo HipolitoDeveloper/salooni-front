@@ -42,7 +42,7 @@ export const getEmployeeByEmail = (employeeEmail, returnParseObject) => {
     try {
       const EmployeeQuery = new Parse.Query(EmployeeObject);
       EmployeeQuery.equalTo('email', employeeEmail.trim());
-      // EmployeeQuery.include('salon_id');
+      EmployeeQuery.include('salon_id');
 
       if (returnParseObject) {
         resolve(await EmployeeQuery.first());
@@ -78,7 +78,7 @@ export const getEmployeeById = (employeeId, returnParseObject) => {
   });
 };
 
-export const saveEmployee = (employeeObj, returnParseObject, currentUser) => {
+export const saveEmployee = (employeeObj, returnParseObject) => {
   return new Promise((resolve, reject) => {
     try {
       const {cnpj, tel, tel2, employeeType, name, salonId, email, procedures} =
@@ -90,7 +90,7 @@ export const saveEmployee = (employeeObj, returnParseObject, currentUser) => {
       newEmployee.set('employee_type', employeeType);
       newEmployee.set('tel', tel);
       newEmployee.set('tel2', tel2);
-      newEmployee.set('salon_id', salonId);
+      newEmployee.set('salon_id', new SalonObject({objectId: salonId}));
       newEmployee.set('email', email.trim());
 
       newEmployee.save().then(
@@ -98,8 +98,8 @@ export const saveEmployee = (employeeObj, returnParseObject, currentUser) => {
           if (procedures !== undefined) {
             for (const procedure of procedures) {
               const procedureEmployee = await saveProcedureEmployee({
-                procedureId: new ProcedureObject({objectId: procedure.id}),
-                employeeId: new EmployeeObject({objectId: savedEmployee.id}),
+                procedureId: procedure.id,
+                employeeId: savedEmployee.id,
               });
 
               procedure.procedureEmployeeId = procedureEmployee.objectId;
@@ -135,7 +135,7 @@ export const saveEmployeeWithoutProcedures = (
 ) => {
   return new Promise((resolve, reject) => {
     try {
-      let {cnpj, tel, tel2, employeeType, name, salonId, email} = employeeObj;
+      const {cnpj, tel, tel2, employeeType, name, salonId, email} = employeeObj;
 
       const newEmployee = new EmployeeObject();
       newEmployee.set('name', name.trim());
@@ -143,7 +143,7 @@ export const saveEmployeeWithoutProcedures = (
       newEmployee.set('employee_type', employeeType);
       newEmployee.set('tel', tel);
       newEmployee.set('tel2', tel2);
-      newEmployee.set('salon_id', salonId);
+      newEmployee.set('salon_id', new SalonObject({objectId: salonId}));
       newEmployee.set('email', email.trim());
 
       newEmployee.save().then(
@@ -214,22 +214,21 @@ export const updateEmployeeCRUD = (
         if (returnParseObject) {
           resolve(employee);
         } else {
-          procedureListWithoutChanges.map(async pl => {
-            if (!procedures.some(p => p.name === pl.name)) {
-              await deleteProcedureEmployee(pl.procedureEmployeeId);
+          for (const procedure of procedureListWithoutChanges) {
+            if (!procedures.some(p => p.name === procedure.name)) {
+              await deleteProcedureEmployee(procedure.procedureEmployeeId);
             }
-          });
+          }
 
           for (const procedure of procedures) {
             if (
               !procedureListWithoutChanges.some(pl => pl.id === procedure.id)
             ) {
-              const procedureEmployeer = {
-                procedureId: new ProcedureObject({objectId: procedure.id}),
-                employeeId: employee,
-              };
               const procedureEmployee = await saveProcedureEmployee(
-                procedureEmployeer,
+                {
+                  procedureId: procedure.id,
+                  employeeId: employee.id,
+                },
                 false,
               );
               procedure.procedureEmployeeId = procedureEmployee.objectId;

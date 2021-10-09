@@ -43,6 +43,7 @@ export const buildSchedule = (schedule, procedures) => {
     formattedDate: moment(scheduleDate).format('YYYY-MM-DD'),
     formattedHour: moment(scheduleDate).format('HH:mm'),
     procedures: procedures,
+    analyzedSchedule: schedule.analyzed_schedule,
   };
 };
 
@@ -59,6 +60,7 @@ export const buildScheduleList = schedules => {
         formattedDateHour: moment(scheduleDate).format('DD-MM-YYYY - HH:mm'),
         formattedDate: moment(scheduleDate).format('YYYY-MM-DD'),
         formattedHour: moment(scheduleDate).format('HH:mm'),
+        analyzedSchedule: schedule.analyzed_schedule,
       };
     });
 

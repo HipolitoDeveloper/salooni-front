@@ -24,6 +24,9 @@ const Input = ({
   leftPlaceholder,
   rightPlaceholder,
   maxLength,
+  placeholderTextColor,
+  selectTextOnFocus,
+  editable,
 }) => {
   const chooseMask = text => {
     switch (mask) {
@@ -75,6 +78,8 @@ const Input = ({
         secureTextEntry={isSecureTextEntry}
         clearButtonMode={'always'}
         maxLength={maxLength}
+        selectTextOnFocus={selectTextOnFocus}
+        editable={editable}
       />
       {rightPlaceholder && value.length > 0 && (
         <Text style={[styles.rightPlaceholder]}>{rightPlaceholder}</Text>
