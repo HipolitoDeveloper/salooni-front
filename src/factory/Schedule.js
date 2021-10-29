@@ -44,6 +44,10 @@ export const buildSchedule = (schedule, procedures) => {
     formattedHour: moment(scheduleDate).format('HH:mm'),
     procedures: procedures,
     analyzedSchedule: schedule.analyzed_schedule,
+    checked: procedures.some(procedure => procedure.accomplishedSchedule),
+    firstCheckedState: procedures.some(
+      procedure => procedure.accomplishedSchedule,
+    ),
   };
 };
 
@@ -57,7 +61,7 @@ export const buildScheduleList = schedules => {
         client: buildClientObject(schedule.client_id),
         employee: buildEmployeeObject(schedule.employee_id, []),
         scheduleDate: scheduleDate,
-        formattedDateHour: moment(scheduleDate).format('DD-MM-YYYY - HH:mm'),
+        formattedDateHour: moment(scheduleDate).format('DD/MM/YYYY - HH:mm'),
         formattedDate: moment(scheduleDate).format('YYYY-MM-DD'),
         formattedHour: moment(scheduleDate).format('HH:mm'),
         analyzedSchedule: schedule.analyzed_schedule,
@@ -69,6 +73,12 @@ export const buildScheduleList = schedules => {
       schedule.procedures = await getScheduleProcedureByScheduleId(
         schedule.id,
         false,
+      );
+      schedule.checked = schedule.procedures.every(
+        procedure => procedure.accomplishedSchedule,
+      );
+      schedule.firstCheckedState = schedule.procedures.every(
+        procedure => procedure.accomplishedSchedule,
       );
     }
 
@@ -93,13 +103,23 @@ const buildDateList = schedules => {
   return scheduledDates;
 };
 
-export const buildScheduleProcedure = scheduleProcedures => {
+export const buildScheduleProcedureList = scheduleProcedures => {
   return scheduleProcedures.map(sp => {
     return {
       ...buildProcedure(sp.procedure_id),
       scheduleProcedureId: sp.objectId,
+      accomplishedSchedule: sp.accomplished_schedule,
     };
   });
+};
+
+export const buildScheduleProcedure = scheduleProcedure => {
+  return {
+    ...buildProcedure(scheduleProcedure.procedure_id),
+    scheduleProcedureId: scheduleProcedure.objectId,
+    scheduleId: scheduleProcedure.schedule_id.objectId,
+    accomplishedSchedule: scheduleProcedure.accomplished_schedule,
+  };
 };
 
 export const setNextHour = schedules => {
@@ -118,11 +138,12 @@ export const setNextHour = schedules => {
 };
 
 export const sortSchedules = schedules => {
-  schedules.sort((a, b) => {
+  const newSchedules = setNextHour(schedules);
+  newSchedules.sort((a, b) => {
     if (a.scheduleDate > b.scheduleDate) return -1;
     else if (a.scheduleDate < b.scheduleDate) return 1;
     return 0;
   });
 
-  return setNextHour(schedules);
+  return newSchedules;
 };

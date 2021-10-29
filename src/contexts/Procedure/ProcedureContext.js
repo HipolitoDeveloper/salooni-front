@@ -2,16 +2,23 @@ import React, {createContext, useReducer} from 'react';
 import {ProcedureReducer} from './ProcedureReducer';
 import {
   deleteProcedureCRUD,
+  deleteProceduresCRUD,
   getAllProceduresBySalonId,
   saveProcedure,
   updateProcedureCRUD,
 } from '../../services/ProcedureService';
+import {deleteProcedureEmployeeByEmployeeId} from '../../services/ProcedureEmployeeService';
+import {
+  deleteClientCRUD,
+  deleteClientsCRUD,
+} from '../../services/ClientService';
 
 export const ProcedureContext = createContext();
 
 const initialState = {
   procedures: [],
   registeredProcedures: [],
+  isProceduresLoading: true,
 };
 
 const ProcedureProvider = ({children}) => {
@@ -73,15 +80,40 @@ const ProcedureProvider = ({children}) => {
     });
   };
 
-  const deleteProcedure = payload => {
+  // const deleteProcedure = payload => {
+  //   return new Promise(async (resolve, reject) => {
+  //     const {id} = payload;
+  //     try {
+  //       deleteProcedureCRUD(id, false).then(deletedProcedures => {
+  //         resolve(dispatch({type: 'DELETE_PROCEDURE', deletedProcedures}));
+  //       });
+  //     } catch (e) {
+  //       reject(`Deu ruim ao excluir procedimento ${e}`);
+  //     }
+  //   });
+  // };
+
+  const deleteUniqueProcedure = payload => {
     return new Promise(async (resolve, reject) => {
       const {id} = payload;
       try {
-        deleteProcedureCRUD(id, false).then(deletedProcedures => {
+        deleteProcedureCRUD(id).then(deletedProcedures => {
           resolve(dispatch({type: 'DELETE_PROCEDURE', deletedProcedures}));
         });
       } catch (e) {
         reject(`Deu ruim ao excluir procedimento ${e}`);
+      }
+    });
+  };
+
+  const deleteProcedureList = payload => {
+    return new Promise(async (resolve, reject) => {
+      const clients = payload;
+      try {
+        await deleteProceduresCRUD(clients);
+        resolve(dispatch({type: 'DELETE_PROCEDURES', clients}));
+      } catch (e) {
+        reject(`Deu ruim ao excluir procedimentos ${e}`);
       }
     });
   };
@@ -98,11 +130,11 @@ const ProcedureProvider = ({children}) => {
     loadAllProcedures,
     addProcedure,
     cleanProceduresInformation,
-
     saveProcedures,
     cleanRegisteredProcedures,
     updateProcedure,
-    deleteProcedure,
+    deleteProcedureList,
+    deleteUniqueProcedure,
     deleteProcedureInView,
     updateProcedureInView,
     editProcedure,

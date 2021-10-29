@@ -1,7 +1,7 @@
 import Parse from 'parse/react-native';
 import {convertToObj} from '../pipe/conversor';
 import {buildUserList, buildUserObject} from '../factory/User';
-import {EmployeeObject} from './EmployeeService';
+import {EmployeeObject, updateEmployeeCRUD} from './EmployeeService';
 
 const UserObject = Parse.Object.extend('User');
 const UserQuery = new Parse.Query(UserObject);
@@ -46,11 +46,12 @@ export const updateUser = userObj => {
   return new Promise(async (resolve, reject) => {
     try {
       const {email, username, password} = userObj;
-      const user = await getUsersByEmail(email, true);
+      const user = new UserObject({objectId: userObj.id});
 
       user.set('username', username.trim());
       user.set('email', email.trim());
-      user.set('password', password.trim());
+
+      if (password !== undefined) user.set('password', password.trim());
 
       resolve(await user.save());
     } catch (e) {

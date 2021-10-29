@@ -1,119 +1,61 @@
 import React, {useContext, useEffect, useState} from 'react';
 import * as S from './styled';
-import Input from '../../../components/Input';
-import SubmitButton from '../../../components/SubmitButton';
+import Input from '../../../components/small/Input';
+import SubmitButton from '../../../components/small/SubmitButton';
 import {useNavigation} from '@react-navigation/native';
-import ErrorMessage from '../../../components/ErrorMessage';
+import ErrorMessage from '../../../components/small/ErrorMessage';
 import {UserContext} from '../../../../contexts/User/UserContext';
 import errorMessages from '../../../../common/errorMessages';
 import global from '../../../../common/global';
-import BackButton from '../../../components/BackButton';
+import BackButton from '../../../components/small/BackButton';
 
-const OwnerRegister = () => {
-  const {saveOwnerInformation, salon, owner, user} = useContext(UserContext);
-  const [ownerData, setOwnerData] = useState({
-    salon: `Teste`,
-    cnpj: '111.999',
-    name: 'Teste',
-    tel: '222222',
-    email: '2222@222',
-    password: '123',
-  });
+const SignupOwners = () => {
+  const {saveOwnerInformation, owner, handleOwner} = useContext(UserContext);
   const [errorMessage, setErrorMessage] = useState('');
 
   const navigate = useNavigation();
 
-  useEffect(() => {
-    if (owner !== undefined && salon !== undefined && user !== undefined) {
-      if (
-        Object.keys(salon).length !== 0 &&
-        Object.keys(owner).length !== 0 &&
-        Object.keys(user).length !== 0
-      ) {
-        const storagedOwnerData = {
-          salon: salon.name,
-          cnpj: salon.cnpj,
-          name: owner.name,
-          tel: owner.tel,
-          email: user.username,
-          password: user.password,
-        };
-
-        setOwnerData(storagedOwnerData);
-      }
-    }
-  }, []);
-
   const handleChange = (text, name) => {
-    setOwnerData({
-      ...ownerData,
-      [name]: text,
-    });
+    handleOwner({text: text, inputName: name});
   };
 
-  const goNextPage = () => {
-    if (verifyInformation()) {
-      setErrorMessage('');
-      saveOwnerInformation(ownerData);
-      navigate.navigate('SignupStack', {
-        screen: 'SignupProcedures',
-        params: {procedure: []},
-      });
-    }
-  };
-
-  const verifyInformation = () => {
-    let ableToGo = true;
-    let errorMessage = '';
-
-    if (
-      ownerData.salon === undefined ||
-      ownerData.salon === '' ||
-      ownerData.cnpj === undefined ||
-      ownerData.cnpj === ''
-    ) {
-      ableToGo = false;
-      errorMessage = errorMessages.salonMessage;
-    } else if (
-      ownerData.name === undefined ||
-      ownerData.name === '' ||
-      ownerData.tel === undefined ||
-      ownerData.tel === '' ||
-      ownerData.email === undefined ||
-      ownerData.email === ''
-    ) {
-      ableToGo = false;
-      errorMessage = errorMessages.ownerMessage;
-    }
-
-    setErrorMessage(errorMessage);
-    return ableToGo;
-  };
+  // const verifyInformation = () => {
+  //   let ableToGo = true;
+  //   let errorMessage = '';
+  //
+  //   if (
+  //     user.salon === undefined ||
+  //     user.salon === '' ||
+  //     user.cnpj === undefined ||
+  //     user.cnpj === ''
+  //   ) {
+  //     ableToGo = false;
+  //     errorMessage = errorMessages.salonMessage;
+  //   } else if (
+  //     user.name === undefined ||
+  //     user.name === '' ||
+  //     user.tel === undefined ||
+  //     user.tel === '' ||
+  //     user.email === undefined ||
+  //     user.email === ''
+  //   ) {
+  //     ableToGo = false;
+  //     errorMessage = errorMessages.ownerMessage;
+  //   }
+  //
+  //   setErrorMessage(errorMessage);
+  //   return ableToGo;
+  // };
 
   return (
     <S.Container>
       <S.Content>
-        <S.HeaderContainer>
-          <BackButton
-            positionTop={'20px'}
-            buttonColor={`${global.colors.purpleColor}`}
-            onPress={navigate.goBack}
-          />
-          <S.HeaderContent>
-            <S.HeaderTitle>Proprietário</S.HeaderTitle>
-            <S.HeaderText>
-              Nos informe alguns dados para podermos ir em frente.
-              {'\n'}
-              Não demorará muito
-            </S.HeaderText>
-          </S.HeaderContent>
-        </S.HeaderContainer>
         <S.BodyContent>
           <Input
             handleChange={handleChange}
-            name={'salon'}
+            name={'salonName'}
             placeholder={'Salão'}
-            value={ownerData.salon}
+            value={owner?.salonName}
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={false}
@@ -125,7 +67,7 @@ const OwnerRegister = () => {
             handleChange={handleChange}
             name={'cnpj'}
             placeholder={'CNPJ'}
-            value={ownerData.cnpj}
+            value={owner?.cnpj}
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
@@ -135,9 +77,9 @@ const OwnerRegister = () => {
           />
           <Input
             handleChange={handleChange}
-            name={'name'}
+            name={'userName'}
             placeholder={'Nome do Proprietário'}
-            value={ownerData.name}
+            value={owner?.userName}
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={false}
@@ -149,7 +91,7 @@ const OwnerRegister = () => {
             handleChange={handleChange}
             name={'tel'}
             placeholder={'Telefone'}
-            value={ownerData.tel}
+            value={owner?.tel}
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
@@ -161,7 +103,7 @@ const OwnerRegister = () => {
             handleChange={handleChange}
             name={'email'}
             placeholder={'E-mail'}
-            value={ownerData.email}
+            value={owner?.email}
             width={'80%'}
             keyboard={'email-address'}
             isSecureTextEntry={false}
@@ -174,7 +116,7 @@ const OwnerRegister = () => {
             handleChange={handleChange}
             name={'password'}
             placeholder={'Senha'}
-            value={ownerData.password}
+            value={owner?.password}
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={true}
@@ -184,15 +126,6 @@ const OwnerRegister = () => {
           />
         </S.BodyContent>
         <S.FooterContent>
-          <SubmitButton
-            text={'Avançar'}
-            onPress={() => goNextPage()}
-            width={'40%'}
-            height={'50px'}
-            fontSize={18}
-            buttonColor={`${global.colors.purpleColor}`}
-          />
-
           {errorMessage !== '' && (
             <ErrorMessage
               text={errorMessage}
@@ -206,4 +139,4 @@ const OwnerRegister = () => {
   );
 };
 
-export default OwnerRegister;
+export default SignupOwners;

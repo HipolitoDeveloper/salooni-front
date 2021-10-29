@@ -1,20 +1,21 @@
-import React, {useContext, useState} from 'react';
-import SubmitButton from '../../../components/SubmitButton';
+import React, {useContext, useEffect, useState} from 'react';
+import SubmitButton from '../../../components/small/SubmitButton';
 import * as S from './styled';
 import SalooniLogo from '../../../../assets/icone11-nobackground.png';
 import {UserContext} from '../../../../contexts/User/UserContext';
 import errorMessages from '../../../../common/errorMessages';
 
 import {useNavigation} from '@react-navigation/native';
-import AlertModal from '../../../components/AlertModal';
+import AlertModal from '../../../components/small/AlertModal';
 import {ActivityIndicator, StyleSheet} from 'react-native';
 import global from '../../../../common/global';
 import {MaskedTextInput} from 'react-native-mask-text';
-import ErrorMessage from '../../../components/ErrorMessage';
-import Input from '../../../components/Input';
+import ErrorMessage from '../../../components/small/ErrorMessage';
+import Input from '../../../components/small/Input';
+import Loading from '../../../components/small/Loading';
 
 const SignInPartner = () => {
-  const {doLogin, verifyPartner, doSignup} = useContext(UserContext);
+  const {doLogin, verifyPartner, doSignup, owner} = useContext(UserContext);
   const navigate = useNavigation();
 
   const [verifiedPartner, setVerifiedPartner] = useState({});
@@ -41,7 +42,7 @@ const SignInPartner = () => {
   const doPartnerLogin = () => {
     doLogin(userData).then(
       () => {
-        navigate.navigate('ApplicationStack');
+        navigate.navigate('TabStack');
       },
 
       error => {
@@ -173,9 +174,7 @@ const SignInPartner = () => {
           width={'70%'}
         />
 
-        {isLoading && (
-          <ActivityIndicator size="large" color={global.colors.purpleColor} />
-        )}
+        <Loading isLoading={isLoading} color={`${global.colors.purpleColor}`} />
 
         {isPartnerFirstAccess ? (
           isAbleToSignup ? (

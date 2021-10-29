@@ -3,17 +3,20 @@ import {
   setNextHour,
   sortSchedules,
 } from '../../factory/Schedule';
+import moment from 'moment';
 
 export const ScheduleReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_SCHEDULES':
-      state.schedules = action.schedules;
-
-      state.calendarSchedule = buildCalendar(action.schedules);
+      state.schedules = action.payload.schedules;
+      state.calendarSchedule = buildCalendar(action.payload.schedules);
+      state.showingCurrentUserSchedule =
+        action.payload.showCurrentUserSchedules;
 
       return {
         schedules: state.schedules,
         calendarSchedule: state.calendarSchedule,
+        showingCurrentUserSchedule: state.showingCurrentUserSchedule,
         ...state,
       };
     case 'ADD_SCHEDULE':
@@ -37,18 +40,18 @@ export const ScheduleReducer = (state, action) => {
       };
 
     case 'SAVE_SCHEDULE':
-      state.schedules.push(action.newSchedule);
-      state.schedules = sortSchedules(state.schedules);
-      state.calendarSchedule = buildCalendar(state.schedules);
+      const newScheduleToSave = action.newSchedule;
+      newScheduleToSave.scheduleDate = new Date(newScheduleToSave.scheduleDate);
 
+      state.schedules.push(newScheduleToSave);
       return {
         schedules: state.schedules,
-        calendarSchedule: state.calendarSchedule,
         ...state,
       };
 
     case 'UPDATE_SCHEDULE':
       const updatedSchedule = action.updatedSchedule;
+      updatedSchedule.scheduleDate = new Date(updatedSchedule.scheduleDate);
       state.schedules = state.schedules.map(schedule => {
         if (schedule.id === updatedSchedule.id) {
           schedule = {...updatedSchedule};
@@ -56,24 +59,34 @@ export const ScheduleReducer = (state, action) => {
         return schedule;
       });
 
-      state.schedules = sortSchedules(state.schedules);
-      state.calendarSchedule = buildCalendar(state.schedules);
-
       return {
         schedules: state.schedules,
         calendarSchedule: state.calendarSchedule,
         ...state,
       };
     case 'DELETE_SCHEDULE':
-      const {id} = action.payload;
+      const deletedScheduleId = action.payload;
       state.schedules.forEach((schedule, index) => {
-        if (schedule.id === id) {
+        if (schedule.id === deletedScheduleId) {
           state.schedules.splice(index, 1);
         }
       });
 
-      state.schedules = sortSchedules(state.schedules);
-      state.calendarSchedule = buildCalendar(state.schedules);
+      return {
+        schedules: state.schedules,
+        calendarSchedule: state.calendarSchedule,
+        ...state,
+      };
+
+    case 'DELETE_SCHEDULES':
+      const schedules = action.schedules;
+      schedules.forEach(deletedSchedule => {
+        state.schedules.forEach((schedule, index) => {
+          if (schedule.id === deletedSchedule.id) {
+            state.schedules.splice(index, 1);
+          }
+        });
+      });
 
       return {
         schedules: state.schedules,
@@ -92,10 +105,32 @@ export const ScheduleReducer = (state, action) => {
         ...state,
       };
 
+    case 'DELETE_SCHEDULE_PROCEDURE':
+      const {scheduleId, id} = action.deletedScheduleProcedure;
+      state.schedules.forEach(schedule => {
+        if (schedule.id === scheduleId) {
+          schedule.procedures.forEach((procedure, index) => {
+            if (procedure.id === id) {
+              schedule.procedures.splice(index, 1);
+            }
+          });
+        }
+      });
+
+      return {
+        schedules: state.schedules,
+        ...state,
+      };
+
     case 'UPDATE_SCHEDULE_INVIEW':
       const scheduleInViewIndex = action.payload;
       state.registeredSchedules.forEach((schedule, index) => {
-        if (schedule.isInView === true && index !== scheduleInViewIndex) {
+        if (scheduleInViewIndex === -1) {
+          schedule.isInView = false;
+        } else if (
+          schedule.isInView === true &&
+          index !== scheduleInViewIndex
+        ) {
           schedule.isInView = false;
         }
       });
@@ -115,6 +150,46 @@ export const ScheduleReducer = (state, action) => {
 
       return {
         registeredSchedules: state.registeredSchedules,
+        ...state,
+      };
+
+    case 'CHECK_SCHEDULE':
+      const scheduleIdToCheck = action.id;
+      state.schedules = state.schedules.map(schedule => {
+        if (scheduleIdToCheck === -1)
+          schedule.checked = schedule.firstCheckedState;
+        else if (schedule.id === scheduleIdToCheck) {
+          schedule.checked = !schedule.checked;
+        }
+
+        return schedule;
+      });
+      return {
+        schedules: state.schedules,
+        ...state,
+      };
+
+    case 'CONFIRM_SCHEDULE':
+      const scheduleIdToConfirm = action.id;
+
+      state.schedules = state.schedules.map(schedule => {
+        if (schedule.id == scheduleIdToConfirm) {
+          schedule.firstCheckedState = schedule.checked;
+        }
+        return schedule;
+      });
+      return {
+        schedules: state.schedules,
+        ...state,
+      };
+
+    case 'SORT_SCHEDULES':
+      state.schedules = sortSchedules(state.schedules);
+      state.calendarSchedule = buildCalendar(state.schedules);
+
+      return {
+        schedules: state.schedules,
+        calendarSchedule: state.calendarSchedule,
         ...state,
       };
 

@@ -35,7 +35,6 @@ export const buildEmployeeList = employees => {
       let employee = newEmployees[i];
       employee.procedures = await getProcedureEmployeeByEmployeeId(
         employee.id,
-        null,
         false,
       );
     }
@@ -43,11 +42,20 @@ export const buildEmployeeList = employees => {
   });
 };
 
-export const buildProcedureEmployee = procedureEmployee => {
+export const buildProcedureEmployeeList = procedureEmployee => {
   return procedureEmployee.map(pe => {
     return {
       ...buildProcedure(pe.procedure_id),
       procedureEmployeeId: pe.objectId,
+      employeeId: pe.employee_id.objectId,
     };
   });
+};
+
+export const buildProcedureEmployee = procedureEmployee => {
+  return {
+    ...buildProcedure(procedureEmployee.procedure_id),
+    procedureEmployeeId: procedureEmployee.objectId,
+    employeeId: procedureEmployee.employee_id.objectId,
+  };
 };

@@ -5,6 +5,8 @@ import {deleteProcedureEmployeeByProcedureId} from './ProcedureEmployeeService';
 import {buildProcedure, buildProcedureList} from '../factory/Procedure';
 import {deleteScheduleProcedureByProcedureId} from './ScheduleProcedureService';
 import {EmployeeObject} from './EmployeeService';
+import {deleteScheduleByClientId} from './ScheduleService';
+import {ClientObject} from './ClientService';
 
 export const ProcedureObject = Parse.Object.extend('procedure');
 
@@ -64,7 +66,7 @@ export const saveProcedure = (procedureObj, returnParseObject) => {
 
       const newProcedure = new ProcedureObject();
 
-      if (maintenanceValue !== undefined && maintenanceDays !== undefined) {
+      if (maintenanceValue !== '' && maintenanceDays !== '') {
         newProcedure.set(
           'maintenance_value',
           parseFloat(maintenanceValue.replace('.', '').replace(',', '.')),
@@ -121,7 +123,7 @@ export const getProcedureByName = (procedureName, returnParseObject) => {
       if (returnParseObject) {
         resolve(await ProcedureQuery.first());
       } else {
-        resolve(buildProcedure(convertToObj(await ProcedureQuery.first())));
+        resolve(convertToObj(await ProcedureQuery.first()));
       }
     } catch (e) {
       console.error(`Procedimento   ${e}`);
@@ -149,6 +151,19 @@ export const deleteProcedureCRUD = (procedureId, returnParseObject) => {
       reject(`Procedimento ${JSON.stringify(e)}`);
     }
   });
+};
+
+export const deleteProceduresCRUD = async procedures => {
+  try {
+    for (const procedure of procedures) {
+      const procedureToDelete = new ClientObject({objectId: procedure.id});
+      await procedureToDelete.destroy();
+      await deleteProcedureEmployeeByProcedureId(procedure.id);
+      await deleteScheduleProcedureByProcedureId(procedure.id, false);
+    }
+  } catch (e) {
+    console.error(`Procedimento ${e}`);
+  }
 };
 
 export const updateProcedureCRUD = (procedureObj, returnParseObject) => {

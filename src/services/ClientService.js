@@ -94,3 +94,14 @@ export const deleteClientCRUD = (clientId, returnParseObject) => {
     }
   });
 };
+export const deleteClientsCRUD = async clients => {
+  try {
+    for (const client of clients) {
+      const clientToDelete = new ClientObject({objectId: client.id});
+      await clientToDelete.destroy();
+      await deleteScheduleByClientId(client.id, false);
+    }
+  } catch (e) {
+    console.error(`Cliente ${e}`);
+  }
+};

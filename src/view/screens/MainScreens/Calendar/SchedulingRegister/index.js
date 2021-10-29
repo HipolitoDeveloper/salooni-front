@@ -2,24 +2,27 @@ import React, {useContext, useState} from 'react';
 import {ActivityIndicator, Platform} from 'react-native';
 
 import * as S from './styled';
-import BackButton from '../../../../components/BackButton';
+import BackButton from '../../../../components/small/BackButton';
 import global from '../../../../../common/global';
 import {useNavigation} from '@react-navigation/native';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import {ProcedureContext} from '../../../../../contexts/Procedure/ProcedureContext';
 import {xorBy} from 'lodash';
-import SubmitButton from '../../../../components/SubmitButton';
+import SubmitButton from '../../../../components/small/SubmitButton';
 import errorMessages from '../../../../../common/errorMessages';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {ScheduleContext} from '../../../../../contexts/Schedule/ScheduleContext';
-import AlertModal from '../../../../components/AlertModal';
-import ErrorMessage from '../../../../components/ErrorMessage';
+import AlertModal from '../../../../components/small/AlertModal';
+import ErrorMessage from '../../../../components/small/ErrorMessage';
 import {UserContext} from '../../../../../contexts/User/UserContext';
 import {PartnerContext} from '../../../../../contexts/Partner/PartnerContext';
 import {ClientContext} from '../../../../../contexts/Client/ClientContext';
-import AutoComplete from '../../../../components/AutoComplete';
-import MultipleSelect from '../../../../components/MultipleSelect';
+import AutoComplete from '../../../../components/small/AutoComplete';
+import MultipleSelect from '../../../../components/small/MultipleSelect';
 import moment from 'moment';
+import RegisterComponent from '../../../../components/huge/RegisterComponent';
+import {buildDateTime} from '../../../../../pipe/dateBuilder';
+import Loading from '../../../../components/small/Loading';
 
 const SchedulingRegister = ({route}) => {
   const {
@@ -32,13 +35,13 @@ const SchedulingRegister = ({route}) => {
     updateSchedule,
     deleteSchedule,
     deleteScheduleInView,
-    loadAllSchedules,
+    sortScheduleList,
   } = useContext(ScheduleContext);
 
   const {partners} = useContext(PartnerContext);
   const {clients} = useContext(ClientContext);
   const {procedures} = useContext(ProcedureContext);
-  const {currentUser} = useContext(UserContext);
+  const {currentUser, isOwner} = useContext(UserContext);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -50,15 +53,20 @@ const SchedulingRegister = ({route}) => {
 
   const [schedule, setSchedule] = useState({
     client: '',
-    employee: '',
+    employee: partners.find(partner => partner.id === currentUser.idFunc),
     procedures: [],
     scheduleDate: new Date(route.params.date),
   });
 
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
+  const [date, setDate] = useState(new Date());
 
   const navigate = useNavigation();
+
+  // navigate.addListener('beforeRemove', () => {
+  //   sortSchedules();
+  // });
 
   navigate.addListener('focus', () => {
     const scheduleInView = route.params?.schedule ? route.params?.schedule : {};
@@ -93,6 +101,11 @@ const SchedulingRegister = ({route}) => {
   };
 
   const handleChange = (name, value) => {
+    if (name === 'scheduleHour') {
+      value = buildDateTime(schedule.scheduleDate, value);
+      name = 'scheduleDate';
+    }
+
     setSchedule({
       ...schedule,
       [name]: value,
@@ -103,7 +116,7 @@ const SchedulingRegister = ({route}) => {
     setShowAlertModal({isShowing: isShowing, text: text});
   };
 
-  const chooseAddClientMethod = async () => {
+  const chooseAddScheduleMethod = async () => {
     const {isInView, indexInView} = schedule;
     if (verifyInformation() && isInView) {
       schedule.isInView = false;
@@ -125,16 +138,17 @@ const SchedulingRegister = ({route}) => {
     if (verifyInformationToGo()) {
       saveSchedule().then(
         () => {
-          setIsLoading(false);
+          sortScheduleList();
           cleanRegisteredSchedules();
           setErrorMessage('');
           clearSchedule();
-          navigate.push('ApplicationStack', {
+          navigate.push('TabStack', {
             screen: 'SchedulingCalendar',
             params: {
-              typeView: 'AGN',
+              calendarViewState: false,
             },
           });
+          setIsLoading(false);
         },
         error => {
           setIsLoading(false);
@@ -148,13 +162,15 @@ const SchedulingRegister = ({route}) => {
     setIsLoading(true);
     updateSchedule(schedule).then(
       () => {
+        sortScheduleList();
         setIsLoading(false);
-        navigate.push('ApplicationStack', {
+        navigate.replace('TabStack', {
           screen: 'SchedulingCalendar',
           params: {
-            typeView: 'LST',
+            calendarViewState: false,
           },
         });
+        setIsLoading(false);
         setErrorMessage('');
         clearSchedule();
       },
@@ -171,10 +187,10 @@ const SchedulingRegister = ({route}) => {
     deleteSchedule(schedule).then(
       () => {
         setIsLoading(false);
-        navigate.push('ApplicationStack', {
+        navigate.push('TabStack', {
           screen: 'SchedulingCalendar',
           params: {
-            typeView: 'LST',
+            calendarViewState: false,
           },
         });
         setErrorMessage('');
@@ -187,6 +203,16 @@ const SchedulingRegister = ({route}) => {
     );
   };
 
+  const cancelEditing = () => {
+    updateScheduleInView(-1);
+    clearSchedule();
+  };
+
+  const deletePreRegisteredItem = schedule => {
+    deleteScheduleInView(schedule);
+    clearSchedule();
+  };
+
   const handleSchedule = (schedule, index) => {
     updateScheduleInView(index);
     schedule.isInView = !schedule.isInView;
@@ -194,10 +220,10 @@ const SchedulingRegister = ({route}) => {
 
     setSchedule(schedule);
 
-    if (!verifyIfIsEditing()) clearSchedule();
+    if (!verifyIfIsPreRegisteredEditing()) clearSchedule();
   };
 
-  const verifyIfIsEditing = () => {
+  const verifyIfIsPreRegisteredEditing = () => {
     return registeredSchedules.some(schedule => schedule.isInView === true);
   };
 
@@ -236,178 +262,131 @@ const SchedulingRegister = ({route}) => {
     setErrorMessage(errorMessage);
     return ableToGo;
   };
-
   const onChange = (event, selectedDate) => {
-    if (mode === 'date') showTimepicker();
     const currentDate = selectedDate || schedule.scheduleDate;
-    setShow(Platform.OS === 'ios');
-    handleChange('scheduleDate', currentDate);
+    if (mode === 'date') {
+      handleChange('scheduleDate', currentDate);
+
+      showMode(false, 'time');
+    } else if (mode === 'time') {
+      showMode(false, '');
+
+      handleChange('scheduleHour', currentDate);
+    }
+    // setShow(Platform.OS === 'ios');
   };
 
-  const showMode = currentMode => {
-    setShow(true);
-    setMode(currentMode);
+  const showMode = (state, currentMode) => {
+    if (currentMode === 'date' && state) {
+      setShow(true);
+      setMode(currentMode);
+    } else if (currentMode === 'time' && !state) {
+      setMode(currentMode);
+    } else if (currentMode === '') {
+      setShow(false);
+    }
   };
-
-  const showDatepicker = () => {
-    showMode('date');
-  };
-
-  const showTimepicker = () => {
-    showMode('time');
-  };
-
-  const loadBoxInformation = () =>
-    registeredSchedules.map((schedule, index) => (
-      <S.BoxContent onPress={() => handleSchedule(schedule, index)} key={index}>
-        <S.BoxText isInView={schedule.isInView}>
-          {schedule.client.name}
-        </S.BoxText>
-      </S.BoxContent>
-    ));
 
   return (
-    <S.Container>
-      <S.Content>
-        <S.HeaderContent>
-          <BackButton
-            positionTop={'23px'}
-            positionLeft={'-5px'}
-            buttonColor={`${global.colors.purpleColor}`}
-            onPress={() =>
-              navigate.push('ApplicationStack', {
-                screen: 'SchedulingCalendar',
-                params: {
-                  typeView: 'LST',
-                },
-              })
-            }
-          />
-          <S.HeaderTitle>
-            {show && (
-              <RNDateTimePicker
-                value={schedule.scheduleDate}
-                mode={mode}
-                is24Hour={true}
-                display="default"
-                minimumDate={new Date(1950, 0, 1)}
-                maximumDate={new Date(2300, 10, 20)}
-                minuteInterval={10}
-                onChange={onChange}
-                locale="pt-BR"
-              />
-            )}
-            <S.HeaderText onPress={showDatepicker}>
-              {moment(schedule.scheduleDate).format('DD/MM/YYYY HH:mm')}
-            </S.HeaderText>
-          </S.HeaderTitle>
-          {isLoading && (
-            <S.LoadingContent>
-              <ActivityIndicator
-                size="large"
-                color={global.colors.purpleColor}
-              />
-            </S.LoadingContent>
-          )}
-        </S.HeaderContent>
-        <S.BodyContent>
-          <AutoComplete
-            placeholder={'Cliente'}
-            iconName={'user'}
-            textColor={'black'}
-            iconColor={global.colors.purpleColor}
-            searchLengthToSuggest={2}
-            options={clients}
-            name={'client'}
-            value={schedule.client}
-            handleChange={handleChange}
-          />
+    <RegisterComponent
+      onCancel={() =>
+        navigate.push('TabStack', {
+          screen: 'SchedulingCalendar',
+          params: {
+            calendarState: true,
+          },
+        })
+      }
+      showAddButton={true}
+      color={global.colors.purpleColor}
+      preRegisteredItems={registeredSchedules}
+      handleSelect={handleSchedule}
+      deletePreRegisteredItem={deletePreRegisteredItem}
+      onConfirm={isEditing ? updateSchedules : saveSchedules}
+      isEditing={isEditing}
+      isPreRegisteredEditing={verifyIfIsPreRegisteredEditing()}
+      cancelEditing={cancelEditing}
+      onAdd={chooseAddScheduleMethod}
+      registeredItemRightInformation={'procedures'}
+      registeredItemLeftInformation={'client'}
+      headerTitle={'Agendamento'}>
+      {errorMessage !== '' && (
+        <ErrorMessage
+          text={errorMessage}
+          width={'70%'}
+          textColor={`${global.colors.purpleColor}`}
+        />
+      )}
 
-          <AutoComplete
-            placeholder={'Parceiros'}
-            textColor={'black'}
-            iconName={'cut'}
-            iconColor={global.colors.purpleColor}
-            searchLengthToSuggest={2}
-            options={partners}
-            name={'employee'}
-            value={schedule.employee}
-            handleChange={handleChange}
+      <Loading isLoading={isLoading} color={`${global.colors.purpleColor}`} />
+
+      <S.BodyContent>
+        {show && (
+          <RNDateTimePicker
+            value={schedule.scheduleDate}
+            mode={mode}
+            is24Hour={true}
+            display="default"
+            minimumDate={new Date(1950, 0, 1)}
+            maximumDate={new Date(2300, 10, 20)}
+            minuteInterval={10}
+            onChange={onChange}
+            locale="pt-BR"
           />
+        )}
+
+        <S.HeaderText onPress={() => showMode(true, 'date')}>
+          {moment(schedule.scheduleDate).format('DD/MM/YYYY HH:mm')}
+        </S.HeaderText>
+        <AutoComplete
+          placeholder={'Procure por um cliente'}
+          iconName={'user'}
+          textColor={global.colors.darkGreyColor}
+          iconColor={global.colors.purpleColor}
+          searchLengthToSuggest={2}
+          options={clients}
+          name={'client'}
+          value={schedule.client}
+          handleChange={handleChange}
+        />
+
+        <AutoComplete
+          editable={isOwner}
+          placeholder={'Procure por um parceiro'}
+          textColor={global.colors.darkGreyColor}
+          iconName={'cut'}
+          iconColor={global.colors.purpleColor}
+          searchLengthToSuggest={2}
+          options={
+            isOwner
+              ? partners
+              : partners.filter(partner => partner.id === currentUser.idFunc)
+          }
+          name={'employee'}
+          value={schedule.employee}
+          handleChange={handleChange}
+        />
+
+        {Object.keys(schedule.employee).length > 5 && (
           <MultipleSelect
+            disabled={Object.keys(schedule.employee).length <= 5}
             iconColor={global.colors.purpleColor}
             plusIconColor={global.colors.purpleColor}
             modalHeaderText={'Escolha os procedimentos'}
-            options={procedures}
-            selectTextColor={'black'}
+            options={
+              currentUser.idFunc === schedule.employee.id
+                ? procedures
+                : schedule.employee.procedures
+            }
+            selectTextColor={global.colors.darkGreyColor}
             selectedItemBorderColor={global.colors.purpleColor}
             value={schedule.procedures}
             handleMultiSelect={handleMultiSelect}
+            placeholderText={'Procure por um procedimento'}
           />
+        )}
+      </S.BodyContent>
 
-          {!isEditing && (
-            <S.RegisteredProceduresContent>
-              <S.RegisteredProceduresBoxTitle>
-                Já Cadastrados
-              </S.RegisteredProceduresBoxTitle>
-              <S.RegisteredProceduresBox>
-                {loadBoxInformation()}
-              </S.RegisteredProceduresBox>
-            </S.RegisteredProceduresContent>
-          )}
-        </S.BodyContent>
-        <S.FooterContent>
-          <S.AddButtonContent>
-            {errorMessage !== '' && (
-              <ErrorMessage
-                text={errorMessage}
-                width={'70%'}
-                textColor={`${global.colors.purpleColor}`}
-              />
-            )}
-
-            <S.ButtonsContent>
-              {!isEditing && (
-                <SubmitButton
-                  text={schedule.isInView ? 'Editar' : 'Adicionar'}
-                  onPress={() => chooseAddClientMethod()}
-                  width={'40%'}
-                  height={'30px'}
-                  fontSize={'18px'}
-                  buttonColor={`${global.colors.purpleColor}`}
-                />
-              )}
-
-              {schedule.isInView && (
-                <S.DeleteButton
-                  onPress={() => {
-                    deleteScheduleInView(schedule);
-                    clearSchedule();
-                  }}>
-                  <Icon name="trash" size={17} />
-                </S.DeleteButton>
-              )}
-            </S.ButtonsContent>
-          </S.AddButtonContent>
-          <S.SubmitButtonContent>
-            <SubmitButton
-              disabled={verifyIfIsEditing()}
-              text={'Salvar'}
-              onPress={() => (!isEditing ? saveSchedules() : updateSchedules())}
-              width={'40%'}
-              height={'50px'}
-              fontSize={'18px'}
-              buttonColor={`${global.colors.purpleColor}`}
-            />
-            {isEditing && (
-              <S.DeleteButton
-                onPress={() => handleModal(true, errorMessages.deleteMessage)}>
-                <Icon name="trash" size={17} />
-              </S.DeleteButton>
-            )}
-          </S.SubmitButtonContent>
-        </S.FooterContent>
-      </S.Content>
       <AlertModal
         text={showAlertModal.text}
         isVisible={showAlertModal.isShowing}
@@ -419,7 +398,7 @@ const SchedulingRegister = ({route}) => {
         }}
         title={'Atenção.'}
       />
-    </S.Container>
+    </RegisterComponent>
   );
 };
 

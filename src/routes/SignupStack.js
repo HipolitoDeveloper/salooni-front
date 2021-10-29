@@ -1,19 +1,29 @@
 import React from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
 
 import SignupOwners from '../view/screens/Signup/SignupOwners';
 import SignupPartners from '../view/screens/Signup/SignupPartners';
 import SignupProcedures from '../view/screens/Signup/SignupProcedures';
-
-const Stack = createStackNavigator();
+import SignupTabBar from './components/SignupTabBar/SignupTabBar';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import UserProvider from '../contexts/User/UserContext';
+const Tab = createMaterialTopTabNavigator();
 
 export default () => (
-  <Stack.Navigator
+  <Tab.Navigator
+    initialRouteName={'SignupOwners'}
+    tabBar={props => <SignupTabBar {...props} />}
     screenOptions={{
-      headerShown: false,
+      swipeEnabled: false,
+      // tabBarBounces: true,
+      // tabBarActiveTintColor: '#e91e63',
+      // tabBarLabelStyle: {fontSize: 12},
+      // tabBarStyle: {backgroundColor: 'powderblue'},
+      // tabBarScrollEnabled: true,
     }}>
-    <Stack.Screen name="SignupOwners" component={SignupOwners} />
-    <Stack.Screen name="SignupPartners" component={SignupPartners} />
-    <Stack.Screen name="SignupProcedures" component={SignupProcedures} />
-  </Stack.Navigator>
+    <>
+      <Tab.Screen name="SignupOwners" component={SignupOwners} />
+      <Tab.Screen name="SignupProcedures" component={SignupProcedures} />
+      <Tab.Screen name="SignupPartners" component={SignupPartners} />
+    </>
+  </Tab.Navigator>
 );

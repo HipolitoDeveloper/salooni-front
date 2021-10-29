@@ -1,29 +1,38 @@
 import React, {createContext, useEffect, useReducer} from 'react';
 import Parse from 'parse/react-native';
 import {convertToObj} from '../../pipe/conversor';
-import {getUsersByEmail, signUp} from '../../services/UserService';
+import {getUsersByEmail, signUp, updateUser} from '../../services/UserService';
 import {
   getEmployeeByEmail,
   getEmployeeById,
   saveEmployee,
+  saveEmployeeSignup,
   saveEmployeeWithoutProcedures,
+  updateEmployeeCRUD,
 } from '../../services/EmployeeService';
 import {UserReducer} from './UserReducer';
 import {
   getProcedureByName,
   saveProcedure,
 } from '../../services/ProcedureService';
-import {saveProcedureEmployee} from '../../services/ProcedureEmployeeService';
-import {saveSalon} from '../../services/SalonService';
+import {saveSalon, updateSalon} from '../../services/SalonService';
 import {buildCurrentUser} from '../../factory/User';
+import errorMessages from '../../common/errorMessages';
+import {convertUserToProfileObject} from '../../pipe/userPipe';
 
 export const UserContext = createContext();
 
 const initialState = {
+  isOwner: false,
   currentUser: {},
-  salon: {},
-  owner: {},
-  user: {},
+  owner: {
+    salonName: '',
+    cnpj: '',
+    userName: '',
+    tel: '',
+    email: '',
+    password: '',
+  },
 };
 
 const UserProvider = ({children}) => {
@@ -35,6 +44,61 @@ const UserProvider = ({children}) => {
     };
     verifyUser();
   }, []);
+
+  const verifySignup = payload => {
+    const {procedures, partners} = payload;
+    let isOk = true;
+    let errorMessage = '';
+    let showReconfirmModal = false;
+    let ownerToBeVerified = state.owner !== undefined ? state.owner : '';
+
+    if (ownerToBeVerified === '') {
+      return {
+        isOk: false,
+        errorMessage: 'Nenhuma informação do cadastro foi preenchida.',
+        showReconfirmModal: false,
+      };
+    }
+
+    if (ownerToBeVerified.salonName === '') {
+      isOk = false;
+      errorMessage = 'O nome de usuário não pode ser vazio.';
+    } else if (ownerToBeVerified.cnpj === '') {
+      isOk = false;
+      errorMessage = 'O CNPJ do usuário não pode ser vazio.';
+    } else if (ownerToBeVerified.userName === '') {
+      isOk = false;
+      errorMessage = 'O nome do salão não pode ser vazio.';
+    } else if (ownerToBeVerified.tel === '') {
+      isOk = false;
+      errorMessage = 'O telefone do usuário não pode ser vazio.';
+    } else if (ownerToBeVerified.email === '') {
+      isOk = false;
+      errorMessage = 'O e-mail do usuário não pode ser vazio.';
+    } else if (ownerToBeVerified.password === '') {
+      isOk = false;
+      errorMessage = 'A senha não é forte o suficiente.';
+    } else if (procedures.length === 0) {
+      isOk = true;
+      errorMessage = partners.length === 0 && errorMessages.noProcedureMessage;
+      showReconfirmModal = true;
+    } else if (partners.length === 0) {
+      isOk = true;
+      errorMessage =
+        partners.length === 0 && errorMessages.noPartnerSignupMessage;
+      showReconfirmModal = true;
+    }
+
+    return {
+      isOk,
+      errorMessage,
+      showReconfirmModal,
+    };
+  };
+
+  const handleOwner = payload => {
+    dispatch({type: 'HANDLE_OWNER', payload});
+  };
 
   const setCurrentUser = async (isLogging, user) => {
     if (isLogging && user !== null) {
@@ -51,11 +115,10 @@ const UserProvider = ({children}) => {
         let isOwner = false;
 
         const users = await getUsersByEmail(userData.email.trim(), false);
-
         if (users.length > 0) {
           const user = users[0];
           if (user) {
-            const employee = await getEmployeeById(user.employee.id, false);
+            const {employee} = user;
 
             if (employee.employeeType === 'OWN') {
               isOwner = true;
@@ -107,8 +170,6 @@ const UserProvider = ({children}) => {
           });
         } else {
           let isAbleToSignup = false;
-          console.log('Cnpj Digitado >', userData.cnpj);
-          console.log('Partner sendo verificado>', verifiedPartner);
 
           if (userData.cnpj === verifiedPartner.salon.cnpj) {
             isAbleToSignup = true;
@@ -144,7 +205,7 @@ const UserProvider = ({children}) => {
   const doSignup = (employee, userData) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const userToSignup = userData === '' ? state.user : userData;
+        const userToSignup = userData === '' ? state.owner : userData;
         userToSignup.employeeId = employee.id;
 
         resolve(convertToObj(await signUp(userToSignup)));
@@ -156,17 +217,19 @@ const UserProvider = ({children}) => {
 
   const saveSignupInformation = payload => {
     const {procedures, partners} = payload;
-    const salonInformation = state.salon;
-    const ownerInformation = state.owner;
+    const userInformation = state.owner;
+    console.log('Procedimentos', procedures);
+    console.log('Parceiros', partners);
+    console.log('Dono', userInformation);
 
     return new Promise(async (resolve, reject) => {
       try {
-        salonInformation.employeeQt = partners.length;
-        const salon = await saveSalon(salonInformation, false);
-        ownerInformation.salonId = salon.id;
-
+        userInformation.employeeQt = partners.length;
+        const salon = await saveSalon(userInformation, false);
+        userInformation.salonId = salon.id;
+        userInformation.employeeType = 'OWN';
         const ownerEmployee = await saveEmployeeWithoutProcedures(
-          ownerInformation,
+          userInformation,
           false,
         );
 
@@ -181,12 +244,8 @@ const UserProvider = ({children}) => {
         if (partners.length > 0) {
           partners.map(async partner => {
             partner.salonId = salon.id;
-            if (partner.procedures.length !== 0) {
-              for (let procedure of partner.procedures) {
-                procedure = await getProcedureByName(procedure.name, false);
-              }
-            }
-            await saveEmployee(partner, true);
+
+            await saveEmployee(partner, true, true);
           });
         }
 
@@ -198,15 +257,31 @@ const UserProvider = ({children}) => {
     });
   };
 
+  const updateProfile = payload => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const {user, salon, employee} = convertUserToProfileObject(payload);
+        await updateEmployeeCRUD(employee, false);
+        await updateUser(user);
+        await updateSalon(salon);
+        resolve(dispatch({type: 'UPDATE_USER', payload}));
+      } catch (e) {
+        console.log(e);
+        reject(`Deu ruim ao atualizar as informações do Usuário ${e}`);
+      }
+    });
+  };
+
   const saveOwnerInformation = payload => {
     dispatch({type: 'SAVE_OWNER', payload});
   };
 
   const cleanOwnerInformation = payload => {
-    dispatch({type: 'CLEAN_USER', payload});
+    dispatch({type: 'CLEAN_OWNER', payload});
   };
 
   const contextValues = {
+    updateProfile,
     doLogin,
     setCurrentUser,
     verifyOwner,
@@ -215,6 +290,8 @@ const UserProvider = ({children}) => {
     saveSignupInformation,
     doSignup,
     cleanOwnerInformation,
+    handleOwner,
+    verifySignup,
     ...state,
   };
 

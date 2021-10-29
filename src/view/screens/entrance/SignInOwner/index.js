@@ -1,18 +1,19 @@
 import React, {useContext, useEffect, useState} from 'react';
-import SubmitButton from '../../../components/SubmitButton';
+import SubmitButton from '../../../components/small/SubmitButton';
 import * as S from './styled';
 import SalooniLogo from '../../../../assets/icone11-nobackground.png';
 import {UserContext} from '../../../../contexts/User/UserContext';
 
 import {useNavigation} from '@react-navigation/native';
-import Input from '../../../components/Input';
+import Input from '../../../components/small/Input';
 import errorMessages from '../../../../common/errorMessages';
-import ErrorMessage from '../../../components/ErrorMessage';
+import ErrorMessage from '../../../components/small/ErrorMessage';
 import global from '../../../../common/global';
 import {ActivityIndicator} from 'react-native';
+import Loading from '../../../components/small/Loading';
 
 const SignInOwner = () => {
-  const {doLogin, verifyOwner} = useContext(UserContext);
+  const {doLogin, verifyOwner, owner} = useContext(UserContext);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +36,7 @@ const SignInOwner = () => {
       () => {
         doLogin(userData).then(
           () => {
-            navigate.navigate('ApplicationStack');
+            navigate.navigate('TabStack');
             setErrorMessage('');
             setIsLoading(false);
           },
@@ -89,11 +90,7 @@ const SignInOwner = () => {
           <S.PasswordResetText>Esqueceu a senha?</S.PasswordResetText>
         </S.PasswordResetButton>
 
-        {isLoading && (
-          <S.LoadingContent>
-            <ActivityIndicator size="large" color={global.colors.purpleColor} />
-          </S.LoadingContent>
-        )}
+        <Loading isLoading={isLoading} color={`${global.colors.purpleColor}`} />
         <SubmitButton
           text={'Entrar'}
           onPress={() => onLogin()}

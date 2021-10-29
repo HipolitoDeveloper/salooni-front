@@ -1,22 +1,10 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import Parse from 'parse/react-native';
-
-import EntranceStack from './EntranceStack';
 import {UserContext} from '../contexts/User/UserContext';
-
+import TabStack from './TabStack';
 import SignupStack from './SignupStack';
-import {ClientContext} from '../contexts/Client/ClientContext';
-import ProcedureProvider, {
-  ProcedureContext,
-} from '../contexts/Procedure/ProcedureContext';
-import PartnerProvider, {
-  PartnerContext,
-} from '../contexts/Partner/PartnerContext';
+import EntranceStack from './EntranceStack';
 import ApplicationStack from './ApplicationStack';
-import ScheduleProvider, {
-  ScheduleContext,
-} from '../contexts/Schedule/ScheduleContext';
 
 const Stack = createStackNavigator();
 
@@ -28,12 +16,19 @@ export const MainStack = () => {
 
   return (
     <Stack.Navigator
-      initialRouteName={'ApplicationStack'}
+      initialRouteName={'TabStack'}
       screenOptions={{
         headerShown: false,
       }}>
       {isLoggedIn ? (
-        <Stack.Screen name="ApplicationStack" component={ApplicationStack} />
+        <Stack.Group>
+          <Stack.Screen name="ApplicationStack" component={ApplicationStack} />
+          <Stack.Screen name="TabStack" component={TabStack} />
+          {/*/!*<Stack.Screen*!/*/}
+          {/*/!*  name={'ProcedureRegister'}*!/*/}
+          {/*/!*  component={ProcedureRegister}*!/*/}
+          {/*/>*/}
+        </Stack.Group>
       ) : (
         <Stack.Group>
           <Stack.Screen name="EntranceStack" component={EntranceStack} />

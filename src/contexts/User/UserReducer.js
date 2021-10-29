@@ -1,39 +1,46 @@
 export const UserReducer = (state, action) => {
   switch (action.type) {
-    case 'SAVE_OWNER':
-      const {salon, cnpj, name, tel, email, password} = action.payload;
-      const newOwner = {
-        cnpj: cnpj,
-        tel: tel,
-        employeeType: 'OWN',
-        name: name,
-        email: email,
+    case 'HANDLE_OWNER':
+      const {text, inputName} = action.payload;
+
+      state.owner = {
+        ...state.owner,
+        [inputName]: text,
       };
-      const newSalon = {name: salon, cnpj: cnpj, employee_qt: 0};
-      const newUser = {username: email, password: password, email: email};
 
       return {
         ...state,
-        owner: newOwner,
-        user: newUser,
-        salon: newSalon,
+        owner: state.owner,
       };
 
     case 'SET_CURRENT_USER':
       state.currentUser = action.currentUser;
+      state.isOwner = state.currentUser.employeeType === 'OWN';
       return {
+        ...state,
+        currentUser: state.currentUser,
+        isPartner: state.isPartner,
+      };
+    case 'UPDATE_USER':
+      state.currentUser = action.payload;
+      return {
+        ...state,
         currentUser: state.currentUser,
       };
 
-    case 'CLEAN_USER':
-      state.user = {};
-      state.salon = {};
-      state.owner = {};
+    case 'CLEAN_OWNER':
+      state.owner = {
+        salonName: '',
+        cnpj: '',
+        userName: '',
+        tel: '',
+        email: '',
+        password: '',
+      };
+
       return {
         ...state,
         owner: state.owner,
-        user: state.user,
-        salon: state.salon,
       };
 
     default:

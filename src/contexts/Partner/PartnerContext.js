@@ -3,19 +3,25 @@ import {PartnerReducer} from './PartnerReducer';
 
 import {
   deleteEmployeeCRUD,
+  deleteEmployeesCRUD,
   getAllPartnersBySalonId,
   saveEmployee,
   updateEmployeeCRUD,
 } from '../../services/EmployeeService';
 import {getProcedureByName} from '../../services/ProcedureService';
-import {saveProcedureEmployee} from '../../services/ProcedureEmployeeService';
+import {
+  deleteProcedureEmployee,
+  deleteProcedureEmployeeByEmployeeId,
+  saveProcedureEmployee,
+} from '../../services/ProcedureEmployeeService';
+import {deleteClientsCRUD} from '../../services/ClientService';
 
 export const PartnerContext = createContext();
 
 const initialState = {
   partners: [],
   registeredPartners: [],
-  dropdownPartners: [],
+  isPartnersLoading: true,
 };
 
 const PartnerProvider = ({children}) => {
@@ -82,7 +88,7 @@ const PartnerProvider = ({children}) => {
     });
   };
 
-  const deletePartner = payload => {
+  const deleteUniquePartner = payload => {
     return new Promise(async (resolve, reject) => {
       try {
         const {id} = payload;
@@ -95,8 +101,40 @@ const PartnerProvider = ({children}) => {
     });
   };
 
+  const deletePartnerList = payload => {
+    return new Promise(async (resolve, reject) => {
+      const partners = payload;
+      try {
+        await deleteEmployeesCRUD(partners);
+        resolve(dispatch({type: 'DELETE_PARTNERS', partners}));
+      } catch (e) {
+        reject(`Deu ruim ao excluir clientes ${e}`);
+      }
+    });
+  };
+
   const deletePartnerInView = payload => {
     dispatch({type: 'DELETE_PARTNER_INVIEW', payload});
+  };
+
+  const deletePartnerProcedure = payload => {
+    return new Promise(async (resolve, reject) => {
+      const {procedureEmployeeId} = payload;
+      try {
+        deleteProcedureEmployee(procedureEmployeeId, false).then(
+          deletedProcedureEmployee => {
+            resolve(
+              dispatch({
+                type: 'DELETE_PARTNER_PROCEDURE',
+                deletedProcedureEmployee,
+              }),
+            );
+          },
+        );
+      } catch (e) {
+        reject(`Deu ruim ao excluir procedimento ${e}`);
+      }
+    });
   };
 
   const cleanRegisteredPartners = payload => {
@@ -107,11 +145,12 @@ const PartnerProvider = ({children}) => {
     loadAllPartners,
     addPartner,
     cleanPartnersInformation,
-
+    deletePartnerProcedure,
     savePartner,
     cleanRegisteredPartners,
     updatePartner,
-    deletePartner,
+    deleteUniquePartner,
+    deletePartnerList,
     deletePartnerInView,
     updatePartnerInView,
     editPartner,

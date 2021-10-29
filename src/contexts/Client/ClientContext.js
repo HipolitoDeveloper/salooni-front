@@ -2,6 +2,7 @@ import React, {createContext, useReducer} from 'react';
 import {ClientReducer} from './ClientReducer';
 import {
   deleteClientCRUD,
+  deleteClientsCRUD,
   getAllClientsBySalonId,
   insertClientCRUD,
   updateClientCRUD,
@@ -12,6 +13,7 @@ export const ClientContext = createContext();
 const initialState = {
   clients: [],
   registeredClients: [],
+  isClientsLoading: true,
 };
 
 const ClientProvider = ({children}) => {
@@ -72,13 +74,25 @@ const ClientProvider = ({children}) => {
     });
   };
 
-  const deleteClient = payload => {
+  const deleteUniqueClient = payload => {
     return new Promise(async (resolve, reject) => {
       const {id} = payload;
       try {
         deleteClientCRUD(id).then(deletedClient => {
           resolve(dispatch({type: 'DELETE_CLIENT', deletedClient}));
         });
+      } catch (e) {
+        reject(`Deu ruim ao excluir cliente ${e}`);
+      }
+    });
+  };
+
+  const deleteClientList = payload => {
+    return new Promise(async (resolve, reject) => {
+      const clients = payload;
+      try {
+        await deleteClientsCRUD(clients);
+        resolve(dispatch({type: 'DELETE_CLIENTS', clients}));
       } catch (e) {
         reject(`Deu ruim ao excluir clientes ${e}`);
       }
@@ -106,7 +120,8 @@ const ClientProvider = ({children}) => {
     cleanClients,
 
     updateClient,
-    deleteClient,
+    deleteUniqueClient,
+    deleteClientList,
     deleteClientInView,
     updateClientInView,
     editClient,

@@ -9,6 +9,10 @@ export const buildCurrentUser = user => {
     idFunc: currentUser.employee_id.objectId,
     idSalon: currentUser.employee_id.salon_id.objectId,
     employeeType: currentUser.employee_id.employee_type,
+    userName: currentUser.employee_id.name,
+    salonName: currentUser.employee_id.salon_id.name,
+    cnpj: currentUser.employee_id.salon_id.cnpj,
+    email: currentUser.email,
   };
 };
 

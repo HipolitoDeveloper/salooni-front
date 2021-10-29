@@ -37,16 +37,19 @@ export const HeaderTitle = styled.View`
 `;
 
 export const HeaderText = styled.Text`
+  margin-top: 20px;
   font-size: 18px;
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   text-align: center;
-  color: ${global.colors.purpleColor};
+  color: black;
+  border-bottom-width: ${StyleSheet.hairlineWidth}px;
+  border-bottom-color: ${global.colors.purpleColor};
 `;
 
 export const BodyContent = styled.View`
   height: 70%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   align-items: center;
   width: 90%;
 `;
@@ -72,13 +75,13 @@ export const BoxContent = styled.TouchableOpacity`
 `;
 
 export const BoxText = styled.Text`
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   font-size: 18px;
   color: ${props => (props.isInView ? 'red' : 'black')};
 `;
 
 export const RegisteredProceduresBoxTitle = styled.Text`
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   font-size: 16px;
 `;
 

@@ -3,16 +3,10 @@ export const PartnerReducer = (state, action) => {
     case 'LOAD_PARTNERS':
       state.partners = action.partners;
 
-      state.dropdownPartners = action.partners.map(partner => {
-        return {
-          id: partner.id,
-          item: partner.name,
-        };
-      });
-
+      state.isPartnersLoading = false;
       return {
         partners: state.partners,
-        dropdownPartners: state.dropdownPartners,
+        isPartnersLoading: state.isPartnersLoading,
         ...state,
       };
     case 'ADD_PARTNER':
@@ -34,7 +28,9 @@ export const PartnerReducer = (state, action) => {
     case 'UPDATE_PARTNERS_INVIEW':
       const partnerInViewIndex = action.payload;
       state.registeredPartners.map((partner, index) => {
-        if (partner.isInView === true && index !== partnerInViewIndex) {
+        if (partnerInViewIndex === -1) {
+          partner.isInView = false;
+        } else if (partner.isInView === true && index !== partnerInViewIndex) {
           partner.isInView = false;
         }
 
@@ -100,6 +96,22 @@ export const PartnerReducer = (state, action) => {
 
       return {
         registeredPartners: state.registeredPartners,
+        ...state,
+      };
+    case 'DELETE_PARTNER_PROCEDURE':
+      const {employeeId, id} = action.deletedProcedureEmployee;
+      state.partners.forEach(partner => {
+        if (partner.id === employeeId) {
+          partner.procedures.forEach((procedure, index) => {
+            if (procedure.id === id) {
+              partner.procedures.splice(index, 1);
+            }
+          });
+        }
+      });
+
+      return {
+        partners: state.partners,
         ...state,
       };
 

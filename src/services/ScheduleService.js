@@ -5,6 +5,7 @@ import {ClientObject} from './ClientService';
 import {buildSchedule, buildScheduleList} from '../factory/Schedule';
 import {ProcedureObject} from './ProcedureService';
 import {
+  confirmScheduleProcedure,
   deleteScheduleProcedureById,
   saveScheduleProcedure,
 } from './ScheduleProcedureService';
@@ -44,8 +45,7 @@ export const getAllSchedules = (
     }
   });
 };
-// Padrões SOLID
-// Padrões OO
+
 export const insertScheduleCRUD = (scheduleObj, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -146,13 +146,13 @@ export const updateScheduleCRUD = (scheduleObj, returnParseObject) => {
 };
 
 export const deleteScheduleCRUD = (schedule, returnParseObject) => {
-  const {id, procedureListWithoutChanges} = schedule;
+  const {id, procedures} = schedule;
 
   return new Promise(async (resolve, reject) => {
     try {
       const schedule = new ScheduleObject({objectId: id});
       schedule.destroy().then(deletedSchedule => {
-        procedureListWithoutChanges.map(async ({scheduleProcedureId}) => {
+        procedures.map(async ({scheduleProcedureId}) => {
           await deleteScheduleProcedureById(scheduleProcedureId);
         });
 
@@ -167,6 +167,22 @@ export const deleteScheduleCRUD = (schedule, returnParseObject) => {
       reject(`Agendamento ${JSON.stringify(e)}`);
     }
   });
+};
+
+export const deleteSchedulesCRUD = (schedules, returnParseObject) => {
+  try {
+    for (const schedule of schedules) {
+      const {id, procedures} = schedule;
+      const schedule = new ScheduleObject({objectId: id});
+      schedule.destroy().then(deletedSchedule => {
+        procedures.map(async ({scheduleProcedureId}) => {
+          await deleteScheduleProcedureById(scheduleProcedureId);
+        });
+      });
+    }
+  } catch (e) {
+    console.error(`Agendamento ${e}`);
+  }
 };
 
 export const deleteScheduleByClientId = async (clientId, returnParseObject) => {
@@ -278,4 +294,15 @@ export const getScheduleByEmployeeId = (employeeId, returnParseObject) => {
       reject(`Agendamento ${JSON.stringify(e)}`);
     }
   });
+};
+
+export const confirmSchedulesList = async (scheduleId, procedures, checked) => {
+  try {
+    const schedule = new ScheduleObject({objectId: scheduleId});
+    schedule.set('analyzed_schedule', true);
+    await schedule.save();
+    await confirmScheduleProcedure(procedures, checked);
+  } catch (e) {
+    console.error(`Agendamento ${e}`);
+  }
 };

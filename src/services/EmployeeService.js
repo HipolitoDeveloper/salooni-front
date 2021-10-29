@@ -6,9 +6,13 @@ import {
   deleteProcedureEmployeeByEmployeeId,
   saveProcedureEmployee,
 } from './ProcedureEmployeeService';
-import {ProcedureObject} from './ProcedureService';
+import {getProcedureByName, ProcedureObject} from './ProcedureService';
 import {buildEmployeeList, buildEmployeeObject} from '../factory/Employee';
-import {deleteScheduleByEmployeeId} from './ScheduleService';
+import {
+  deleteScheduleByClientId,
+  deleteScheduleByEmployeeId,
+} from './ScheduleService';
+import {ClientObject} from './ClientService';
 
 export const EmployeeObject = Parse.Object.extend('employee');
 
@@ -78,7 +82,7 @@ export const getEmployeeById = (employeeId, returnParseObject) => {
   });
 };
 
-export const saveEmployee = (employeeObj, returnParseObject) => {
+export const saveEmployee = (employeeObj, returnParseObject, isSigningUp) => {
   return new Promise((resolve, reject) => {
     try {
       const {cnpj, tel, tel2, employeeType, name, salonId, email, procedures} =
@@ -96,9 +100,12 @@ export const saveEmployee = (employeeObj, returnParseObject) => {
       newEmployee.save().then(
         async savedEmployee => {
           if (procedures !== undefined) {
-            for (const procedure of procedures) {
+            for (let procedure of procedures) {
+              if (isSigningUp)
+                procedure = await getProcedureByName(procedure.name, false);
+
               const procedureEmployee = await saveProcedureEmployee({
-                procedureId: procedure.id,
+                procedureId: procedure.objectId,
                 employeeId: savedEmployee.id,
               });
 
@@ -135,10 +142,11 @@ export const saveEmployeeWithoutProcedures = (
 ) => {
   return new Promise((resolve, reject) => {
     try {
-      const {cnpj, tel, tel2, employeeType, name, salonId, email} = employeeObj;
+      const {cnpj, tel, tel2, employeeType, userName, salonId, email} =
+        employeeObj;
 
       const newEmployee = new EmployeeObject();
-      newEmployee.set('name', name.trim());
+      newEmployee.set('name', userName.trim());
       newEmployee.set('cnpj', cnpj);
       newEmployee.set('employee_type', employeeType);
       newEmployee.set('tel', tel);
@@ -185,11 +193,20 @@ export const deleteEmployeeCRUD = (employeeId, returnParseObject) => {
   });
 };
 
-export const updateEmployeeCRUD = (
-  partnerObj,
-  proceduresList,
-  returnParseObject,
-) => {
+export const deleteEmployeesCRUD = async partners => {
+  try {
+    for (const partner of partners) {
+      const partnerToDelete = new EmployeeObject({objectId: partner.id});
+      await partnerToDelete.destroy();
+      await deleteProcedureEmployeeByEmployeeId(partner.id);
+      await deleteScheduleByEmployeeId(partner.id, false);
+    }
+  } catch (e) {
+    console.error(`Empregador ${e}`);
+  }
+};
+
+export const updateEmployeeCRUD = (partnerObj, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
       const {
@@ -214,24 +231,26 @@ export const updateEmployeeCRUD = (
         if (returnParseObject) {
           resolve(employee);
         } else {
-          for (const procedure of procedureListWithoutChanges) {
-            if (!procedures.some(p => p.name === procedure.name)) {
-              await deleteProcedureEmployee(procedure.procedureEmployeeId);
+          if (procedures.length > 0) {
+            for (const procedure of procedureListWithoutChanges) {
+              if (!procedures.some(p => p.name === procedure.name)) {
+                await deleteProcedureEmployee(procedure.procedureEmployeeId);
+              }
             }
-          }
 
-          for (const procedure of procedures) {
-            if (
-              !procedureListWithoutChanges.some(pl => pl.id === procedure.id)
-            ) {
-              const procedureEmployee = await saveProcedureEmployee(
-                {
-                  procedureId: procedure.id,
-                  employeeId: employee.id,
-                },
-                false,
-              );
-              procedure.procedureEmployeeId = procedureEmployee.objectId;
+            for (const procedure of procedures) {
+              if (
+                !procedureListWithoutChanges.some(pl => pl.id === procedure.id)
+              ) {
+                const procedureEmployee = await saveProcedureEmployee(
+                  {
+                    procedureId: procedure.id,
+                    employeeId: employee.id,
+                  },
+                  false,
+                );
+                procedure.procedureEmployeeId = procedureEmployee.objectId;
+              }
             }
           }
           resolve(

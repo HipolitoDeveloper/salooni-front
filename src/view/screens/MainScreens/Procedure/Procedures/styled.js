@@ -3,6 +3,7 @@ import global from '../../../../../common/global';
 import {StyleSheet} from 'react-native';
 
 export const Container = styled.View`
+  flex: 1;
   background-color: ${global.colors.backgroundColor};
 `;
 
@@ -53,7 +54,7 @@ export const BoxText = styled.View`
 
 export const BoxName = styled.Text`
   font-size: 20px;
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   color: ${global.colors.purpleColor};
 `;
 
@@ -72,14 +73,14 @@ export const PrefixBold = styled.Text`
 export const BoxTime = styled.Text`
   margin-left: 20px;
   font-size: 14px;
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   color: black;
 `;
 
 export const BoxPrice = styled.Text`
   margin-left: 20px;
   font-size: 14px;
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   color: black;
 `;
 
@@ -93,14 +94,14 @@ export const BoxEmployeeInformation = styled.View`
 
 export const BoxEmployee = styled.Text`
   font-size: 10px;
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   color: black;
   font-style: italic;
 `;
 
 export const BoxEmployeeName = styled.Text`
   font-size: 14px;
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   color: ${global.colors.purpleColor};
 `;
 
@@ -114,11 +115,11 @@ export const BoxComission = styled.View`
 `;
 export const BoxComissionLabel = styled.Text`
   font-size: 12px;
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
 `;
 export const BoxComissionText = styled.Text`
   font-size: 12px;
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   color: ${global.colors.purpleColor};
 `;
 

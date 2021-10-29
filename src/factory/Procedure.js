@@ -5,8 +5,14 @@ export const buildProcedureList = procedures => {
     return {
       id: procedure.objectId,
       name: procedure.name,
-      commissionValue: maskBRL(procedure.commission_value),
-      commissionPercentage: procedure.commission_percentage.toString(),
+      commissionValue:
+        procedure.commission_value !== null
+          ? maskBRL(procedure.commission_value)
+          : 0,
+      commissionPercentage:
+        procedure.commission_percentage !== null
+          ? procedure.commission_percentage.toString()
+          : 0,
       isPercentage: procedure.commission_percentage !== 0,
       isFixedValue: procedure.commission_value !== 0,
       value: maskBRL(procedure.value),
@@ -21,8 +27,14 @@ export const buildProcedure = procedure => {
   return {
     id: procedure.objectId,
     name: procedure.name,
-    commissionValue: maskBRL(procedure.commission_value),
-    commissionPercentage: procedure.commission_percentage.toString(),
+    commissionValue:
+      procedure.commission_value !== null
+        ? maskBRL(procedure.commission_value)
+        : 0,
+    commissionPercentage:
+      procedure.commission_percentage !== null
+        ? procedure.commission_percentage.toString()
+        : 0,
     isPercentage: procedure.commission_percentage !== 0,
     isFixedValue: procedure.commission_value !== 0,
     value: maskBRL(procedure.value),

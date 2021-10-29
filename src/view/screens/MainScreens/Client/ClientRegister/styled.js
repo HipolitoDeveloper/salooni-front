@@ -32,14 +32,14 @@ export const HeaderContent = styled.View`
 export const HeaderTitle = styled.Text`
   text-align: center;
 
-  font-family: ${global.fonts.g};
+  font-family: ${global.fonts.mainFont};
   font-size: 24px;
   color: ${global.colors.blueColor};
 `;
 
 export const HeaderText = styled.Text`
   font-size: 16px;
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   text-align: center;
 `;
 
@@ -58,15 +58,6 @@ export const ClientInformationContent = styled.View`
   flex-direction: row;
   align-items: flex-start;
   justify-content: center;
-`;
-
-export const InformationContent = styled.View`
-  width: ${props => (!props.isEditing ? '34%' : '95%')};
-  height: 64%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 export const RegisteredProceduresContent = styled.View`
@@ -91,13 +82,13 @@ export const BoxContent = styled.TouchableOpacity`
 `;
 
 export const BoxText = styled.Text`
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   font-size: 18px;
   color: ${props => (props.isInView ? 'red' : 'black')};
 `;
 
 export const RegisteredProceduresBoxTitle = styled.Text`
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   font-size: 16px;
 `;
 
