@@ -171,15 +171,6 @@ const ProcedureForm = ({
     clearProcedure();
   };
 
-  const goNextPage = () => {
-    updateProcedureInView(-1);
-    if (verifyInformationToGo()) {
-      navigate.navigate('SignupPartners');
-      setErrorMessage('');
-      clearProcedure();
-    }
-  };
-
   const saveProcedure = () => {
     setIsLoading(true);
 
@@ -188,7 +179,7 @@ const ProcedureForm = ({
         () => {
           setTimeout(() => {
             setIsLoading(false);
-            navigate.navigate('Procedures');
+            navigate.navigate('UserInformationStack', {screen: 'Procedures'});
             clearProcedure();
             cleanRegisteredProcedures();
           }, 3000);
@@ -204,20 +195,22 @@ const ProcedureForm = ({
 
   const updateProcedures = () => {
     setIsLoading(true);
-    updateProcedure(procedure).then(
-      async () => {
-        setTimeout(() => {
+    if (verifyInformation()) {
+      updateProcedure(procedure).then(
+        async () => {
+          setTimeout(() => {
+            setIsLoading(false);
+            goBack();
+            clearProcedure();
+          }, 1000);
+          setErrorMessage('');
+        },
+        error => {
           setIsLoading(false);
-          goBack();
-          clearProcedure();
-        }, 1000);
-        setErrorMessage('');
-      },
-      error => {
-        setIsLoading(false);
-        console.log(error);
-      },
-    );
+          console.log(error);
+        },
+      );
+    }
   };
 
   const deleteProcedures = () => {

@@ -3,6 +3,7 @@ import * as S from './styled';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import {FlatList} from 'react-native';
+import {InputTitle} from './styled';
 
 const AutoComplete = ({
   placeholder,
@@ -15,6 +16,7 @@ const AutoComplete = ({
   value,
   textColor,
   editable,
+  inputText,
 }) => {
   const [suggestions, setSuggestions] = useState([]);
 
@@ -35,35 +37,38 @@ const AutoComplete = ({
 
   return (
     <S.Container>
-      <S.InputContent>
-        {iconName && (
-          <S.IconContainer>
-            <Icon
-              name={iconName}
-              size={30}
-              style={{marginTop: 13, marginRight: 10}}
-              color={iconColor}
-            />
-          </S.IconContainer>
-        )}
+      <S.InputContainer>
+        <S.InputTitle color={iconColor}>{inputText}</S.InputTitle>
+        <S.InputContent>
+          {iconName && (
+            <S.IconContainer>
+              <Icon
+                name={iconName}
+                size={30}
+                style={{marginTop: 13, marginRight: 10}}
+                color={iconColor}
+              />
+            </S.IconContainer>
+          )}
 
-        <S.Input
-          placeholder={placeholder}
-          placeholderTextColor={textColor}
-          value={value.name}
-          onChangeText={handleSuggestion}
-          editable={editable}
-        />
-        {value.length > 0 && (
-          <S.ClearButton onPress={() => clearSearch()}>
-            <Icon
-              name={'times'}
-              size={15}
-              style={{marginTop: 13, marginRight: 10}}
-            />
-          </S.ClearButton>
-        )}
-      </S.InputContent>
+          <S.Input
+            placeholder={placeholder}
+            placeholderTextColor={textColor}
+            value={value.name}
+            onChangeText={handleSuggestion}
+            editable={editable}
+          />
+          {value.length > 0 && (
+            <S.ClearButton onPress={() => clearSearch()}>
+              <Icon
+                name={'times'}
+                size={15}
+                style={{marginTop: 13, marginRight: 10}}
+              />
+            </S.ClearButton>
+          )}
+        </S.InputContent>
+      </S.InputContainer>
       {value.length >= searchLengthToSuggest && (
         <S.SuggestionContent>
           <FlatList
@@ -71,7 +76,7 @@ const AutoComplete = ({
             data={suggestions}
             renderItem={({item}) => (
               <S.InputItem onPress={() => chooseSuggestion(item)}>
-                <S.InputText>{item.name}</S.InputText>
+                <S.InputText color={iconColor}>{item.name}</S.InputText>
               </S.InputItem>
             )}
           />

@@ -5,6 +5,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import Profile from '../view/screens/MainScreens/Profile';
 import Procedures from '../view/screens/MainScreens/Procedure/Procedures';
 import UserTabBar from './components/UserTabBar/UserTabBar';
+import Video from '../view/screens/MainScreens/Video';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -23,7 +24,7 @@ export default () => (
     <>
       <Tab.Screen name="Profile" component={Profile} />
       <Tab.Screen name="Procedures" component={Procedures} />
-      {/*<Tab.Screen name="SignupPartners" component={SignupPartners} />*/}
+      <Tab.Screen name="Videos" component={Video} />
     </>
   </Tab.Navigator>
 );

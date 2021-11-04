@@ -15,11 +15,11 @@ import {deleteScheduleProcedureById} from '../../services/ScheduleProcedureServi
 export const ScheduleContext = createContext();
 
 const initialState = {
+  isSchedulesLoading: true,
   schedules: [],
   calendarSchedule: [],
   registeredSchedules: [],
   scheduleInView: {},
-  dropdownClients: [],
   showingCurrentUserSchedule: true,
 };
 

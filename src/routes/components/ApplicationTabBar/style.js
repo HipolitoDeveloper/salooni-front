@@ -5,15 +5,14 @@ export const TabArea = styled.View`
   border-top-width: ${StyleSheet.hairlineWidth}px;
   height: 60px;
   background-color: white;
+  display: flex;
   flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
   border-top-color: lightgrey;
   elevation: 10;
 `;
-export const TabItem = styled.TouchableOpacity`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`;
+export const TabItem = styled.TouchableOpacity``;
 export const TabItemCenter = styled.View`
   width: 70px;
   height: 70px;

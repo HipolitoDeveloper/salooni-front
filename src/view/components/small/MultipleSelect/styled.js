@@ -49,6 +49,15 @@ export const ItemsContainer = styled.View`
   width: 100%;
 `;
 
+export const InputText = styled.Text`
+  font-family: ${global.fonts.mainFont};
+  font-size: 12px;
+  position: absolute;
+  left: 5px;
+  top: -10px;
+  color: ${props => props.color};
+`;
+
 export const SelectedContent = styled.View`
   border: 1px solid ${props => props.selectedItemBorderColor};
   border-radius: 30px;
@@ -80,19 +89,13 @@ export const SelectedContentIcon = styled.TouchableOpacity`
 export const ModalContainer = styled.View``;
 
 export const SuggestionContainer = styled.View`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 120px;
-`;
-
-export const SuggestionContent = styled.View`
   border-radius: 20px;
   background-color: white;
-  width: 300px;
-  height: 400px;
+
   elevation: 30;
 `;
+
+export const SuggestionContent = styled.View``;
 
 export const CloseButton = styled.TouchableOpacity`
   position: absolute;
@@ -101,10 +104,13 @@ export const CloseButton = styled.TouchableOpacity`
 `;
 
 export const SuggestionHeader = styled.View`
-  margin-top: 10px;
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: white;
+  elevation: 5;
 `;
 
 export const SuggestionHeaderText = styled.Text`

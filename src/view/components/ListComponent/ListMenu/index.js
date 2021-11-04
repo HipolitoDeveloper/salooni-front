@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import * as S from './styled';
 import Button from '../../small/Button';
 import global from '../../../../common/global';
@@ -25,7 +25,6 @@ const ListMenu = ({
   onConfirm,
   handleMenu,
   isOwner,
-  needsPermissions,
 }) => {
   const hasProcedure = menuItems.some(item => item === 'procedure');
   const showingItem = Object.keys(menuState.itemToShow).length > 0;
@@ -92,10 +91,12 @@ const ListMenu = ({
                   backgroundColor={global.colors.lightGreyColor}
                   circleColor={global.colors.purpleColor}
                   marginTop={'10px'}
-                  handleSwitch={() => checkItem(menuState.itemToShow.id)}
+                  handleSwitch={() => {
+                    checkItem(menuState.itemToShow.id);
+                  }}
                   switchState={{
                     state: menuState.itemToShow.checked,
-                    text: 'times',
+                    text: menuState.itemToShow.checked ? 'check' : 'times',
                   }}
                 />
               </S.ConfimationMessageContent>

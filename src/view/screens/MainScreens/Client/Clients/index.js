@@ -48,6 +48,7 @@ const Clients = () => {
         headerText={'Clientes'}
         color={`${global.colors.blueColor}`}
         itemList={clients}
+        searchPlaceHolder={'Procure pelos seus clientes'}
         menuItems={['name', 'tel', 'email']}
         deleteUniqueItem={deleteClient}
         deleteItemList={deleteClients}

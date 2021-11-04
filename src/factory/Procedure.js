@@ -6,19 +6,40 @@ export const buildProcedureList = procedures => {
       id: procedure.objectId,
       name: procedure.name,
       commissionValue:
-        procedure.commission_value !== null
+        procedure.commission_value !== 0
           ? maskBRL(procedure.commission_value)
-          : 0,
+          : '',
       commissionPercentage:
-        procedure.commission_percentage !== null
+        procedure.commission_percentage !== 0
           ? procedure.commission_percentage.toString()
-          : 0,
+          : '',
       isPercentage: procedure.commission_percentage !== 0,
+
       isFixedValue: procedure.commission_value !== 0,
       value: maskBRL(procedure.value),
       time: procedure.time.toString(),
-      maintenanceValue: maskBRL(procedure.maintenance_value),
-      maintenanceDays: procedure.maintenance_days.toString(),
+      maintenanceValue:
+        procedure.maintenance_value !== 0
+          ? maskBRL(procedure.maintenance_value)
+          : '',
+      maintenanceDays:
+        procedure.maintenance_days !== 0
+          ? procedure.maintenance_days.toString()
+          : '',
+      hasCommission: {
+        state:
+          procedure.commission_percentage !== 0 ||
+          procedure.commission_value !== 0,
+        text:
+          procedure.commission_percentage !== 0 ||
+          procedure.commission_value !== 0
+            ? 'check'
+            : 'times',
+      },
+      hasMaintenance: {
+        state: procedure.maintenance_value !== 0,
+        text: procedure.maintenance_value !== 0 ? 'check' : 'times',
+      },
     };
   });
 };
@@ -28,18 +49,32 @@ export const buildProcedure = procedure => {
     id: procedure.objectId,
     name: procedure.name,
     commissionValue:
-      procedure.commission_value !== null
+      procedure.commission_value !== 0
         ? maskBRL(procedure.commission_value)
-        : 0,
+        : '',
     commissionPercentage:
-      procedure.commission_percentage !== null
+      procedure.commission_percentage !== 0
         ? procedure.commission_percentage.toString()
-        : 0,
+        : '',
     isPercentage: procedure.commission_percentage !== 0,
     isFixedValue: procedure.commission_value !== 0,
     value: maskBRL(procedure.value),
     time: procedure.time.toString(),
     maintenanceValue: maskBRL(procedure.maintenance_value),
     maintenanceDays: procedure.maintenance_days.toString(),
+    hasCommission: {
+      state:
+        procedure.commission_percentage !== 0 ||
+        procedure.commission_value !== 0,
+      text:
+        procedure.commission_percentage !== 0 ||
+        procedure.commission_value !== 0
+          ? 'check'
+          : 'times',
+    },
+    hasMaintenance: {
+      state: procedure.maintenance_value !== 0,
+      text: procedure.maintenance_value !== 0 ? 'check' : 'times',
+    },
   };
 };

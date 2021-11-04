@@ -19,7 +19,7 @@ export const Select = styled.View`
 export const TextContent = styled.View`
   margin-top: 10px;
   width: 100%;
-  padding-left: 10px;
+  padding-left: 30px;
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
@@ -32,15 +32,11 @@ export const Text = styled.Text`
 
 export const InputsContainer = styled.View`
   display: flex;
-  border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 40px;
-  border-top-right-radius: 40px;
+  margin: auto auto;
+  border-radius: 40px;
   background-color: white;
-  position: absolute;
-  top: 0;
   width: 80%;
   height: 180px;
-  z-index: 5;
   elevation: 5;
 `;
 
@@ -65,6 +61,7 @@ export const CloseButtonContent = styled.TouchableOpacity`
   display: flex;
   align-items: center;
   justify-content: center;
+  elevation: 5;
 `;
 
 export const CloseButton = styled.View``;

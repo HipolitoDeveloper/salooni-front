@@ -4,24 +4,36 @@ import {StyleSheet} from 'react-native';
 
 export const Container = styled.View`
   width: 100%;
-  height: 17%;
   background-color: ${global.colors.headerColor};
-  display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: flex-start;
-  border-bottom-color: lightgrey;
-
   border-bottom-width: ${StyleSheet.hairlineWidth}px;
+  elevation: 10;
 `;
 
 export const Content = styled.View`
+  padding-top: 20px;
   width: 100%;
-  height: ${props => (props.isSearching ? '100%  ' : '62%')};
+  height: 100%;
   display: flex;
-  flex-direction: ${props => (props.isSearching ? 'column  ' : 'row')};
-  justify-content: ${props =>
-    props.isSearching ? 'flex-start  ' : 'space-between'};
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+`;
+
+export const Header = styled.View`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-end;
+`;
+
+export const SubHeader = styled.View`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
 `;
 
@@ -30,18 +42,19 @@ export const TitleName = styled.Text`
   font-size: 24px;
   color: ${props => props.headerColor};
   letter-spacing: 2px;
-  margin-top: 10px;
+  margin: 0 auto;
 `;
 
 export const DeleteContent = styled.View`
   padding: 0 20px 0 30px;
   background-color: ${props => props.headerColor};
-  height: 50%;
+  height: 200%;
   width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  z-index: 5;
 `;
 
 export const DeleteText = styled.Text`
@@ -57,13 +70,14 @@ export const DeleteCancelIcon = styled.TouchableOpacity`
 `;
 
 export const IconContent = styled.View`
-  margin-left: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 50px;
   width: 50px;
   border-radius: 40px;
+  position: absolute;
+  left: 15px;
 `;
 
 export const SearchIconContainer = styled.TouchableOpacity`
@@ -83,9 +97,6 @@ export const SearchContainer = styled.View`
   align-items: center;
   border-bottom-width: ${StyleSheet.hairlineWidth}px;
   border-bottom-color: black;
-  position: absolute;
-  left: 30px;
-  bottom: 10px;
 `;
 
 export const SearchIcon = styled.View``;
@@ -107,6 +118,8 @@ export const SwitchButton = styled.TouchableOpacity`
 `;
 
 export const ChangeIconContent = styled.TouchableOpacity`
-  margin: 10px 0 0 10px;
+  height: 100%;
+  position: absolute;
+  right: 50px;
   transform: scaleX(-1);
 `;

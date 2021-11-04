@@ -11,12 +11,15 @@ import {ClientContext} from '../contexts/Client/ClientContext';
 import {ProcedureContext} from '../contexts/Procedure/ProcedureContext';
 import Schedulings from '../view/screens/MainScreens/Scheduling/Schedulings';
 import ApplicationTabBar from './components/ApplicationTabBar/ApplicationTabBar';
+import SplashScreen from '../view/screens/MainScreens/SplashScreen';
+import {createStackNavigator} from '@react-navigation/stack';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 const TabStack = () => {
   const {currentUser} = useContext(UserContext);
-  const {loadAllSchedules} = useContext(ScheduleContext);
+  const {loadAllSchedules, isSchedulesLoading} = useContext(ScheduleContext);
   const {loadAllPartners, isPartnersLoading} = useContext(PartnerContext);
   const {loadAllClients, isClientsLoading} = useContext(ClientContext);
   const {loadAllProcedures, isProceduresLoading} = useContext(ProcedureContext);
@@ -27,7 +30,8 @@ const TabStack = () => {
   let informationsOnLoading =
     isClientsLoading === false &&
     isPartnersLoading === false &&
-    isProceduresLoading === false;
+    isProceduresLoading === false &&
+    isSchedulesLoading === false;
 
   if (isLoggedIn) {
     const loadProcedureDropdown = () => {
@@ -50,26 +54,24 @@ const TabStack = () => {
     }
   }
 
-  return (
+  return informationsOnLoading ? (
     <Tab.Navigator
       initialRouteName={'SchedulingCalendar'}
       tabBar={props => <ApplicationTabBar {...props} />}
       screenOptions={{
         headerShown: false,
       }}>
-      {informationsOnLoading ? (
-        <>
-          <Tab.Screen name="Partners" component={Partners} />
-          <Tab.Screen
-            name="SchedulingCalendar"
-            component={SchedulingCalendar}
-          />
-          <Tab.Screen name="Clients" component={Clients} />
-        </>
-      ) : (
-        <Tab.Screen name="Scheduling" component={Schedulings} />
-      )}
+      <Tab.Screen name="Partners" component={Partners} />
+      <Tab.Screen name="SchedulingCalendar" component={SchedulingCalendar} />
+      <Tab.Screen name="Clients" component={Clients} />
     </Tab.Navigator>
+  ) : (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
+      <Stack.Screen name="SplashScreen" component={SplashScreen} />
+    </Stack.Navigator>
   );
 };
 

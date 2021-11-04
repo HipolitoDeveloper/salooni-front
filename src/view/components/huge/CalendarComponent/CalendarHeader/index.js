@@ -1,12 +1,12 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React from 'react';
 import * as S from './styled';
-import global from '../../../../../common/global';
 import Salooni from '../../../../../assets/svg/salooniSVG.svg';
 import Profile from '../../../../../assets/svg/profileSVG.svg';
 import {TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {ChangeIconContent} from './styled';
+import {TourGuideZone} from 'rn-tourguide';
 import BackButton from '../../../small/BackButton';
+import tourMessages from '../../../../../common/tourMessages';
 
 const CalendarHeader = ({color, headerTitle, handleState, navigate, route}) => {
   console.log(route.params);
@@ -32,8 +32,15 @@ const CalendarHeader = ({color, headerTitle, handleState, navigate, route}) => {
       )}
 
       <S.ChangeIconContent onPress={handleState} employeeView={employeeView}>
-        <Icon name={'exchange-alt'} size={20} color={color} />
+        <TourGuideZone
+          zone={3}
+          shape={'circle'}
+          maskOffset={5}
+          text={tourMessages.tour3}>
+          <Icon name={'exchange-alt'} size={20} color={color} />
+        </TourGuideZone>
       </S.ChangeIconContent>
+
       {!employeeView && (
         <S.IconContent>
           <TouchableOpacity

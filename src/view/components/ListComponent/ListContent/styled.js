@@ -57,9 +57,23 @@ export const TelText = styled.Text`
     props.nextHour ? `${global.colors.purpleColor}` : 'black'};
 `;
 
+export const EmployeeNameText = styled.Text`
+  font-size: 10px;
+  opacity: 0.6;
+`;
+
 export const GenericText = styled.Text`
   font-size: 13px;
   font-family: ${global.fonts.mainFont};
+`;
+
+export const ConfirmQuestionText = styled.Text`
+  font-size: 8px;
+  opacity: 0.6;
+  position: absolute;
+  width: 100%;
+  top: -15px;
+  right: -40px;
 `;
 
 export const InlineInformationContent = styled.View`
@@ -108,10 +122,10 @@ export const CheckContent = styled.View`
   margin-bottom: 23px;
   margin-right: 20px;
   height: 20px;
-  width: 20px;
+  width: 100px;
   background-color: ${props =>
     props.selected ? `${global.colors.purpleColor}` : 'transparent'};
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
 `;

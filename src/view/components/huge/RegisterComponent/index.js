@@ -9,6 +9,7 @@ import {Platform, TouchableOpacity} from 'react-native';
 import {Text} from '../../small/InputModal/styled';
 import Times from '../../../../assets/svg/timesSVG.svg';
 import {ButtonsContent} from './styled';
+import AlertModal from '../../small/AlertModal';
 
 const RegisterComponent = ({
   isSigningUp,
@@ -30,6 +31,15 @@ const RegisterComponent = ({
 }) => {
   const [isRegisteredItemsBoxOpened, setIsRegisteredItemsBoxOpened] =
     useState(false);
+  const [modalState, setModalState] = useState(false);
+
+  const cancelRegister = () => {
+    if (preRegisteredItems.length > 0) {
+      setModalState(true);
+    } else {
+      onCancel();
+    }
+  };
 
   return (
     <>
@@ -38,7 +48,7 @@ const RegisterComponent = ({
           color={color}
           headerTitle={headerTitle}
           isEditing={isPreRegisteredEditing}
-          onCancel={onCancel}
+          onCancel={cancelRegister}
           onConfirm={onConfirm}
         />
       )}
@@ -60,7 +70,10 @@ const RegisterComponent = ({
           <FloatButton
             bottom={'150px'}
             right={'40px'}
-            onPress={onAdd}
+            onPress={() => {
+              onAdd();
+              setIsRegisteredItemsBoxOpened(true);
+            }}
             buttonColor={color}
             icon={isPreRegisteredEditing ? 'pen' : 'plus'}
           />
@@ -81,6 +94,14 @@ const RegisterComponent = ({
           leftInformation={registeredItemLeftInformation}
         />
       )}
+      <AlertModal
+        text={`Você possui ${preRegisteredItems.length} itens pré-registrados, gostaria de cancelar esses pré-registros?`}
+        isVisible={modalState}
+        onOk={onCancel}
+        title={'Atenção!'}
+        onClose={() => setModalState(false)}
+        cancelTitle={'NÃO'}
+      />
     </>
   );
 };

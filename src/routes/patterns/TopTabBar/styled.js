@@ -25,9 +25,13 @@ export const Content = styled.View`
 
 export const ErrorButton = styled.TouchableOpacity``;
 
-export const CancelButton = styled.TouchableOpacity``;
+export const CancelButton = styled.TouchableOpacity`
+  elevation: 10;
+`;
 
 export const ConfirmButton = styled.TouchableOpacity`
+  elevation: 10;
+
   opacity: ${props => (props.isConfirmAvailable ? 1 : 0.4)};
 `;
 
@@ -36,8 +40,7 @@ export const HeaderTitleContainer = styled.View`
 
   display: flex;
   flex-direction: row;
-  justify-content: ${props =>
-    props.isTwoOptions ? 'center' : 'space-between'};
+  justify-content: ${props => (props.isOneOption ? 'center' : 'space-between')};
   align-items: flex-start;
 `;
 

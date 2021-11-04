@@ -1,5 +1,6 @@
 import styled from 'styled-components/native';
 import {StyleSheet} from 'react-native';
+import global from '../../../../common/global';
 
 export const Container = styled.View`
   width: 100%;
@@ -8,6 +9,14 @@ export const Container = styled.View`
   justify-content: center;
   align-items: center;
   margin: 20px 0 20px 0;
+`;
+
+export const InputContainer = styled.View`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
 `;
 
 export const InputContent = styled.View`
@@ -38,7 +47,7 @@ export const Input = styled.TextInput`
   border-bottom-width: ${StyleSheet.hairlineWidth}px;
   width: 90%;
   font-size: 16px;
-  color: ${props => props.placeholderTextColor};
+  color: black;
 `;
 
 export const InputItem = styled.TouchableOpacity`
@@ -46,8 +55,18 @@ export const InputItem = styled.TouchableOpacity`
 `;
 
 export const InputText = styled.Text`
-  font-size: 17px;
+  font-family: ${global.fonts.mainFont};
+  font-size: 12px;
   margin: 5px;
+`;
+
+export const InputTitle = styled.Text`
+  font-family: ${global.fonts.mainFont};
+  font-size: 12px;
+  position: absolute;
+  left: 35px;
+  top: 0;
+  color: ${props => props.color};
 `;
 
 export const ClearButton = styled.TouchableOpacity`

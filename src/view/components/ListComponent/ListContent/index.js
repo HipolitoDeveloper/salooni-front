@@ -1,12 +1,9 @@
-import React, {useState} from 'react';
+import React from 'react';
 import * as S from './styled';
-import {Swipeable} from 'react-native-gesture-handler';
-import {Pressable, StyleSheet} from 'react-native';
 import global from '../../../../common/global';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {Container, GenericText, InlineInformationContent} from './styled';
-import {backgroundColor} from 'react-native-calendars/src/style';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import {ConfirmQuestionText, EmployeeNameText} from './styled';
 
 const ListContent = ({
   name,
@@ -15,6 +12,7 @@ const ListContent = ({
   id,
   client,
   item,
+  employee,
   value,
   time,
   checked,
@@ -39,6 +37,7 @@ const ListContent = ({
           <S.TelText nextHour={nextHour} passedHour={passedHour}>
             {formattedDateHour}
           </S.TelText>
+          <S.EmployeeNameText>Responsável: {employee.name}</S.EmployeeNameText>
         </>
       );
     } else if (itemType === 'procedure') {
@@ -89,6 +88,9 @@ const ListContent = ({
         <S.RightContent>
           {itemType === 'schedule' && !isDeleting && (
             <S.CheckContent selected={false}>
+              <S.ConfirmQuestionText>
+                Agendamento realizado?
+              </S.ConfirmQuestionText>
               <BouncyCheckbox
                 style={{borderColor: global.colors.purpleColor}}
                 isChecked={checked}

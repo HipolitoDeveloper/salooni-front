@@ -21,10 +21,26 @@ export const Content = styled.View`
   width: 100%;
 `;
 
-export const CancelButton = styled.TouchableOpacity``;
+export const ButtonContent = styled.View`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const CancelButton = styled.TouchableOpacity`
+  elevation: 10;
+`;
 
 export const ConfirmButton = styled.TouchableOpacity`
+  elevation: 10;
   opacity: ${props => (props.isEditing ? 0.6 : 1)};
+`;
+
+export const ButtonText = styled.Text`
+  font-size: 12px;
+  color: black;
+  opacity: 0.4;
+  font-family: ${global.fonts.mainFont};
 `;
 
 export const HeaderTitleContent = styled.View``;

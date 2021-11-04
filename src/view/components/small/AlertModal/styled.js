@@ -7,6 +7,7 @@ export const Container = styled.View`
   justify-content: center;
   align-items: center;
 `;
+
 export const Content = styled.View`
   display: flex;
   justify-content: space-between;
@@ -47,6 +48,16 @@ export const Button = styled.TouchableOpacity`
   color: lightgrey;
   padding: 5px;
   font-weight: bold;
+`;
+
+export const OkButton = styled.TouchableOpacity`
+  background-color: ${global.colors.purpleColor};
+  padding: 5px;
+  border-radius: 5px;
+`;
+
+export const OkButtonText = styled.Text`
+  color: ${global.colors.lightGreyColor};
 `;
 
 export const ButtonText = styled.Text`

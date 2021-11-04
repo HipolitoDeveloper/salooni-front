@@ -1,17 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import global from '../../../common/global';
 import * as S from './styled';
 import ListContent from './ListContent';
 import ListHeader from './ListHeader';
 import Button from '../small/Button';
 import ListMenu from './ListMenu';
-import {ActivityIndicator, FlatList} from 'react-native';
+import {FlatList, Animated} from 'react-native';
 import FloatButton from '../small/FloatButton';
-import item from 'react-native-calendars/src/calendar-list/item';
-import {Text} from '../../screens/entrance/EntranceOption/styled';
 import Times from '../../../assets/svg/timesSVG.svg';
-import {CancelButton} from './styled';
 import Loading from '../small/Loading';
+import {getCloser} from '../../../common/headerFunctions';
+const {diffClamp} = Animated;
+const headerHeight = 70 * 2;
 
 const List = ({
   showCalendarButton,
@@ -33,7 +33,18 @@ const List = ({
   handleState,
   navigateToCalendar,
   isOwner,
+  searchPlaceHolder,
 }) => {
+  const scrollY = useRef(new Animated.Value(0));
+  const scrollYClamped = diffClamp(scrollY.current, 0, headerHeight);
+  const translateY = scrollYClamped.interpolate({
+    inputRange: [0, headerHeight],
+    outputRange: [0, -(headerHeight / 2)],
+  });
+  const translateYNumber = useRef();
+
+  const ref = useRef(null);
+
   const [items, setItems] = useState(itemList);
   const [menuState, setMenuState] = useState({
     itemToShow: {},
@@ -44,6 +55,44 @@ const List = ({
   const isDeleting = items.some(item => item.selected);
   const selectedItems = items.filter(item => item.selected);
   const showFooter = isDeleting || isConfirming;
+
+  const handleScroll = Animated.event(
+    [
+      {
+        nativeEvent: {
+          contentOffset: {y: scrollY.current},
+        },
+      },
+    ],
+    {
+      useNativeDriver: true,
+    },
+  );
+
+  translateY.addListener(({value}) => {
+    translateYNumber.current = value;
+  });
+
+  const handleSnap = ({nativeEvent}) => {
+    const offsetY = nativeEvent.contentOffset.y;
+
+    if (
+      !(
+        translateYNumber.current === 0 ||
+        translateYNumber.current === -headerHeight / 2
+      )
+    ) {
+      if (ref.current) {
+        ref.current.scrollToOffset({
+          offset:
+            getCloser(translateYNumber.current, -headerHeight / 2, 0) ===
+            -headerHeight / 2
+              ? offsetY + headerHeight / 2
+              : offsetY - headerHeight / 2,
+        });
+      }
+    }
+  };
 
   const changeListState = itemId => {
     selectItem(itemId, true);
@@ -184,24 +233,40 @@ const List = ({
         onEditNavigateTo={onEditNavigateTo}
         deleteProcedure={deleteItemProcedure}
       />
-
-      {showHeader && (
-        <ListHeader
-          isDeleting={isDeleting}
-          items={items}
-          headerColor={color}
-          headerTitle={headerText}
-          searchItems={searchItems}
-          selectedItemsLength={selectedItems.length}
-          cancelDelete={unselectItems}
-          handleState={handleState}
-        />
-      )}
-
       <Loading isLoading={isLoading} color={color} />
-
+      {showHeader && (
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              width: '100%',
+              zIndex: 1,
+            },
+            {transform: [{translateY}]},
+          ]}>
+          <ListHeader
+            isDeleting={isDeleting}
+            items={items}
+            headerColor={color}
+            headerTitle={headerText}
+            searchItems={searchItems}
+            selectedItemsLength={selectedItems.length}
+            cancelDelete={unselectItems}
+            handleState={handleState}
+            headerHeight={headerHeight}
+            searchPlaceHolder={searchPlaceHolder}
+          />
+        </Animated.View>
+      )}
       <S.Body isDeleting={isDeleting} isConfirming={isConfirming}>
-        <FlatList
+        <Animated.FlatList
+          ref={ref}
+          scrollEventThrottle={16}
+          contentContainerStyle={{paddingTop: showHeader ? headerHeight : 0}}
+          onMomentumScrollEnd={handleSnap}
+          onScroll={handleScroll}
           keyExtractor={item => item.id}
           data={items}
           renderItem={({item}) => (
@@ -222,7 +287,6 @@ const List = ({
           )}
         />
       </S.Body>
-
       {!showFooter && (
         <FloatButton
           bottom={'40px'}

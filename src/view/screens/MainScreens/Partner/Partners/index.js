@@ -78,6 +78,7 @@ const Partners = () => {
   return (
     <S.Container>
       <List
+        searchPlaceHolder={'Procure pelos seus parceiros'}
         navigateToCalendar={navigateToEmployeeCalendar}
         isOwner={isOwner}
         showCalendarButton={true}

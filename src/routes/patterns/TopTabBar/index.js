@@ -133,7 +133,7 @@ const TopTabBar = ({
           </S.ExitButtonContent>
         )}
       </S.Content>
-      <S.HeaderTitleContainer isTwoOptions={pages.length === 2}>
+      <S.HeaderTitleContainer isOneOption={pages.length === 1}>
         {pages.map((page, index) => (
           <S.HeaderTitleContent
             key={page.screen}

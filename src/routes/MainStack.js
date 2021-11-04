@@ -1,18 +1,16 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {UserContext} from '../contexts/User/UserContext';
 import TabStack from './TabStack';
 import SignupStack from './SignupStack';
 import EntranceStack from './EntranceStack';
 import ApplicationStack from './ApplicationStack';
+import SplashScreen from '../view/screens/MainScreens/SplashScreen';
 
 const Stack = createStackNavigator();
 
 export const MainStack = () => {
-  const [isLoading, setIsLoading] = useState(false); // Implementar splashscreen
-
-  const {currentUser} = useContext(UserContext);
-  const isLoggedIn = Object.keys(currentUser).length > 0;
+  const {loginStatus} = useContext(UserContext);
 
   return (
     <Stack.Navigator
@@ -20,16 +18,18 @@ export const MainStack = () => {
       screenOptions={{
         headerShown: false,
       }}>
-      {isLoggedIn ? (
+      {loginStatus === 'LOA' && (
+        <Stack.Screen name="SplashScreen" component={SplashScreen} />
+      )}
+
+      {loginStatus === 'IN' && (
         <Stack.Group>
           <Stack.Screen name="ApplicationStack" component={ApplicationStack} />
           <Stack.Screen name="TabStack" component={TabStack} />
-          {/*/!*<Stack.Screen*!/*/}
-          {/*/!*  name={'ProcedureRegister'}*!/*/}
-          {/*/!*  component={ProcedureRegister}*!/*/}
-          {/*/>*/}
         </Stack.Group>
-      ) : (
+      )}
+
+      {loginStatus === 'OUT' && (
         <Stack.Group>
           <Stack.Screen name="EntranceStack" component={EntranceStack} />
           <Stack.Screen name="SignupStack" component={SignupStack} />

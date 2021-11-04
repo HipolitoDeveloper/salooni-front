@@ -2,8 +2,9 @@ import React from 'react';
 
 import * as S from './styled';
 import Modal from 'react-native-modal';
+import {OkButtonText} from './styled';
 
-const AlertModal = ({isVisible, title, text, onClose, onOk}) => {
+const AlertModal = ({isVisible, title, text, onClose, onOk, cancelTitle}) => {
   return (
     <S.Container>
       <Modal
@@ -24,13 +25,17 @@ const AlertModal = ({isVisible, title, text, onClose, onOk}) => {
           </S.BodyContent>
           <S.FooterContent>
             {onOk && (
-              <S.Button onPress={() => onOk()}>
-                <S.ButtonText>SIM</S.ButtonText>
+              <S.OkButton onPress={() => onOk()}>
+                <S.OkButtonText>SIM</S.OkButtonText>
+              </S.OkButton>
+            )}
+            {onClose && (
+              <S.Button onPress={() => onClose()}>
+                <S.ButtonText>
+                  {cancelTitle ? cancelTitle : 'Fechar'}
+                </S.ButtonText>
               </S.Button>
             )}
-            <S.Button onPress={() => onClose()}>
-              <S.ButtonText>Fechar</S.ButtonText>
-            </S.Button>
           </S.FooterContent>
         </S.Content>
       </Modal>

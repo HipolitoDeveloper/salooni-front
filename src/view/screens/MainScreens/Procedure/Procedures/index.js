@@ -53,6 +53,7 @@ const Procedures = () => {
   return (
     <S.Container>
       <List
+        searchPlaceHolder={'Procure pelos seus procedimentos'}
         isOwner={isOwner}
         itemType={'procedure'}
         showHeader={false}

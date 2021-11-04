@@ -3,19 +3,21 @@ import * as S from './styled';
 import global from '../../../../../common/global';
 import {ScheduleContext} from '../../../../../contexts/Schedule/ScheduleContext';
 import Calendar from '../../../../components/huge/CalendarComponent';
-import {FlatList, RefreshControl} from 'react-native';
-import ListContent from '../../../../components/ListComponent/ListContent';
-import FloatButton from '../../../../components/small/FloatButton';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import {UserContext} from '../../../../../contexts/User/UserContext';
-import {PartnerContext} from '../../../../../contexts/Partner/PartnerContext';
-import {ClientContext} from '../../../../../contexts/Client/ClientContext';
-import {ProcedureContext} from '../../../../../contexts/Procedure/ProcedureContext';
 import CalendarHeader from '../../../../components/huge/CalendarComponent/CalendarHeader';
 import List from '../../../../components/ListComponent';
+import {useTourGuideController} from 'rn-tourguide';
 
 const SchedulingCalendar = ({route}) => {
+  const {
+    canStart, // a boolean indicate if you can start tour guide
+    start, // a function to start the tourguide
+    stop, // a function  to stopping it
+    eventEmitter, // an object for listening some events
+  } = useTourGuideController();
+
   const {currentUser, isOwner} = useContext(UserContext);
   const {
     calendarSchedule,
@@ -91,6 +93,7 @@ const SchedulingCalendar = ({route}) => {
           />
         ) : (
           <List
+            searchPlaceHolder={'Procure pela sua agenda '}
             isOwner={true}
             showHeader={true}
             handleState={handleIsListing}

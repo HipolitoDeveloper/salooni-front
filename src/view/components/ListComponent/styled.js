@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 import global from '../../../common/global';
 
-export const Container = styled.View`
+export const Container = styled.SafeAreaView`
   flex: 1;
   background-color: ${global.colors.backgroundColor};
 `;
@@ -18,6 +18,7 @@ export const Header = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  border: 1px solid red;
 `;
 
 export const Body = styled.View`

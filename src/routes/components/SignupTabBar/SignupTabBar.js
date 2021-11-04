@@ -9,6 +9,7 @@ import {PartnerContext} from '../../../contexts/Partner/PartnerContext';
 import {UserContext} from '../../../contexts/User/UserContext';
 import AlertModal from '../../../view/components/small/AlertModal';
 import ErrorMessage from '../../../view/components/small/ErrorMessage';
+import InformationModal from '../../../view/components/small/InformationModal';
 
 const SignupTabBar = ({children, state, navigation}) => {
   const {
@@ -27,6 +28,10 @@ const SignupTabBar = ({children, state, navigation}) => {
     isShowing: false,
     text: '',
     method: () => {},
+    cancelMethod: () => {},
+  });
+  const [showInformationModal, setShowInformationModal] = useState({
+    state: true,
   });
 
   const pages = [
@@ -41,12 +46,31 @@ const SignupTabBar = ({children, state, navigation}) => {
     partners: registeredPartners,
   }).isOk;
 
-  const handleModal = (title, isShowing, text, method) => {
+  const handleModal = (
+    title,
+    isShowing,
+    text,
+    method,
+    cancelMethod,
+    cancelTitle,
+  ) => {
     setShowAlertModal({
       isShowing: isShowing,
       text: text,
       title: title,
       method: method,
+      cancelMethod: cancelMethod,
+      cancelTitle: cancelTitle,
+    });
+  };
+
+  const closeModal = () => {
+    setShowAlertModal({
+      isShowing: false,
+      text: 'text',
+      title: 'title',
+      method: () => {},
+      cancelMethod: () => closeModal(),
     });
   };
 
@@ -58,8 +82,13 @@ const SignupTabBar = ({children, state, navigation}) => {
     });
 
     if (verifier.isOk && verifier.showReconfirmModal) {
-      handleModal('Atenção', true, verifier.errorMessage, () =>
-        goWithoutProceduresOrPartners(),
+      handleModal(
+        'Atenção',
+        true,
+        verifier.errorMessage,
+        () => goWithoutProceduresOrPartners(),
+        closeModal,
+        'NÃO',
       );
     } else if (verifier.isOk && !verifier.showReconfirmModal) {
       saveInformations();
@@ -87,11 +116,13 @@ const SignupTabBar = ({children, state, navigation}) => {
               'O cadastro foi concluído.',
               true,
               `Realize a entrada como proprietário com o usuário ${user.email}`,
-              () => goBack(),
+              null,
+              () => navigate.navigate('EntranceStack', {screen: 'SignInOwner'}),
+              'IR',
             );
           },
           error => {
-            handleModal('', true, ``, () => {});
+            handleModal('', false, ``, () => {}, closeModal);
             setIsLoadingSignup(false);
             setErrorMessage(errorMessages.salonWarningMessage);
           },
@@ -105,7 +136,7 @@ const SignupTabBar = ({children, state, navigation}) => {
     );
   };
   const goWithoutProceduresOrPartners = () => {
-    handleModal('', false, '', () => {});
+    closeModal();
     saveInformations();
   };
 
@@ -138,9 +169,14 @@ const SignupTabBar = ({children, state, navigation}) => {
         text={showAlertModal.text}
         isVisible={showAlertModal.isShowing}
         onOk={showAlertModal.method}
-        onClose={() => handleModal('', false, ``, () => {})}
         title={showAlertModal.title}
+        onClose={showAlertModal.cancelMethod}
+        cancelTitle={showAlertModal.cancelTitle}
       />
+
+      <InformationModal
+        modalState={showInformationModal}
+        closeModal={() => setShowInformationModal(false)}></InformationModal>
     </>
   );
 };

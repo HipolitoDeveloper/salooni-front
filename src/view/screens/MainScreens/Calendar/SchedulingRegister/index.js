@@ -81,11 +81,11 @@ const SchedulingRegister = ({route}) => {
   });
 
   const clearSchedule = () => {
-    const scheduleDate = schedule.scheduleDate;
+    const {scheduleDate, employee} = schedule;
 
     setSchedule({
       client: '',
-      employee: '',
+      employee: employee,
       procedures: [],
       scheduleDate: scheduleDate,
     });
@@ -339,6 +339,7 @@ const SchedulingRegister = ({route}) => {
           {moment(schedule.scheduleDate).format('DD/MM/YYYY HH:mm')}
         </S.HeaderText>
         <AutoComplete
+          inputText={'Cliente'}
           placeholder={'Procure por um cliente'}
           iconName={'user'}
           textColor={global.colors.darkGreyColor}
@@ -351,6 +352,7 @@ const SchedulingRegister = ({route}) => {
         />
 
         <AutoComplete
+          inputText={'Parceiro'}
           editable={isOwner}
           placeholder={'Procure por um parceiro'}
           textColor={global.colors.darkGreyColor}
@@ -369,6 +371,7 @@ const SchedulingRegister = ({route}) => {
 
         {Object.keys(schedule.employee).length > 5 && (
           <MultipleSelect
+            inputText={'Procedimentos'}
             disabled={Object.keys(schedule.employee).length <= 5}
             iconColor={global.colors.purpleColor}
             plusIconColor={global.colors.purpleColor}

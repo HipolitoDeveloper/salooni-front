@@ -13,10 +13,13 @@ export const ScheduleReducer = (state, action) => {
       state.showingCurrentUserSchedule =
         action.payload.showCurrentUserSchedules;
 
+      state.isSchedulesLoading = false;
+
       return {
         schedules: state.schedules,
         calendarSchedule: state.calendarSchedule,
         showingCurrentUserSchedule: state.showingCurrentUserSchedule,
+        isSchedulesLoading: state.isSchedulesLoading,
         ...state,
       };
     case 'ADD_SCHEDULE':

@@ -23,6 +23,7 @@ import {convertUserToProfileObject} from '../../pipe/userPipe';
 export const UserContext = createContext();
 
 const initialState = {
+  loginStatus: 'LOA',
   isOwner: false,
   currentUser: {},
   owner: {
@@ -103,8 +104,13 @@ const UserProvider = ({children}) => {
   const setCurrentUser = async (isLogging, user) => {
     if (isLogging && user !== null) {
       const currentUser = buildCurrentUser(user);
+
+      const loginStatus = Object.keys(currentUser).length > 0 ? 'IN' : 'OUT';
+
+      dispatch({type: 'SET_LOGIN_STATUS', loginStatus});
       dispatch({type: 'SET_CURRENT_USER', currentUser});
     } else {
+      dispatch({type: 'SET_LOGIN_STATUS', loginStatus: 'OUT'});
       dispatch({type: 'SET_CURRENT_USER', currentUser: {}});
     }
   };

@@ -16,6 +16,7 @@ const MultipleSelect = ({
   navigate,
   placeholderText,
   disabled,
+  inputText,
 }) => {
   const [isShowingSuggestionBox, setIsShowingSuggestionBox] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
@@ -76,6 +77,7 @@ const MultipleSelect = ({
           />
         </S.IconContainer>
         <S.SelectedContainer>
+          <S.InputText color={iconColor}>{inputText}</S.InputText>
           {value.some(v => v.id) > 0 ? (
             <S.ItemsContainer>
               <FlatList
@@ -149,13 +151,10 @@ const SuggestionModal = ({
         onRequestClose={onClose}
         onModalWillShow={onShow}>
         <S.SuggestionContainer>
+          <S.SuggestionHeader>
+            <S.SuggestionHeaderText>{modalHeaderText}</S.SuggestionHeaderText>
+          </S.SuggestionHeader>
           <S.SuggestionContent>
-            <S.CloseButton onPress={() => onClose()}>
-              <Icon name={'times'} size={20} />
-            </S.CloseButton>
-            <S.SuggestionHeader>
-              <S.SuggestionHeaderText>{modalHeaderText}</S.SuggestionHeaderText>
-            </S.SuggestionHeader>
             <S.SuggestionBody>
               <FlatList
                 keyExtractor={item => item.id}

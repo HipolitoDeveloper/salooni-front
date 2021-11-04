@@ -11,9 +11,13 @@ const UserTabBar = ({children, state, navigation}) => {
     pages = [
       {screen: 'Profile', name: 'Perfil'},
       {screen: 'Procedures', name: 'Procedimentos'},
+      {screen: 'Videos', name: 'Vídeos'},
     ];
   } else {
-    pages = [{screen: 'Profile', name: 'Perfil'}];
+    pages = [
+      {screen: 'Profile', name: 'Perfil'},
+      {screen: 'Videos', name: 'Vídeos'},
+    ];
   }
 
   const goBack = () => {

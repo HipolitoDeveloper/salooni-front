@@ -42,6 +42,13 @@ export const UserReducer = (state, action) => {
         ...state,
         owner: state.owner,
       };
+    case 'SET_LOGIN_STATUS':
+      state.loginStatus = action.loginStatus;
+
+      return {
+        ...state,
+        loginStatus: state.loginStatus,
+      };
 
     default:
       return state;

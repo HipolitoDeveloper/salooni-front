@@ -5,7 +5,8 @@ import React from 'react';
 import {View} from 'react-native';
 import {Button} from './styled';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-
+import tourMessages from '../../../../common/tourMessages';
+import {TourGuideZone} from 'rn-tourguide';
 const FloatButton = ({buttonColor, onPress, icon, right, bottom}) => {
   return (
     <S.Button
