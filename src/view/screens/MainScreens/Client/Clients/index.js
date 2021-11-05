@@ -47,7 +47,7 @@ const Clients = () => {
         showHeader={true}
         headerText={'Clientes'}
         color={`${global.colors.blueColor}`}
-        itemList={[{name: "name"}, {name: "name"}, {name: "name"}, {name: "name"}, {name: "name"}, {name: "name"}, {name: "name"}, {name: "name"}, {name: "name"}, {name: "name"},{name: "name"}, {name: "name"}, {name: "name"},  ]}
+        itemList={clients}
         searchPlaceHolder={'Procure pelos seus clientes'}
         menuItems={['name', 'tel', 'email']}
         deleteUniqueItem={deleteClient}

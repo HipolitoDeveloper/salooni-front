@@ -173,12 +173,14 @@ const Calendar = ({calendarSchedule}) => {
   return (
     <>
       <Agenda
-        onPress={
-          date => console.log('eqwew')
-          // navigate.push('ApplicationStack', {
-          //   screen: 'SchedulingRegister',
-          //   params: {schedule: [], date: moment(date).format()},
-          // })
+        onPress={date =>
+          navigate.push('ApplicationStack', {
+            screen: 'SchedulingRegister',
+            params: {
+              schedule: [],
+              date: new Date(date),
+            },
+          })
         }
         items={items}
         loadItemsForMonth={month => {

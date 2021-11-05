@@ -8,7 +8,6 @@ import BackButton from '../../../small/BackButton';
 import tourMessages from '../../../../../common/tourMessages';
 
 const CalendarHeader = ({color, headerTitle, handleState, navigate, route}) => {
-  console.log(route.params);
   const employeeView = route.params?.employeeView;
   const employee = route.params?.employee;
   return (
@@ -29,9 +28,8 @@ const CalendarHeader = ({color, headerTitle, handleState, navigate, route}) => {
       {employeeView && (
         <S.EmployeeName headerColor={color}>do {employee.name}</S.EmployeeName>
       )}
-
       <S.ChangeIconContent onPress={handleState} employeeView={employeeView}>
-       
+        <Icon name={'exchange-alt'} size={20} color={color} />
       </S.ChangeIconContent>
 
       {!employeeView && (

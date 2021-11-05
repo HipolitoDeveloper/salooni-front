@@ -6,7 +6,7 @@ import Salooni from '../../../../assets/svg/salooniSVG.svg';
 import Search from '../../../../assets/svg/searchSVG.svg';
 import Times from '../../../../assets/svg/timesSVG.svg';
 import tourMessages from '../../../../common/tourMessages';
-
+import {View, Text} from 'react-native';
 
 const ListHeader = ({
   searchItems,
@@ -20,6 +20,7 @@ const ListHeader = ({
   handleState,
   headerHeight,
   searchPlaceHolder,
+  scrolling,
 }) => {
   const [scheduleView, setScheduleView] = useState('');
   const [search, setSearch] = useState('');
@@ -39,7 +40,7 @@ const ListHeader = ({
       ]}>
       <S.Content>
         <S.Header>
-          {!isDeleting && (
+          {!isDeleting && scrolling && (
             <S.IconContent>
               <Salooni
                 fill={headerColor}

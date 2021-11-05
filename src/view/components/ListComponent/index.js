@@ -12,8 +12,8 @@ import Loading from '../small/Loading';
 import {getCloser} from '../../../common/headerFunctions';
 import {useNavigation} from '@react-navigation/native';
 const {diffClamp} = Animated;
-  
-const headerHeight = Platform.OS === "ios" ? 90* 2: 70 * 2;
+
+const headerHeight = Platform.OS === 'ios' ? 90 * 2 : 70 * 2;
 
 const List = ({
   showCalendarButton,
@@ -54,6 +54,8 @@ const List = ({
   });
   const [isConfirming, setIsConfirming] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
+  const [scrolling, setScrolling] = useState(false);
+
   const isDeleting = items.some(item => item.selected);
   const selectedItems = items.filter(item => item.selected);
   const showFooter = isDeleting || isConfirming;
@@ -79,6 +81,7 @@ const List = ({
 
   translateY.addListener(({value}) => {
     translateYNumber.current = value;
+    setScrolling(translateYNumber.current === 0);
   });
 
   const handleSnap = ({nativeEvent}) => {
@@ -265,6 +268,7 @@ const List = ({
             handleState={handleState}
             headerHeight={headerHeight}
             searchPlaceHolder={searchPlaceHolder}
+            scrolling={scrolling}
           />
         </Animated.View>
       )}

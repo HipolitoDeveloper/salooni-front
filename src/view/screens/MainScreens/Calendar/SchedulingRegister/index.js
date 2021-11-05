@@ -55,12 +55,11 @@ const SchedulingRegister = ({route}) => {
     client: '',
     employee: partners.find(partner => partner.id === currentUser.idFunc),
     procedures: [],
-    scheduleDate: new Date(route.params.date),
+    scheduleDate: route.params?.date,
   });
 
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
-  const [date, setDate] = useState(new Date());
 
   const navigate = useNavigation();
 
@@ -69,6 +68,7 @@ const SchedulingRegister = ({route}) => {
   // });
 
   navigate.addListener('focus', () => {
+    console.log('data', route.params.date);
     const scheduleInView = route.params?.schedule ? route.params?.schedule : {};
 
     if (Object.keys(scheduleInView).length !== 0) {
