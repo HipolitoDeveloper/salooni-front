@@ -1,5 +1,5 @@
 import React from 'react';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import * as S from './styled';
 import Input from '../Input';
 
@@ -10,7 +10,7 @@ const BackButton = ({onPress, positionTop, buttonColor, positionLeft}) => {
         onPress={onPress}
         positionTop={positionTop}
         positionLeft={positionLeft}>
-        <Icon size={30} name="arrow-back" color={buttonColor} />
+        <Icon size={30} name="arrow-left" color={buttonColor} />
       </S.ContentButton>
     </>
   );

@@ -10,7 +10,7 @@ import AlertModal from '../../../components/small/AlertModal';
 import {ActivityIndicator, View} from 'react-native';
 import BackButton from '../../../components/small/BackButton';
 import {UserContext} from '../../../../contexts/User/UserContext';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import {PartnerContext} from '../../../../contexts/Partner/PartnerContext';
 import {xorBy} from 'lodash';
 import {ProcedureContext} from '../../../../contexts/Procedure/ProcedureContext';

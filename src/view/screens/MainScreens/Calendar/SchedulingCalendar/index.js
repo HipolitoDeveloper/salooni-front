@@ -8,7 +8,6 @@ import moment from 'moment';
 import {UserContext} from '../../../../../contexts/User/UserContext';
 import CalendarHeader from '../../../../components/huge/CalendarComponent/CalendarHeader';
 import List from '../../../../components/ListComponent';
-import {useTourGuideController} from 'rn-tourguide';
 
 const SchedulingCalendar = ({route}) => {
   const {currentUser, isOwner} = useContext(UserContext);

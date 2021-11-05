@@ -265,7 +265,7 @@ export default SignInPartner;
 
 export const styles = StyleSheet.create({
   input: {
-    fontFamily: `${global.fonts.s}`,
+    fontFamily: `${global.fonts.mainFont}`,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: `${global.colors.purpleColor}`,
     color: 'black',

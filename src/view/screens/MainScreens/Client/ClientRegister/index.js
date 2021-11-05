@@ -12,7 +12,7 @@ import {ActivityIndicator} from 'react-native';
 import BackButton from '../../../../components/small/BackButton';
 import {UserContext} from '../../../../../contexts/User/UserContext';
 import {SalonObject} from '../../../../../services/SalonService';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import RegisterComponent from '../../../../components/huge/RegisterComponent';
 import Loading from '../../../../components/small/Loading';
 import {

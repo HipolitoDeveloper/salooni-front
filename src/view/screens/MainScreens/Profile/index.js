@@ -42,7 +42,7 @@ const Profile = () => {
           placeholder={'Nome*'}
           value={profile.userName}
           width={'80%'}
-          keyboard={'text'}
+          keyboard={'default'}
           isSecureTextEntry={false}
           fontSize={18}
           disabled={false}
@@ -54,7 +54,7 @@ const Profile = () => {
           placeholder={'Salão*'}
           value={profile.salonName}
           width={'80%'}
-          keyboard={'text'}
+          keyboard={'default'}
           isSecureTextEntry={false}
           fontSize={18}
           disabled={false}
@@ -92,7 +92,7 @@ const Profile = () => {
           placeholder={'Senha*'}
           value={profile.password}
           width={'80%'}
-          keyboard={'text'}
+          keyboard={'default'}
           isSecureTextEntry={true}
           fontSize={18}
           disabled={false}

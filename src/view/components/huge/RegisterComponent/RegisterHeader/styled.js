@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import global from '../../../../../common/global';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Platform} from 'react-native';
 
 export const Container = styled.View`
   border: ${StyleSheet.hairlineWidth}px solid ${props => props.headerColor};
@@ -10,6 +10,7 @@ export const Container = styled.View`
   height: 13%;
   background-color: ${global.colors.lightGreyColor};
   elevation: 10;
+  padding-top: ${Platform.OS === "ios" ? '40px' : '0'};
 `;
 
 export const Content = styled.View`

@@ -123,7 +123,6 @@ export const PASSVerifier = password => {
     }
   }
 
-  console.log('lowercase', hasLowercase);
   if (!hasUppercase)
     message = 'Sua senha precisa de ao menos uma letra maiúscula';
 

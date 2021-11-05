@@ -1,5 +1,6 @@
 import styled from 'styled-components/native/dist/styled-components.native.esm';
 import global from '../../../../common/global';
+import {StyleSheet, Platform} from 'react-native';
 
 export const Container = styled.View`
   width: 100%;
@@ -57,7 +58,7 @@ export const CloseButtonContent = styled.TouchableOpacity`
   border-top-right-radius: 50px;
   position: absolute;
   top: 0;
-  left: 230px;
+  left: ${Platform.OS === "ios" ? '252px' : '230px'};;
   display: flex;
   align-items: center;
   justify-content: center;

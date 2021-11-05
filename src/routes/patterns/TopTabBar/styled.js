@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import global from '../../../common/global';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Platform} from 'react-native';
 
 export const Container = styled.View`
   background-color: ${global.colors.lightGreyColor};
@@ -20,7 +20,9 @@ export const Content = styled.View`
   justify-content: space-around;
 
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: ${Platform.OS === "ios" ? '10px' : '20px'};
+  margin-top: ${Platform.OS === "ios" ? '40px' : '0'};
+
 `;
 
 export const ButtonContent = styled.View`

@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import global from '../../../../common/global';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Platform} from 'react-native';
 
 export const Container = styled.View`
   width: 100%;
@@ -10,6 +10,7 @@ export const Container = styled.View`
   align-items: flex-start;
   border-bottom-width: ${StyleSheet.hairlineWidth}px;
   elevation: 10;
+  padding-top: ${Platform.OS === "ios" ? '40px' : '0'};
 `;
 
 export const Content = styled.View`
@@ -107,6 +108,7 @@ export const SearchInput = styled.TextInput`
   font-size: 16px;
   opacity: 0.6;
   font-family: ${global.fonts.mainFont};
+  height: ${Platform.OS === "ios" ? '40px' : '0'}; 
 `;
 
 export const SwitchContent = styled.View``;

@@ -65,7 +65,7 @@ export const ButtonText = styled.Text`
 `;
 
 export const ContentButtonText = styled.Text`
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   color: ${global.colors.lightGreyColor};
   font-size: ${props => props.fontSize}; ;
 `;

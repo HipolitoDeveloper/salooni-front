@@ -6,7 +6,7 @@ import Salooni from '../../../../assets/svg/salooniSVG.svg';
 import Search from '../../../../assets/svg/searchSVG.svg';
 import Times from '../../../../assets/svg/timesSVG.svg';
 import tourMessages from '../../../../common/tourMessages';
-import {TourGuideZone} from 'rn-tourguide';
+
 
 const ListHeader = ({
   searchItems,

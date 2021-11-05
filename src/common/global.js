@@ -10,7 +10,7 @@ export default {
     lightBlueColor: '#88d1ce',
   },
   fonts: {
-    auxiliarFont: 'Sani Trixie Sans Regular',
+    auxiliarFont: 'SaniTrixieSans',
     mainFont: 'SaniTrixieSans',
   },
 };

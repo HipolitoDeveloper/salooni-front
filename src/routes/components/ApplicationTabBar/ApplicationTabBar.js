@@ -8,14 +8,8 @@ import Clock from '../../../assets/svg/clockSVG.svg';
 import {ScheduleContext} from '../../../contexts/Schedule/ScheduleContext';
 import {UserContext} from '../../../contexts/User/UserContext';
 import Loading from '../../../view/components/small/Loading';
-import {AppTour, AppTourView} from 'react-native-app-tour';
 import {Button, TouchableOpacity, View, Text} from 'react-native';
-import {
-  TourGuideProvider, // Main provider
-  TourGuideZone, // Main wrapper of highlight component
-  TourGuideZoneByPosition, // Component to use mask on overlay (ie, position absolute)
-  useTourGuideController, // hook to start, etc.
-} from 'rn-tourguide';
+
 
 export default ({state, navigation}) => {
   const {currentUser} = useContext(UserContext);

@@ -14,10 +14,7 @@ target 'salooni' do
 
   pod 'RNSVG', :path => '../node_modules/react-native-svg'
 
-  target 'salooniTests' do
-    inherit! :complete
-    # Pods for testing
-  end
+
 
   # Enables Flipper.
   #

@@ -1,5 +1,5 @@
 import * as S from './styled';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import React, {useRef, useState} from 'react';
 import {InputsContainer, InputsContent} from './styled';
 import {Switch} from '../Switch';
@@ -70,7 +70,7 @@ export const InputModal = ({
             </S.TextContent>
             <S.CloseButtonContent onPress={() => setIsShowingInput(false)}>
               <S.CloseButton>
-                <Icon name={'close'} size={18} color={'white'} />
+                <Icon name={'times'} size={18} color={'white'} />
               </S.CloseButton>
             </S.CloseButtonContent>
             <S.InputsContent>{children}</S.InputsContent>
