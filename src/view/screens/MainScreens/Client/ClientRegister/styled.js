@@ -60,13 +60,6 @@ export const ClientInformationContent = styled.View`
   justify-content: center;
 `;
 
-export const RegisteredProceduresContent = styled.View`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-`;
-
 export const RegisteredProceduresBox = styled.View`
   margin-top: 10px;
   border-width: ${StyleSheet.hairlineWidth}px;
@@ -81,15 +74,20 @@ export const BoxContent = styled.TouchableOpacity`
   flex-direction: row;
 `;
 
-export const BoxText = styled.Text`
+export const DateTextContent = styled.TouchableOpacity`
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 80%;
+  border-bottom-width: 1px;
+  border-bottom-color: black;
+  height: 60px;
+`;
+
+export const DateText = styled.Text`
   font-family: ${global.fonts.auxiliarFont};
   font-size: 18px;
   color: ${props => (props.isInView ? 'red' : 'black')};
-`;
-
-export const RegisteredProceduresBoxTitle = styled.Text`
-  font-family: ${global.fonts.auxiliarFont};
-  font-size: 16px;
 `;
 
 export const FooterContent = styled.View`

@@ -28,6 +28,7 @@ const RegisterComponent = ({
   registeredItemLeftInformation,
   headerTitle,
   showAddButton,
+  invalidForm,
 }) => {
   const [isRegisteredItemsBoxOpened, setIsRegisteredItemsBoxOpened] =
     useState(false);
@@ -68,6 +69,7 @@ const RegisterComponent = ({
 
         {(showAddButton || !isEditing) && (
           <FloatButton
+            disabled={invalidForm}
             bottom={'150px'}
             right={'40px'}
             onPress={() => {

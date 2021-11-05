@@ -122,16 +122,11 @@ const ProcedureProvider = ({children}) => {
     dispatch({type: 'DELETE_PROCEDURE_INVIEW', payload});
   };
 
-  const cleanRegisteredProcedures = payload => {
-    dispatch({type: 'CLEAN_REGISTERED_PROCEDURES', payload});
-  };
-
   const contextValues = {
     loadAllProcedures,
     addProcedure,
     cleanProceduresInformation,
     saveProcedures,
-    cleanRegisteredProcedures,
     updateProcedure,
     deleteProcedureList,
     deleteUniqueProcedure,

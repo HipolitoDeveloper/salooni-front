@@ -137,17 +137,12 @@ const PartnerProvider = ({children}) => {
     });
   };
 
-  const cleanRegisteredPartners = payload => {
-    dispatch({type: 'CLEAN_REGISTERED_PARTNERS', payload});
-  };
-
   const contextValues = {
     loadAllPartners,
     addPartner,
     cleanPartnersInformation,
     deletePartnerProcedure,
     savePartner,
-    cleanRegisteredPartners,
     updatePartner,
     deleteUniquePartner,
     deletePartnerList,

@@ -11,13 +11,6 @@ import List from '../../../../components/ListComponent';
 import {useTourGuideController} from 'rn-tourguide';
 
 const SchedulingCalendar = ({route}) => {
-  const {
-    canStart, // a boolean indicate if you can start tour guide
-    start, // a function to start the tourguide
-    stop, // a function  to stopping it
-    eventEmitter, // an object for listening some events
-  } = useTourGuideController();
-
   const {currentUser, isOwner} = useContext(UserContext);
   const {
     calendarSchedule,

@@ -62,6 +62,7 @@ const SignupOwners = () => {
             fontSize={18}
             disabled={false}
             mask="none"
+            validateInput={true}
           />
           <Input
             handleChange={handleChange}
@@ -74,6 +75,7 @@ const SignupOwners = () => {
             fontSize={18}
             disabled={false}
             mask={'cnpj'}
+            validateInput={true}
           />
           <Input
             handleChange={handleChange}
@@ -86,6 +88,7 @@ const SignupOwners = () => {
             fontSize={18}
             disabled={false}
             mask="none"
+            validateInput={true}
           />
           <Input
             handleChange={handleChange}
@@ -98,6 +101,7 @@ const SignupOwners = () => {
             fontSize={18}
             disabled={false}
             mask={'phone'}
+            validateInput={true}
           />
           <Input
             handleChange={handleChange}
@@ -109,7 +113,8 @@ const SignupOwners = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask="none"
+            mask="email"
+            validateInput={true}
           />
 
           <Input
@@ -119,10 +124,11 @@ const SignupOwners = () => {
             value={owner?.password}
             width={'80%'}
             keyboard={'default'}
-            isSecureTextEntry={true}
+            isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask="none"
+            mask="password"
+            validateInput={true}
           />
         </S.BodyContent>
         <S.FooterContent>

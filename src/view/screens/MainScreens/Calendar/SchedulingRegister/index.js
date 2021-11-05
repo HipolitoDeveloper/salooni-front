@@ -329,7 +329,7 @@ const SchedulingRegister = ({route}) => {
             display="default"
             minimumDate={new Date(1950, 0, 1)}
             maximumDate={new Date(2300, 10, 20)}
-            minuteInterval={10}
+            minuteInterval={1}
             onChange={onChange}
             locale="pt-BR"
           />

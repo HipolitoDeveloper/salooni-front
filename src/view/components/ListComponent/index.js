@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import global from '../../../common/global';
 import * as S from './styled';
 import ListContent from './ListContent';
@@ -10,6 +10,7 @@ import FloatButton from '../small/FloatButton';
 import Times from '../../../assets/svg/timesSVG.svg';
 import Loading from '../small/Loading';
 import {getCloser} from '../../../common/headerFunctions';
+import {useNavigation} from '@react-navigation/native';
 const {diffClamp} = Animated;
 const headerHeight = 70 * 2;
 
@@ -55,6 +56,12 @@ const List = ({
   const isDeleting = items.some(item => item.selected);
   const selectedItems = items.filter(item => item.selected);
   const showFooter = isDeleting || isConfirming;
+
+  const navigate = useNavigation();
+
+  navigate.addListener('focus', () => {
+    setItems(itemList);
+  });
 
   const handleScroll = Animated.event(
     [

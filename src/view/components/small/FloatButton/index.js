@@ -7,9 +7,10 @@ import {Button} from './styled';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import tourMessages from '../../../../common/tourMessages';
 import {TourGuideZone} from 'rn-tourguide';
-const FloatButton = ({buttonColor, onPress, icon, right, bottom}) => {
+const FloatButton = ({buttonColor, onPress, icon, right, bottom, disabled}) => {
   return (
     <S.Button
+      disabled={disabled}
       buttonColor={buttonColor}
       onPress={onPress}
       right={right}

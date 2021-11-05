@@ -23,7 +23,18 @@ export const Content = styled.View`
   margin-bottom: 20px;
 `;
 
-export const ErrorButton = styled.TouchableOpacity``;
+export const ButtonContent = styled.View`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const ButtonText = styled.Text`
+  font-size: 12px;
+  color: black;
+  opacity: 0.4;
+  font-family: ${global.fonts.mainFont};
+`;
 
 export const CancelButton = styled.TouchableOpacity`
   elevation: 10;

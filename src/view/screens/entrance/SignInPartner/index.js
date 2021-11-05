@@ -172,6 +172,7 @@ const SignInPartner = () => {
           name={'email'}
           value={userData.email}
           width={'70%'}
+          mask={'email'}
         />
 
         <Loading isLoading={isLoading} color={`${global.colors.purpleColor}`} />
@@ -187,6 +188,7 @@ const SignInPartner = () => {
                 isSecureTextEntry={true}
                 keyboard={'numeric'}
                 width={'70%'}
+                mask={'password'}
               />
 
               <Input
@@ -197,6 +199,7 @@ const SignInPartner = () => {
                 isSecureTextEntry={true}
                 keyboard={'numeric'}
                 width={'70%'}
+                mask={'password'}
               />
             </>
           ) : (
@@ -221,6 +224,7 @@ const SignInPartner = () => {
             selectTextOnFocus={isPartner}
             isSecureTextEntry={true}
             width={'70%'}
+            mask={'password'}
           />
         )}
 

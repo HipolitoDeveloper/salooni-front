@@ -12,11 +12,8 @@ import ErrorMessage from '../../../view/components/small/ErrorMessage';
 import InformationModal from '../../../view/components/small/InformationModal';
 
 const SignupTabBar = ({children, state, navigation}) => {
-  const {
-    registeredProcedures,
-    cleanProceduresInformation,
-    cleanRegisteredProcedures,
-  } = useContext(ProcedureContext);
+  const {registeredProcedures, cleanProceduresInformation} =
+    useContext(ProcedureContext);
   const {addPartner, registeredPartners, cleanPartnersInformation} =
     useContext(PartnerContext);
   const {doSignup, saveSignupInformation, cleanOwnerInformation, verifySignup} =
@@ -108,7 +105,6 @@ const SignupTabBar = ({children, state, navigation}) => {
         doSignup(ownerEmployee, '').then(
           user => {
             setIsLoadingSignup(false);
-            cleanRegisteredProcedures();
             cleanProceduresInformation();
             cleanOwnerInformation();
             cleanPartnersInformation();

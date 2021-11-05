@@ -15,6 +15,14 @@ import {SalonObject} from '../../../../../services/SalonService';
 import Icon from 'react-native-vector-icons/Ionicons';
 import RegisterComponent from '../../../../components/huge/RegisterComponent';
 import Loading from '../../../../components/small/Loading';
+import {
+  CNPJVerifier,
+  CPFVerifier,
+  TELVerifier,
+} from '../../../../components/small/Input/verifier';
+import RNDateTimePicker from '@react-native-community/datetimepicker';
+import {DateText} from './styled';
+import moment from 'moment';
 
 const ClientRegister = ({route}) => {
   const {
@@ -39,7 +47,12 @@ const ClientRegister = ({route}) => {
     isShowing: false,
     text: '',
   });
-  const [client, setClient] = useState({});
+  const [client, setClient] = useState({
+    bornDate: new Date(),
+  });
+  const [invalidForm, setInvalidForm] = useState(false);
+  const [showDate, setShowDate] = useState(false);
+
   const navigate = useNavigation();
 
   useEffect(() => {
@@ -66,6 +79,11 @@ const ClientRegister = ({route}) => {
 
   const handleModal = (isShowing, text) => {
     setShowAlertModal({isShowing: isShowing, text: text});
+  };
+
+  const onChangeDate = (event, selectedDate) => {
+    handleChange(selectedDate, 'bornDate');
+    setShowDate(false);
   };
 
   const chooseAddClientMethod = async () => {
@@ -200,18 +218,22 @@ const ClientRegister = ({route}) => {
       ableToGo = false;
       errorMessage = errorMessages.clientMessage;
       setIsLoading(false);
+    } else {
+      if (!CPFVerifier(client.cpf).state) {
+        ableToGo = false;
+        errorMessage = errorMessages.invalidCPF;
+        setIsLoading(false);
+      }
+      if (!TELVerifier(client.tel).state) {
+        ableToGo = false;
+        errorMessage = errorMessages.invalidTel;
+        setIsLoading(false);
+      }
     }
 
     setErrorMessage(errorMessage);
     return ableToGo;
   };
-
-  const loadBoxInformation = () =>
-    registeredClients.map((client, index) => (
-      <S.BoxContent onPress={() => handleClient(client, index)} key={index}>
-        <S.BoxText isInView={client.isInView}>{client.name}</S.BoxText>
-      </S.BoxContent>
-    ));
 
   return (
     <RegisterComponent
@@ -226,7 +248,8 @@ const ClientRegister = ({route}) => {
       isEditing={isEditing}
       onAdd={chooseAddClientMethod}
       registeredItemRightInformation={'tel'}
-      headerTitle={'Clientes'}>
+      headerTitle={'Clientes'}
+      invalidForm={invalidForm}>
       {errorMessage !== '' && (
         <ErrorMessage
           text={errorMessage}
@@ -247,6 +270,7 @@ const ClientRegister = ({route}) => {
           fontSize={18}
           disabled={false}
           mask="none"
+          validateInput={false}
         />
 
         <Input
@@ -259,7 +283,9 @@ const ClientRegister = ({route}) => {
           isSecureTextEntry={false}
           fontSize={18}
           disabled={false}
-          mask="none"
+          mask="email"
+          validateForm={state => setInvalidForm(state)}
+          validateInput={true}
         />
 
         <Input
@@ -273,20 +299,28 @@ const ClientRegister = ({route}) => {
           fontSize={18}
           disabled={false}
           mask={'cpf'}
+          validateForm={state => setInvalidForm(state)}
+          validateInput={true}
         />
 
-        <Input
-          handleChange={handleChange}
-          name={'bornDate'}
-          placeholder={'Data de Nascimento*'}
-          value={client.bornDate}
-          width={'80%'}
-          keyboard={'numeric'}
-          isSecureTextEntry={false}
-          fontSize={18}
-          disabled={false}
-          mask={'date'}
-        />
+        <S.DateTextContent onPress={() => setShowDate(true)}>
+          <S.DateText>
+            {moment(client.bornDate).format('DD/MM/YYYY')}
+          </S.DateText>
+        </S.DateTextContent>
+        {showDate && (
+          <RNDateTimePicker
+            value={client.bornDate}
+            mode={'date'}
+            is24Hour={true}
+            display="default"
+            minimumDate={new Date(1950, 0, 1)}
+            maximumDate={new Date(2300, 10, 20)}
+            minuteInterval={1}
+            onChange={onChangeDate}
+            locale="pt-BR"
+          />
+        )}
 
         <Input
           handleChange={handleChange}
@@ -299,6 +333,8 @@ const ClientRegister = ({route}) => {
           fontSize={18}
           disabled={false}
           mask={'phone'}
+          validateForm={state => setInvalidForm(state)}
+          validateInput={true}
         />
 
         <Input
@@ -312,6 +348,8 @@ const ClientRegister = ({route}) => {
           fontSize={18}
           disabled={false}
           mask={'phone'}
+          validateForm={state => setInvalidForm(state)}
+          validateInput={true}
         />
       </S.BodyContent>
 

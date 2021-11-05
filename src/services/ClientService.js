@@ -17,7 +17,7 @@ export const insertClientCRUD = (clientObj, returnParseObject) => {
       client.set('cpf', cpf);
       client.set('tel', tel);
       client.set('tel2', tel2);
-      client.set('birthdate', bornDate);
+      client.set('birthdate', bornDate.toString());
       client.set('salon_id', new SalonObject({objectId: salonId}));
       if (returnParseObject) {
         resolve(await client.save());

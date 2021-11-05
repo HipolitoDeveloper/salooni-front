@@ -25,7 +25,7 @@ const ProcedureForm = ({
     editProcedure,
     registeredProcedures,
     saveProcedures,
-    cleanRegisteredProcedures,
+    cleanProceduresInformation,
     updateProcedureInView,
     updateProcedure,
     deleteProcedure,
@@ -181,7 +181,7 @@ const ProcedureForm = ({
             setIsLoading(false);
             navigate.navigate('UserInformationStack', {screen: 'Procedures'});
             clearProcedure();
-            cleanRegisteredProcedures();
+            cleanProceduresInformation();
           }, 3000);
           setErrorMessage('');
         },
@@ -348,6 +348,7 @@ const ProcedureForm = ({
           fontSize={18}
           disabled={false}
           mask="none"
+          validateInput={false}
         />
 
         <Input
@@ -363,6 +364,7 @@ const ProcedureForm = ({
           mask={'hour'}
           maxLength={3}
           rightPlaceholder={'minutos'}
+          validateInput={false}
         />
 
         <Input
@@ -377,6 +379,7 @@ const ProcedureForm = ({
           disabled={false}
           mask={'brl'}
           leftPlaceholder={'R$'}
+          validateInput={false}
         />
 
         <InputModal
@@ -396,6 +399,7 @@ const ProcedureForm = ({
             disabled={false}
             mask="brl"
             leftPlaceholder={'R$'}
+            validateInput={false}
           />
           <Input
             handleChange={handleChange}
@@ -408,6 +412,7 @@ const ProcedureForm = ({
             fontSize={18}
             disabled={false}
             mask="none"
+            validateInput={false}
           />
         </InputModal>
 
@@ -444,6 +449,7 @@ const ProcedureForm = ({
                 mask={'percentage'}
                 maxLength={3}
                 rightPlaceholder={'%'}
+                validateInput={false}
               />
             </S.CheckboxContent>
             <S.CheckboxContent>
@@ -469,6 +475,7 @@ const ProcedureForm = ({
                 disabled={false}
                 mask={'brl'}
                 leftPlaceholder={'R$'}
+                validateInput={false}
               />
             </S.CheckboxContent>
           </S.CheckboxContainer>

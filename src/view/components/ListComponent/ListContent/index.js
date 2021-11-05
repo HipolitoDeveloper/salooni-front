@@ -89,7 +89,7 @@ const ListContent = ({
           {itemType === 'schedule' && !isDeleting && (
             <S.CheckContent selected={false}>
               <S.ConfirmQuestionText>
-                Agendamento realizado?
+                Procedimentos realizados?
               </S.ConfirmQuestionText>
               <BouncyCheckbox
                 style={{borderColor: global.colors.purpleColor}}

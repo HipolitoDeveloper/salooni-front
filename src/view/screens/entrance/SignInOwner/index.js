@@ -19,7 +19,7 @@ const SignInOwner = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [userData, setUserData] = useState({
     email: 'gabriel@gmail.com',
-    password: '123',
+    password: '123Abc@',
   });
   const navigate = useNavigation();
 
@@ -70,7 +70,8 @@ const SignInOwner = () => {
           isSecureTextEntry={false}
           fontSize={18}
           disabled={false}
-          mask="none"
+          mask="email"
+          validateInput={true}
         />
 
         <Input
@@ -83,7 +84,8 @@ const SignInOwner = () => {
           isSecureTextEntry={true}
           fontSize={18}
           disabled={false}
-          mask="none"
+          mask="password"
+          validateInput={false}
         />
 
         <S.PasswordResetButton>

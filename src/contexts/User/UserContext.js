@@ -19,6 +19,12 @@ import {saveSalon, updateSalon} from '../../services/SalonService';
 import {buildCurrentUser} from '../../factory/User';
 import errorMessages from '../../common/errorMessages';
 import {convertUserToProfileObject} from '../../pipe/userPipe';
+import {
+  CNPJVerifier,
+  EMAILVerifier,
+  PASSVerifier,
+  TELVerifier,
+} from '../../view/components/small/Input/verifier';
 
 export const UserContext = createContext();
 
@@ -64,27 +70,37 @@ const UserProvider = ({children}) => {
     if (ownerToBeVerified.salonName === '') {
       isOk = false;
       errorMessage = 'O nome de usuário não pode ser vazio.';
-    } else if (ownerToBeVerified.cnpj === '') {
+    } else if (
+      ownerToBeVerified.cnpj === '' ||
+      !CNPJVerifier(ownerToBeVerified.cnpj).state
+    ) {
       isOk = false;
       errorMessage = 'O CNPJ do usuário não pode ser vazio.';
     } else if (ownerToBeVerified.userName === '') {
       isOk = false;
       errorMessage = 'O nome do salão não pode ser vazio.';
-    } else if (ownerToBeVerified.tel === '') {
+    } else if (
+      ownerToBeVerified.tel === '' ||
+      !TELVerifier(ownerToBeVerified.tel).state
+    ) {
       isOk = false;
       errorMessage = 'O telefone do usuário não pode ser vazio.';
-    } else if (ownerToBeVerified.email === '') {
+    } else if (
+      ownerToBeVerified.email === '' ||
+      !EMAILVerifier(ownerToBeVerified.email).state
+    ) {
       isOk = false;
       errorMessage = 'O e-mail do usuário não pode ser vazio.';
-    } else if (ownerToBeVerified.password === '') {
+    } else if (
+      ownerToBeVerified.password === '' ||
+      !PASSVerifier(ownerToBeVerified.password).state
+    ) {
       isOk = false;
       errorMessage = 'A senha não é forte o suficiente.';
     } else if (procedures.length === 0) {
-      isOk = true;
       errorMessage = partners.length === 0 && errorMessages.noProcedureMessage;
       showReconfirmModal = true;
     } else if (partners.length === 0) {
-      isOk = true;
       errorMessage =
         partners.length === 0 && errorMessages.noPartnerSignupMessage;
       showReconfirmModal = true;
@@ -243,6 +259,7 @@ const UserProvider = ({children}) => {
           procedures.map(async procedure => {
             procedure.salonId = salon.id;
             procedure.employeeId = ownerEmployee.id;
+            console.log('Procedure', procedure);
             await saveProcedure(procedure, true);
           });
         }

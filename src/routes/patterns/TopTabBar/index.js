@@ -103,25 +103,36 @@ const TopTabBar = ({
         )}
 
         {!disableButtons && (
-          <S.CancelButton onPress={onCancel}>
-            <RoundedTimes
-              fill={'white'}
-              borderFill={color}
-              width={35}
-              height={35}
-            />
-          </S.CancelButton>
+          <S.ButtonContent>
+            <S.CancelButton onPress={onCancel}>
+              <RoundedTimes
+                fill={'white'}
+                borderFill={color}
+                width={35}
+                height={35}
+              />
+            </S.CancelButton>
+            <S.ButtonText>Cancelar</S.ButtonText>
+          </S.ButtonContent>
         )}
 
         <Salooni fill={color} borderFill={'white'} width={60} height={60} />
 
         {!disableButtons && (
-          <S.ConfirmButton
-            disabled={!isConfirmAvailable}
-            isConfirmAvailable={isConfirmAvailable}
-            onPress={onConfirm}>
-            <Confirm fill={color} borderFill={'white'} width={35} height={35} />
-          </S.ConfirmButton>
+          <S.ButtonContent>
+            <S.ConfirmButton
+              disabled={!isConfirmAvailable}
+              isConfirmAvailable={isConfirmAvailable}
+              onPress={onConfirm}>
+              <Confirm
+                fill={color}
+                borderFill={'white'}
+                width={35}
+                height={35}
+              />
+            </S.ConfirmButton>
+            <S.ButtonText>Concluir</S.ButtonText>
+          </S.ButtonContent>
         )}
 
         {showSignoutButton && (

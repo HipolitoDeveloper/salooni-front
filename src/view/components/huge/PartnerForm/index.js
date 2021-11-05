@@ -19,19 +19,22 @@ import RegisterComponent from '../RegisterComponent';
 import SignupComponent from '../SignupComponent';
 import Loading from '../../small/Loading';
 import {noProceduresText} from './styled';
+import {
+  CNPJVerifier,
+  CPFVerifier,
+  EMAILVerifier,
+  TELVerifier,
+} from '../../small/Input/verifier';
 
 const PartnerForm = ({route, goBack, isSigningUp, color}) => {
   const {procedures, registeredProcedures} = useContext(ProcedureContext);
 
-  const [partner, setPartner] = useState({
-    procedures: [],
-  });
   const {
     addPartner,
     editPartner,
     registeredPartners,
     savePartner,
-    cleanRegisteredPartners,
+    cleanPartnersInformation,
     updatePartnerInView,
     updatePartner,
     deletePartner,
@@ -40,6 +43,9 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
 
   const {currentUser} = useContext(UserContext);
 
+  const [partner, setPartner] = useState({
+    procedures: [],
+  });
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -48,6 +54,7 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
     text: '',
     method: () => {},
   });
+  const [invalidForm, setInvalidForm] = useState(false);
 
   const navigate = useNavigation();
   const isFocused = useIsFocused();
@@ -138,7 +145,7 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
             navigate.push('TabStack', {screen: 'Partners'});
             clearPartner();
 
-            cleanRegisteredPartners();
+            cleanPartnersInformation();
           }, 3000);
 
           setErrorMessage('');
@@ -232,6 +239,27 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
       ableToGo = false;
       errorMessage = errorMessages.partnerMessage;
       setIsLoading(false);
+    } else {
+      if (
+        partner.cnpj !== undefined &&
+        partner.cnpj !== '' &&
+        !CNPJVerifier(partner.cnpj).state
+      ) {
+        ableToGo = false;
+        errorMessage = errorMessages.invalidCNPJ;
+        setIsLoading(false);
+      }
+      if (!TELVerifier(partner.tel).state) {
+        ableToGo = false;
+        errorMessage = errorMessages.invalidTel;
+        setIsLoading(false);
+      }
+
+      if (!EMAILVerifier(partner.email).state) {
+        ableToGo = false;
+        errorMessage = errorMessages.invalidEmail;
+        setIsLoading(false);
+      }
     }
 
     setErrorMessage(errorMessage);
@@ -259,6 +287,8 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
           disabled={false}
           mask="none"
           borderBottomColor={color}
+          validateForm={state => setInvalidForm(state)}
+          validateInput={true}
         />
 
         <Input
@@ -271,8 +301,10 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
           isSecureTextEntry={false}
           fontSize={18}
           disabled={false}
-          mask="none"
+          mask="email"
           borderBottomColor={color}
+          validateForm={state => setInvalidForm(state)}
+          validateInput={true}
         />
 
         <Input
@@ -287,12 +319,14 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
           disabled={false}
           mask={'phone'}
           borderBottomColor={color}
+          validateForm={state => setInvalidForm(state)}
+          validateInput={true}
         />
 
         <Input
           handleChange={handleChange}
           name={'cnpj'}
-          placeholder={'CNPJ*'}
+          placeholder={'CNPJ (Opcional)'}
           value={partner.cnpj}
           width={'80%'}
           keyboard={'numeric'}
@@ -301,6 +335,8 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
           disabled={false}
           mask={'cnpj'}
           borderBottomColor={color}
+          validateForm={state => setInvalidForm(state)}
+          validateInput={true}
         />
 
         <View
@@ -351,6 +387,7 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
 
   return (
     <RegisterComponent
+      invalidForm={invalidForm}
       isSigningUp={isSigningUp}
       onCancel={goBack}
       color={color}

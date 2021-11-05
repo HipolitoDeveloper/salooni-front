@@ -28,4 +28,8 @@ export default {
   deleteMessage: 'Deseja mesmo realizar essa exclusão?',
   scheduleMessage:
     'Nem todas as informações relacionas ao agendamento foram preenchidas',
+  invalidCNPJ: 'CNPJ inválido',
+  invalidCPF: 'CPF inválido',
+  invalidEmail: 'E-mail inválido',
+  invalidTel: 'Telefone inválido',
 };

@@ -105,7 +105,7 @@ export const saveEmployee = (employeeObj, returnParseObject, isSigningUp) => {
                 procedure = await getProcedureByName(procedure.name, false);
 
               const procedureEmployee = await saveProcedureEmployee({
-                procedureId: procedure.objectId,
+                procedureId: isSigningUp ? procedure.objectId : procedure.id,
                 employeeId: savedEmployee.id,
               });
 
