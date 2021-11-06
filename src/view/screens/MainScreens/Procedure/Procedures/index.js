@@ -56,7 +56,7 @@ const Procedures = () => {
         searchPlaceHolder={'Procure pelos seus procedimentos'}
         isOwner={isOwner}
         itemType={'procedure'}
-        showHeader={false}
+        showHeader={true}
         headerText={'Procedimentos'}
         color={`${global.colors.purpleColor}`}
         itemList={procedures}

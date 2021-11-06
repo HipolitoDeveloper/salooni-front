@@ -19,11 +19,9 @@ export const PartnerReducer = (state, action) => {
       };
 
     case 'CLEAN_PARTNERS':
-      state.partners = [];
       state.registeredPartners = [];
       return {
         registeredPartners: state.registeredPartners,
-        partners: state.partners,
         ...state,
       };
 
@@ -114,13 +112,6 @@ export const PartnerReducer = (state, action) => {
 
       return {
         partners: state.partners,
-        ...state,
-      };
-
-    case 'CLEAN_REGISTERED_PARTNERS':
-      state.registeredPartners = [];
-      return {
-        registeredPartners: state.registeredPartners,
         ...state,
       };
 

@@ -1,13 +1,20 @@
 import React, {useContext, useEffect, useState} from 'react';
 import * as S from './styled';
 import {Text} from '../../../components/small/InputModal/styled';
-import {BodyContent, Container, FooterContainer, FooterContent} from './styled';
+import {
+  BodyContent,
+  Container,
+  FooterContainer,
+  FooterContent,
+  ProcedureContent,
+} from './styled';
 import Input from '../../../components/small/Input';
 import {UserContext} from '../../../../contexts/User/UserContext';
 import {useNavigation} from '@react-navigation/native';
 import global from '../../../../common/global';
 import Button from '../../../components/small/Button';
 import Times from '../../../../assets/svg/timesSVG.svg';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const Profile = () => {
   const {currentUser, updateProfile} = useContext(UserContext);
@@ -36,6 +43,31 @@ const Profile = () => {
   return (
     <S.Container>
       <S.BodyContent>
+        <S.ProcedureContent>
+          <Button
+            marginBottom={'20px'}
+            onPress={() =>
+              navigate.navigate('ApplicationStack', {screen: 'Procedures'})
+            }
+            color={global.colors.purpleColor}
+            text={'Procedimentos'}
+            width={'180px'}
+            height={'50px'}
+            fontSize={'17px'}
+            textColor={global.colors.backgroundColor}
+            backgroundColor={global.colors.purpleColor}
+            leftContent={{
+              show: true,
+              height: '20px',
+              width: '20px',
+              icon: 'brush',
+              iconColor: 'black',
+              backgroundColor: `${global.colors.backgroundColor}`,
+              borderRadius: '20px',
+              iconSize: 13,
+            }}
+          />
+        </S.ProcedureContent>
         <Input
           handleChange={handleChange}
           name={'userName'}

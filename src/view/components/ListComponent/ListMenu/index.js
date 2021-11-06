@@ -26,7 +26,7 @@ const ListMenu = ({
   handleMenu,
   isOwner,
 }) => {
-  const hasProcedure = menuItems.some(item => item === 'procedure');
+  const hasProcedure = menuItems?.some(item => item === 'procedure');
   const showingItem = Object.keys(menuState.itemToShow).length > 0;
 
   const showItemProperty = item => {

@@ -4,9 +4,11 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import global from '../../../../common/global';
 
 import Modal from 'react-native-modal';
-import {ScrollView} from 'react-native';
+import {Image, ScrollView} from 'react-native';
+import {Text} from '../../../screens/entrance/EntranceOption/styled';
+import {WrittenTutorialText} from './styled';
 
-const CollapsableList = () => {
+const CollapsableList = ({items}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalState, setModalState] = useState({
     state: false,
@@ -26,11 +28,12 @@ const CollapsableList = () => {
         </S.HeaderContent>
         {isOpen && (
           <>
-            <S.ItemContent onPress={() => setModalState({state: true})}>
+            <S.ItemContent
+              onPress={() => setModalState({state: true, item: items[0]})}>
               <S.ItemContentText>Testeeeee</S.ItemContentText>
             </S.ItemContent>
             <S.ItemContent>
-              <S.ItemContentText>Testeeeee</S.ItemContentText>
+              <S.ItemContentText>{JSON.stringify(items[0])}</S.ItemContentText>
             </S.ItemContent>
             <S.ItemContent>
               <S.ItemContentText>Testeeeee</S.ItemContentText>
@@ -73,8 +76,26 @@ const ItemModal = ({modalState, closeModal}) => {
             </S.CloseButton>
           </S.CloseButtonContent>
           <S.ItemInformation>
-            <S.VideoContent></S.VideoContent>
-            <S.WrittenTutorialContent></S.WrittenTutorialContent>
+            <S.VideoTitle>{modalState.item.name}</S.VideoTitle>
+            <S.VideoContent>
+              <Image
+                source={{uri: modalState.item.url}}
+                style={{
+                  width: 250,
+                  height: 480,
+                  borderRadius: 10,
+                  overlayColor: 'white',
+                  marginBottom: 20,
+                }}
+              />
+            </S.VideoContent>
+            <S.WrittenTutorialContent>
+              <S.WrittenTutorialText>
+                Os parceiros dentro do Salooni são vistos como as pessoas que
+                trabalham dentro do seu estabelecimento, manicures, pedicures,
+                cabeleireiros(as), entre outros.
+              </S.WrittenTutorialText>
+            </S.WrittenTutorialContent>
           </S.ItemInformation>
         </S.ModalContent>
       </Modal>

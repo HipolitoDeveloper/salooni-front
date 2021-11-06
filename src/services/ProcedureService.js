@@ -171,7 +171,7 @@ export const deleteProcedureCRUD = (procedureId, returnParseObject) => {
 export const deleteProceduresCRUD = async procedures => {
   try {
     for (const procedure of procedures) {
-      const procedureToDelete = new ClientObject({objectId: procedure.id});
+      const procedureToDelete = new ProcedureObject({objectId: procedure.id});
       await procedureToDelete.destroy();
       await deleteProcedureEmployeeByProcedureId(procedure.id);
       await deleteScheduleProcedureByProcedureId(procedure.id, false);

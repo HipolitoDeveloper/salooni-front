@@ -108,10 +108,10 @@ const ProcedureProvider = ({children}) => {
 
   const deleteProcedureList = payload => {
     return new Promise(async (resolve, reject) => {
-      const clients = payload;
+      const procedures = payload;
       try {
-        await deleteProceduresCRUD(clients);
-        resolve(dispatch({type: 'DELETE_PROCEDURES', clients}));
+        await deleteProceduresCRUD(procedures);
+        resolve(dispatch({type: 'DELETE_PROCEDURES', procedures}));
       } catch (e) {
         reject(`Deu ruim ao excluir procedimentos ${e}`);
       }

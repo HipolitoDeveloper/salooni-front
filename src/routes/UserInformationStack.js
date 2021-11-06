@@ -23,7 +23,6 @@ export default () => (
     }}>
     <>
       <Tab.Screen name="Profile" component={Profile} />
-      <Tab.Screen name="Procedures" component={Procedures} />
       <Tab.Screen name="Videos" component={Video} />
     </>
   </Tab.Navigator>

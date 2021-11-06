@@ -26,6 +26,7 @@ const ApplicationStack = () => {
         />
         <Stack.Screen name="PartnerRegister" component={PartnerRegister} />
         <Stack.Screen name="ProcedureRegister" component={ProcedureRegister} />
+
         <Stack.Screen
           name="SchedulingCalendar"
           component={SchedulingCalendar}

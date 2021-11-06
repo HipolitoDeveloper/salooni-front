@@ -218,9 +218,13 @@ const List = ({
   };
 
   const handleMenu = item => {
+    console.log(
+      'Procedure',
+      itemList.find(itemToShow => itemToShow.id === item.id),
+    );
     setMenuState({
       open: !menuState.open,
-      itemToShow: itemList.find(updatedItem => updatedItem.id === item.id),
+      itemToShow: itemList.find(itemToShow => itemToShow.id === item.id),
     });
   };
 

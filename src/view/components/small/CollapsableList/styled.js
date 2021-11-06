@@ -70,17 +70,32 @@ export const ModalContent = styled.View`
   border: 2px ${global.colors.purpleColor} solid;
 `;
 
-export const ItemInformation = styled.View`
+export const ItemInformation = styled.ScrollView`
   padding: 20px;
 `;
 
 export const VideoContent = styled.View`
-  height: 400px;
-  padding-top: 20px;
+  height: 500px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const VideoTitle = styled.Text`
+  margin: 10px;
+  font-family: ${global.fonts.mainFont};
+  font-size: 20px;
+  font-weight: bold;
 `;
 
 export const WrittenTutorialContent = styled.View`
   height: 80px;
+  margin: 20px;
+`;
+
+export const WrittenTutorialText = styled.Text`
+  font-family: ${global.fonts.mainFont};
 `;
 
 export const CloseButtonContent = styled.View`
@@ -91,6 +106,7 @@ export const CloseButtonContent = styled.View`
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 5;
 `;
 
 export const CloseButton = styled.TouchableOpacity`

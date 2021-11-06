@@ -113,10 +113,8 @@ export const ProcedureReducer = (state, action) => {
       };
 
     case 'CLEAN_PROCEDURES':
-      state.procedures = [];
       state.registeredProcedures = [];
       return {
-        procedures: state.procedures,
         registeredProcedures: state.registeredProcedures,
         ...state,
       };

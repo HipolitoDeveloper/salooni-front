@@ -179,7 +179,7 @@ const ProcedureForm = ({
         () => {
           setTimeout(() => {
             setIsLoading(false);
-            navigate.navigate('UserInformationStack', {screen: 'Procedures'});
+            navigate.navigate('ApplicationStack', {screen: 'Procedures'});
             clearProcedure();
             cleanProceduresInformation();
           }, 3000);

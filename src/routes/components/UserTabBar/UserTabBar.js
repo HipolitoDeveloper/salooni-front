@@ -6,19 +6,10 @@ import {UserContext} from '../../../contexts/User/UserContext';
 
 const UserTabBar = ({children, state, navigation}) => {
   const {isOwner} = useContext(UserContext);
-  let pages = [];
-  if (isOwner) {
-    pages = [
-      {screen: 'Profile', name: 'Perfil'},
-      {screen: 'Procedures', name: 'Procedimentos'},
-      {screen: 'Videos', name: 'Vídeos'},
-    ];
-  } else {
-    pages = [
-      {screen: 'Profile', name: 'Perfil'},
-      {screen: 'Videos', name: 'Vídeos'},
-    ];
-  }
+  let pages = [
+    {screen: 'Profile', name: 'Perfil'},
+    {screen: 'Videos', name: 'Vídeos'},
+  ];
 
   const goBack = () => {
     navigation.navigate('TabStack', {

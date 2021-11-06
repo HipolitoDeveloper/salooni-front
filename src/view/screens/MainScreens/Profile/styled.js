@@ -43,3 +43,16 @@ export const CancelButton = styled.TouchableOpacity`
   width: 25px;
   border-radius: 30px;
 `;
+
+export const ProcedureContent = styled.TouchableOpacity`
+  width: 80%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+`;
+
+export const ProcedureText = styled.Text`
+  font-size: 18px;
+  font-family: ${global.fonts.mainFont};
+`;

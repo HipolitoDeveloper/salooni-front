@@ -55,7 +55,7 @@ const SchedulingRegister = ({route}) => {
     client: '',
     employee: partners.find(partner => partner.id === currentUser.idFunc),
     procedures: [],
-    scheduleDate: route.params?.date,
+    scheduleDate: new Date(route.params?.date),
   });
 
   const [mode, setMode] = useState('date');

@@ -118,8 +118,9 @@ export const ClientReducer = (state, action) => {
         ...state,
       };
     case 'CLEAN_CLIENTS':
+      state.clients = [];
       return {
-        clients: [],
+        clients: state.clients,
         ...state,
       };
 
