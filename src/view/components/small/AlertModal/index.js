@@ -4,7 +4,15 @@ import * as S from './styled';
 import Modal from 'react-native-modal';
 import {OkButtonText} from './styled';
 
-const AlertModal = ({isVisible, title, text, onClose, onOk, cancelTitle}) => {
+const AlertModal = ({
+  isVisible,
+  title,
+  text,
+  onClose,
+  onOk,
+  cancelTitle,
+  okTitle,
+}) => {
   return (
     <S.Container>
       <Modal
@@ -26,7 +34,7 @@ const AlertModal = ({isVisible, title, text, onClose, onOk, cancelTitle}) => {
           <S.FooterContent>
             {onOk && (
               <S.OkButton onPress={() => onOk()}>
-                <S.OkButtonText>SIM</S.OkButtonText>
+                <S.OkButtonText> {okTitle ? okTitle : 'Sim'}</S.OkButtonText>
               </S.OkButton>
             )}
             {onClose && (

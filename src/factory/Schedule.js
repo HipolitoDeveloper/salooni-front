@@ -38,15 +38,21 @@ export const buildSchedule = (schedule, procedures) => {
     client: buildClientObject(schedule.client_id),
     employee: buildEmployeeObject(schedule.employee_id, []),
     scheduleDate: scheduleDate,
-    passedHour: false,
     formattedDateHour: moment(scheduleDate).format('DD-MM-YYYY - HH:mm'),
     formattedDate: moment(scheduleDate).format('YYYY-MM-DD'),
     formattedHour: moment(scheduleDate).format('HH:mm'),
     procedures: procedures,
     analyzedSchedule: schedule.analyzed_schedule,
-    checked: procedures.some(procedure => procedure.accomplishedSchedule),
-    firstCheckedState: procedures.some(
-      procedure => procedure.accomplishedSchedule,
+    checked:
+      procedures.length > 0
+        ? procedures.some(procedure => procedure.accomplishedSchedule)
+        : false,
+    firstCheckedState:
+      procedures.length > 0
+        ? procedures.some(procedure => procedure.accomplishedSchedule)
+        : false,
+    passedHour: moment(scheduleDate).isBefore(
+      moment(new Date().toString()).format(),
     ),
   };
 };
@@ -65,6 +71,9 @@ export const buildScheduleList = schedules => {
         formattedDate: moment(scheduleDate).format('YYYY-MM-DD'),
         formattedHour: moment(scheduleDate).format('HH:mm'),
         analyzedSchedule: schedule.analyzed_schedule,
+        passedHour: moment(scheduleDate).isBefore(
+          moment(new Date().toString()).format(),
+        ),
       };
     });
 
@@ -74,12 +83,14 @@ export const buildScheduleList = schedules => {
         schedule.id,
         false,
       );
+
       schedule.checked = schedule.procedures.every(
         procedure => procedure.accomplishedSchedule,
       );
       schedule.firstCheckedState = schedule.procedures.every(
         procedure => procedure.accomplishedSchedule,
       );
+      schedule.needsToBeNotified = schedule.passedHour && !schedule.checked;
     }
 
     const organizedSchedules = sortSchedules(setNextHour(newSchedules));
@@ -117,7 +128,7 @@ export const buildScheduleProcedure = scheduleProcedure => {
   return {
     ...buildProcedure(scheduleProcedure.procedure_id),
     scheduleProcedureId: scheduleProcedure.objectId,
-    scheduleId: scheduleProcedure.schedule_id.objectId,
+    scheduleId: scheduleProcedure?.schedule_id?.objectId,
     accomplishedSchedule: scheduleProcedure.accomplished_schedule,
   };
 };

@@ -11,6 +11,7 @@ import {
 import {deleteClientCRUD} from '../../services/ClientService';
 import {deleteProcedureEmployee} from '../../services/ProcedureEmployeeService';
 import {deleteScheduleProcedureById} from '../../services/ScheduleProcedureService';
+import {buildCalendar} from '../../factory/Schedule';
 
 export const ScheduleContext = createContext();
 
@@ -20,33 +21,41 @@ const initialState = {
   calendarSchedule: [],
   registeredSchedules: [],
   scheduleInView: {},
-  showingCurrentUserSchedule: true,
 };
 
 const ScheduleProvider = ({children}) => {
   const [state, dispatch] = useReducer(ScheduleReducer, initialState);
 
-  const loadAllSchedules = (payload, refreshSchedules) => {
-    const {employeeId, salonId, employeeType, showCurrentUserSchedules} =
-      payload;
+  const loadAllSchedulesByPartner = payload => {
+    const {employeeId, salonId, employeeType} = payload;
     return new Promise(async (resolve, reject) => {
       try {
         await getAllSchedules(employeeId, salonId, employeeType, false).then(
           schedules => {
-            dispatch({
-              type: 'LOAD_SCHEDULES',
-              payload: {
-                schedules: schedules,
-                showCurrentUserSchedules: showCurrentUserSchedules,
-              },
-            });
-            resolve(sortScheduleList);
+            resolve(buildCalendar(schedules));
+          },
+        );
+      } catch (e) {
+        reject(`Deu ruim ao listar agendamentos ${e}`);
+      }
+    });
+  };
+
+  const loadAllSchedules = payload => {
+    const {employeeId, salonId, employeeType} = payload;
+    return new Promise(async (resolve, reject) => {
+      try {
+        await getAllSchedules(employeeId, salonId, employeeType, false).then(
+          schedules => {
+            dispatch({type: 'LOAD_SCHEDULES', schedules});
+            sortScheduleList();
+            resolve(schedules);
 
             // console.log((state.clients = clients));
           },
         );
       } catch (e) {
-        reject(`Deu ruim ao listar clientes ${e}`);
+        reject(`Deu ruim ao listar agendamentos ${e}`);
       }
     });
   };
@@ -98,7 +107,7 @@ const ScheduleProvider = ({children}) => {
     return new Promise(async (resolve, reject) => {
       const schedule = payload;
       try {
-        dispatch({type: 'DELETE_SCHEDULE', payload});
+        dispatch({type: 'DELETE_SCHEDULE', deletedScheduleId: schedule.id});
         await deleteScheduleCRUD(schedule);
         resolve(sortScheduleList);
       } catch (e) {
@@ -179,6 +188,7 @@ const ScheduleProvider = ({children}) => {
     updateScheduleInView,
     editSchedule,
     confirmSchedules,
+    loadAllSchedulesByPartner,
     ...state,
   };
 

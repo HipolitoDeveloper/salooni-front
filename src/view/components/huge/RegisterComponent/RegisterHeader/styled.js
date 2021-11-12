@@ -10,7 +10,7 @@ export const Container = styled.View`
   height: 13%;
   background-color: ${global.colors.lightGreyColor};
   elevation: 10;
-  padding-top: ${Platform.OS === "ios" ? '40px' : '0'};
+  padding-top: ${Platform.OS === 'ios' ? '40px' : '0'};
 `;
 
 export const Content = styled.View`
@@ -34,7 +34,7 @@ export const CancelButton = styled.TouchableOpacity`
 
 export const ConfirmButton = styled.TouchableOpacity`
   elevation: 10;
-  opacity: ${props => (props.isEditing ? 0.6 : 1)};
+  opacity: ${props => (props.isEditing || props.disabled ? 0.3 : 1)};
 `;
 
 export const ButtonText = styled.Text`

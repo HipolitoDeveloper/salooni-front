@@ -7,47 +7,47 @@ import Modal from 'react-native-modal';
 import {Image, ScrollView} from 'react-native';
 import {Text} from '../../../screens/entrance/EntranceOption/styled';
 import {WrittenTutorialText} from './styled';
+import Loading from '../Loading';
 
-const CollapsableList = ({items}) => {
+const CollapsableList = ({items, categoryName}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalState, setModalState] = useState({
     state: false,
     item: {},
   });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const openItem = item => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setModalState({state: true, item: item});
+      setIsLoading(false);
+    }, 3000);
+  };
 
   return (
     <S.Container>
       <S.Content>
         <S.HeaderContent>
-          <S.HeaderText>Procedimentos</S.HeaderText>
+          <S.HeaderText>{categoryName}</S.HeaderText>
           <S.CollapsableButtonContent>
             <S.CollapsableButton onPress={() => setIsOpen(!isOpen)}>
               <Icon name={'chevron-down'} size={20} />
             </S.CollapsableButton>
           </S.CollapsableButtonContent>
         </S.HeaderContent>
-        {isOpen && (
-          <>
-            <S.ItemContent
-              onPress={() => setModalState({state: true, item: items[0]})}>
-              <S.ItemContentText>Testeeeee</S.ItemContentText>
+        {isOpen &&
+          items.map(item => (
+            <S.ItemContent key={item.url} onPress={() => openItem(item)}>
+              <S.ItemContentText>{item.name}</S.ItemContentText>
             </S.ItemContent>
-            <S.ItemContent>
-              <S.ItemContentText>{JSON.stringify(items[0])}</S.ItemContentText>
-            </S.ItemContent>
-            <S.ItemContent>
-              <S.ItemContentText>Testeeeee</S.ItemContentText>
-            </S.ItemContent>
-            <S.ItemContent>
-              <S.ItemContentText>Testeeeee</S.ItemContentText>
-            </S.ItemContent>
-          </>
-        )}
+          ))}
       </S.Content>
       <ItemModal
         modalState={modalState}
         closeModal={() => setModalState({state: false, item: {}})}
       />
+      <Loading isLoading={isLoading} color={`${global.colors.purpleColor}`} />
     </S.Container>
   );
 };
@@ -77,6 +77,12 @@ const ItemModal = ({modalState, closeModal}) => {
           </S.CloseButtonContent>
           <S.ItemInformation>
             <S.VideoTitle>{modalState.item.name}</S.VideoTitle>
+            <S.WrittenTutorialContent>
+              <S.WrittenTutorialText>
+                {modalState.item.description}
+              </S.WrittenTutorialText>
+            </S.WrittenTutorialContent>
+
             <S.VideoContent>
               <Image
                 source={{uri: modalState.item.url}}
@@ -89,13 +95,6 @@ const ItemModal = ({modalState, closeModal}) => {
                 }}
               />
             </S.VideoContent>
-            <S.WrittenTutorialContent>
-              <S.WrittenTutorialText>
-                Os parceiros dentro do Salooni são vistos como as pessoas que
-                trabalham dentro do seu estabelecimento, manicures, pedicures,
-                cabeleireiros(as), entre outros.
-              </S.WrittenTutorialText>
-            </S.WrittenTutorialContent>
           </S.ItemInformation>
         </S.ModalContent>
       </Modal>

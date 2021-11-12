@@ -1,6 +1,7 @@
 export default {
   signinMessage: 'Usuário ou senha estão errados',
   partnerMessage: 'Nem todas as informações do parceiro foram preenchidas',
+  profileMessage: 'Nem todas as informações do perfil foram preenchidas',
   noPartnerSignupMessage:
     'Tem certeza que deseja realizar o cadastro sem parceiros pré-registrado?',
   noPartnerMessage: 'Nenhum parceiro foi pré-registrado.',
@@ -32,4 +33,5 @@ export default {
   invalidCPF: 'CPF inválido',
   invalidEmail: 'E-mail inválido',
   invalidTel: 'Telefone inválido',
+  partnerSignupMessage: 'Preencha todas as informações!',
 };

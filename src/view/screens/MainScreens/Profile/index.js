@@ -15,11 +15,23 @@ import global from '../../../../common/global';
 import Button from '../../../components/small/Button';
 import Times from '../../../../assets/svg/timesSVG.svg';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import errorMessages from '../../../../common/errorMessages';
+import {
+  CNPJVerifier,
+  CPFVerifier,
+  EMAILVerifier,
+  TELVerifier,
+} from '../../../components/small/Input/verifier';
+import ErrorMessage from '../../../components/small/ErrorMessage';
+import Loading from '../../../components/small/Loading';
 
 const Profile = () => {
   const {currentUser, updateProfile} = useContext(UserContext);
   const [profile, setProfile] = useState({});
   const [isEditting, setIsEditting] = useState(false);
+  const [validForm, setValidForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const navigate = useNavigation();
 
@@ -37,14 +49,64 @@ const Profile = () => {
 
   const cancelEditting = () => {
     setIsEditting(false);
-    setProfile(currentUser);
+  };
+
+  const updateInformation = () => {
+    setIsLoading(true);
+    updateProfile(profile).then(
+      () => {
+        cancelEditting();
+        setIsLoading(false);
+      },
+      error => {
+        console.error(error);
+        setIsLoading(false);
+      },
+    );
+  };
+
+  const verifyInformation = showErrorMessages => {
+    let ableToGo = true;
+    let errorMessage = '';
+
+    if (
+      profile === {} ||
+      profile.userName === undefined ||
+      profile.userName === '' ||
+      profile.salonName === undefined ||
+      profile.salonName === '' ||
+      profile.cnpj === undefined ||
+      profile.cnpj === ''
+    ) {
+      ableToGo = false;
+      errorMessage = errorMessages.profileMessage;
+      setIsLoading(false);
+    } else {
+      if (!CNPJVerifier(profile.cnpj).state) {
+        ableToGo = false;
+        errorMessage = errorMessages.invalidCPF;
+        setIsLoading(false);
+      }
+    }
+
+    if (showErrorMessages) setErrorMessage(errorMessage);
+    return ableToGo;
   };
 
   return (
     <S.Container>
       <S.BodyContent>
+        {errorMessage !== '' && (
+          <ErrorMessage
+            text={errorMessage}
+            width={'70%'}
+            textColor={global.colors.purpleColor}
+          />
+        )}
+        <Loading isLoading={isLoading} color={`${global.colors.purpleColor}`} />
         <S.ProcedureContent>
           <Button
+            disabled={false}
             marginBottom={'20px'}
             onPress={() =>
               navigate.navigate('ApplicationStack', {screen: 'Procedures'})
@@ -71,13 +133,17 @@ const Profile = () => {
         <Input
           handleChange={handleChange}
           name={'userName'}
-          placeholder={'Nome*'}
+          placeholder={'Nome do Usuário'}
           value={profile.userName}
           width={'80%'}
           keyboard={'default'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
+          color={global.colors.purpleColor}
+          label={'Nome do Usuário'}
+          isToValidate={true}
+          noEmpty={true}
         />
 
         <Input
@@ -88,8 +154,12 @@ const Profile = () => {
           width={'80%'}
           keyboard={'default'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
+          color={global.colors.purpleColor}
+          label={'Nome do Salão'}
+          isToValidate={true}
+          noEmpty={true}
         />
 
         <Input
@@ -100,9 +170,13 @@ const Profile = () => {
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
           mask={'cnpj'}
+          color={global.colors.purpleColor}
+          label={'CNPJ'}
+          isToValidate={true}
+          noEmpty={true}
         />
 
         <Input
@@ -113,33 +187,36 @@ const Profile = () => {
           width={'80%'}
           keyboard={'email-address'}
           isSecureTextEntry={false}
-          fontSize={18}
-          disabled={false}
+          fontSize={14}
+          disabled={true}
+          editable={false}
           mask={'email'}
+          color={global.colors.purpleColor}
+          label={'E-mail'}
         />
 
-        <Input
-          handleChange={handleChange}
-          name={'password'}
-          placeholder={'Senha*'}
-          value={profile.password}
-          width={'80%'}
-          keyboard={'default'}
-          isSecureTextEntry={true}
-          fontSize={18}
-          disabled={false}
-          mask={'password'}
-        />
+        {/*<Input*/}
+        {/*  handleChange={handleChange}*/}
+        {/*  name={'password'}*/}
+        {/*  placeholder={'Senha*'}*/}
+        {/*  value={profile.password}*/}
+        {/*  width={'80%'}*/}
+        {/*  keyboard={'default'}*/}
+        {/*  isSecureTextEntry={true}*/}
+        {/*  fontSize={14}*/}
+        {/*  disabled={true}*/}
+        {/*  editable={false}*/}
+        {/*  mask={'password'}*/}
+        {/*  color={global.colors.purpleColor}*/}
+        {/*  label={'Senha'}*/}
+        {/*/>*/}
       </S.BodyContent>
       <S.FooterContainer>
         {isEditting && (
           <S.FooterContent>
             <Button
               marginBottom={'20px'}
-              onPress={() => {
-                updateProfile(profile);
-                cancelEditting();
-              }}
+              onPress={updateInformation}
               color={global.colors.backgroundColor}
               text={'Atualizar'}
               width={'150px'}
@@ -157,6 +234,7 @@ const Profile = () => {
                 borderRadius: '20px',
                 iconSize: 13,
               }}
+              disabled={() => verifyInformation(false)}
             />
             <S.CancelButton onPress={cancelEditting}>
               <Times

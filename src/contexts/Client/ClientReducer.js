@@ -1,5 +1,3 @@
-import {ClientParseObjectToClientObject} from '../../pipe/conversor';
-
 export const ClientReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_CLIENTS':

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import * as S from './styled';
 import Input from '../../../components/small/Input';
 import SubmitButton from '../../../components/small/SubmitButton';
@@ -54,7 +54,6 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
     text: '',
     method: () => {},
   });
-  const [invalidForm, setInvalidForm] = useState(false);
 
   const navigate = useNavigation();
   const isFocused = useIsFocused();
@@ -103,14 +102,14 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
   const chooseAddPartnerMethod = async () => {
     const {isInView, indexInView} = {...partner};
 
-    if (verifyInformation() && isInView) {
+    if (verifyInformation(true) && isInView) {
       partner.isInView = false;
       editPartner({partner: partner, index: indexInView});
       setErrorMessage('');
       clearPartner();
     }
 
-    if (verifyInformation() && !isInView) {
+    if (verifyInformation(true) && !isInView) {
       if (!isSigningUp) partner.salonId = currentUser.idSalon;
       addPartner(partner);
       setErrorMessage('');
@@ -223,7 +222,7 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
     return ableToGo;
   };
 
-  const verifyInformation = () => {
+  const verifyInformation = showErrorMessages => {
     let ableToGo = true;
     let errorMessage = '';
 
@@ -234,36 +233,45 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
       partner.email === undefined ||
       partner.email === '' ||
       partner.tel === undefined ||
-      partner.tel === ''
+      partner.tel === '' ||
+      partner.tel === undefined ||
+      partner.tel === '' ||
+      partner.email === undefined ||
+      partner.email === ''
     ) {
       ableToGo = false;
       errorMessage = errorMessages.partnerMessage;
-      setIsLoading(false);
+      if (showErrorMessages) setIsLoading(false);
     } else {
-      if (
-        partner.cnpj !== undefined &&
-        partner.cnpj !== '' &&
-        !CNPJVerifier(partner.cnpj).state
-      ) {
-        ableToGo = false;
-        errorMessage = errorMessages.invalidCNPJ;
-        setIsLoading(false);
-      }
       if (!TELVerifier(partner.tel).state) {
         ableToGo = false;
         errorMessage = errorMessages.invalidTel;
-        setIsLoading(false);
+        if (showErrorMessages) setIsLoading(false);
       }
 
       if (!EMAILVerifier(partner.email).state) {
         ableToGo = false;
         errorMessage = errorMessages.invalidEmail;
-        setIsLoading(false);
+        if (showErrorMessages) setIsLoading(false);
       }
     }
 
-    setErrorMessage(errorMessage);
+    if (
+      partner.cnpj !== '' &&
+      partner.cnpj !== undefined &&
+      !CNPJVerifier(partner.cnpj).state
+    ) {
+      ableToGo = false;
+      errorMessage = errorMessages.invalidCNPJ;
+      if (showErrorMessages) setIsLoading(false);
+    }
+
+    if (showErrorMessages) setErrorMessage(errorMessage);
     return ableToGo;
+  };
+
+  const clearProcedures = () => {
+    setPartner({...partner, procedures: []});
   };
 
   const renderChildren = () => (
@@ -278,55 +286,57 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
         <Input
           handleChange={handleChange}
           name={'name'}
-          placeholder={'Nome*'}
+          placeholder={'Nome do Parceiro'}
           value={partner.name}
           width={'80%'}
           keyboard={'default'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
-          mask="none"
-          borderBottomColor={color}
-          validateForm={state => setInvalidForm(state)}
-          validateInput={true}
+          isToValidate={isFocused}
+          noEmpty={true}
+          color={color}
+          label={'Nome*'}
         />
 
         <Input
           handleChange={handleChange}
           name={'email'}
-          placeholder={'E-mail*'}
+          placeholder={'E-mail'}
           value={partner.email}
           width={'80%'}
           keyboard={'email-address'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
           mask="email"
-          borderBottomColor={color}
-          validateForm={state => setInvalidForm(state)}
-          validateInput={true}
+          isToValidate={isFocused}
+          noEmpty={true}
+          color={color}
+          label={'E-mail*'}
         />
 
         <Input
           handleChange={handleChange}
           name={'tel'}
-          placeholder={'Celular*'}
+          placeholder={'Celular do Parceiro'}
           value={partner.tel}
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
           mask={'phone'}
-          borderBottomColor={color}
-          validateForm={state => setInvalidForm(state)}
-          validateInput={true}
+          isToValidate={isFocused}
+          noEmpty={true}
+          color={color}
+          label={'Celular*'}
         />
 
         <Input
           handleChange={handleChange}
           name={'cnpj'}
-          placeholder={'CNPJ (Opcional)'}
+          placeholder={'CNPJ do Parceiro'}
           value={partner.cnpj}
           width={'80%'}
           keyboard={'numeric'}
@@ -334,9 +344,10 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
           fontSize={18}
           disabled={false}
           mask={'cnpj'}
-          borderBottomColor={color}
-          validateForm={state => setInvalidForm(state)}
-          validateInput={true}
+          isToValidate={isFocused}
+          noEmpty={false}
+          color={color}
+          label={'CNPJ'}
         />
 
         <View
@@ -355,6 +366,8 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
               value={partner.procedures}
               handleMultiSelect={handleMultiSelect}
               navigate={navigate}
+              inputText={'Procedimentos'}
+              clearValue={clearProcedures}
             />
           ) : (
             <S.noProceduresText>
@@ -387,7 +400,7 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
 
   return (
     <RegisterComponent
-      invalidForm={invalidForm}
+      validForm={() => verifyInformation(false)}
       isSigningUp={isSigningUp}
       onCancel={goBack}
       color={color}

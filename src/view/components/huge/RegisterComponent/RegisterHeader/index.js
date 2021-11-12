@@ -8,9 +8,11 @@ import {ButtonText} from './styled';
 const RegisterHeader = ({
   color,
   headerTitle,
-  isEditing,
+  isPreRegisteredEditing,
   onConfirm,
   onCancel,
+  isEditing,
+  validForm,
 }) => {
   return (
     <S.Container headerColor={color}>
@@ -29,12 +31,12 @@ const RegisterHeader = ({
         <Salooni fill={color} borderFill={'white'} width={60} height={60} />
         <S.ButtonContent>
           <S.ConfirmButton
-            disabled={isEditing}
-            isEditing={isEditing}
+            disabled={isPreRegisteredEditing}
+            isEditing={isPreRegisteredEditing}
             onPress={onConfirm}>
             <Confirm fill={color} borderFill={'white'} width={35} height={35} />
           </S.ConfirmButton>
-          <S.ButtonText>Salvar</S.ButtonText>
+          <S.ButtonText>{isEditing ? 'Editar' : 'Adicionar'}</S.ButtonText>
         </S.ButtonContent>
       </S.Content>
       <S.HeaderTitleContent>

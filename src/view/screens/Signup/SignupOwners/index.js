@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import * as S from './styled';
 import Input from '../../../components/small/Input';
 import SubmitButton from '../../../components/small/SubmitButton';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import ErrorMessage from '../../../components/small/ErrorMessage';
 import {UserContext} from '../../../../contexts/User/UserContext';
 import errorMessages from '../../../../common/errorMessages';
@@ -14,7 +14,7 @@ const SignupOwners = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const navigate = useNavigation();
-
+  const isFocused = useIsFocused();
   const handleChange = (text, name) => {
     handleOwner({text: text, inputName: name});
   };
@@ -61,8 +61,10 @@ const SignupOwners = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask="none"
-            validateInput={true}
+            color={global.colors.purpleColor}
+            label={'Nome do Salão*'}
+            isToValidate={true}
+            noEmpty={true}
           />
           <Input
             handleChange={handleChange}
@@ -75,7 +77,10 @@ const SignupOwners = () => {
             fontSize={18}
             disabled={false}
             mask={'cnpj'}
-            validateInput={true}
+            color={global.colors.purpleColor}
+            label={'CNPJ*'}
+            isToValidate={true}
+            noEmpty={true}
           />
           <Input
             handleChange={handleChange}
@@ -87,8 +92,10 @@ const SignupOwners = () => {
             isSecureTextEntry={false}
             fontSize={18}
             disabled={false}
-            mask="none"
-            validateInput={true}
+            color={global.colors.purpleColor}
+            label={'Nome do Proprietário*'}
+            isToValidate={true}
+            noEmpty={true}
           />
           <Input
             handleChange={handleChange}
@@ -101,7 +108,10 @@ const SignupOwners = () => {
             fontSize={18}
             disabled={false}
             mask={'phone'}
-            validateInput={true}
+            color={global.colors.purpleColor}
+            label={'Telefone*'}
+            isToValidate={true}
+            noEmpty={true}
           />
           <Input
             handleChange={handleChange}
@@ -114,7 +124,10 @@ const SignupOwners = () => {
             fontSize={18}
             disabled={false}
             mask="email"
-            validateInput={true}
+            color={global.colors.purpleColor}
+            label={'E-mail*'}
+            isToValidate={true}
+            noEmpty={true}
           />
 
           <Input
@@ -124,11 +137,14 @@ const SignupOwners = () => {
             value={owner?.password}
             width={'80%'}
             keyboard={'default'}
-            isSecureTextEntry={false}
+            isSecureTextEntry={true}
             fontSize={18}
             disabled={false}
             mask="password"
-            validateInput={true}
+            color={global.colors.purpleColor}
+            label={'Senha*'}
+            isToValidate={true}
+            noEmpty={true}
           />
         </S.BodyContent>
         <S.FooterContent>

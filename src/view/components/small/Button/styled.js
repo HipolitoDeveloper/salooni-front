@@ -13,6 +13,8 @@ export const Button = styled.TouchableOpacity`
     props.existsLeftContent ? 'flex-start' : 'center'};
   align-items: center;
   margin-bottom: ${props => (props.marginBottom ? props.marginBottom : 0)};
+  margin-top: ${props => (props.marginTop ? props.marginTop : 0)};
+  opacity: ${props => (props.disabled ? 0.5 : 1)};
 `;
 
 export const ButtonContent = styled.View`

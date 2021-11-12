@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import global from '../../../../../common/global';
 import * as S from './styled';
 import {UserContext} from '../../../../../contexts/User/UserContext';
@@ -6,7 +6,8 @@ import {useNavigation} from '@react-navigation/native';
 import {PartnerContext} from '../../../../../contexts/Partner/PartnerContext';
 import {ScheduleContext} from '../../../../../contexts/Schedule/ScheduleContext';
 import List from '../../../../components/ListComponent';
-import {ProcedureContext} from '../../../../../contexts/Procedure/ProcedureContext';
+import Calendar from '../../../../components/huge/CalendarComponent';
+import Notification from '../../../../components/small/Notification';
 
 const Partners = () => {
   const {
@@ -14,33 +15,35 @@ const Partners = () => {
     deleteUniquePartner,
     deletePartnerList,
     deletePartnerProcedure,
+    loadAllPartners,
   } = useContext(PartnerContext);
-  const {loadAllSchedules} = useContext(ScheduleContext);
+  const {loadAllSchedulesByPartner} = useContext(ScheduleContext);
   const {currentUser, isOwner} = useContext(UserContext);
 
   const items = partners.filter(partner => partner.employeeType === 'PRC');
   const [isLoading, setIsLoading] = useState(false);
-
+  const [stateAgenda, setStateAgenda] = useState({isShowing: false, item: {}});
   const navigate = useNavigation();
 
   const navigateToEmployeeCalendar = employee => {
     setIsLoading(true);
-    loadAllSchedules({
+    loadAllSchedulesByPartner({
       salonId: currentUser.idSalon,
       employeeId: employee.id,
       employeeType: employee.employeeType,
       showCurrentUserSchedules: false,
     }).then(
-      () => {
+      calendarSchedule => {
         setIsLoading(false);
-        navigate.push('ApplicationStack', {
-          screen: 'SchedulingCalendar',
-          params: {
-            calendarViewState: true,
-            employeeView: true,
-            employee: employee,
-          },
-        });
+        handleAgenda(calendarSchedule);
+        // navigate.push('ApplicationStack', {
+        //   screen: 'Schedules',
+        //   params: {
+        //     calendarViewState: true,
+        //     employeeView: true,
+        //     employee: employee,
+        //   },
+        // });
       },
       error => {
         console.log(error);
@@ -75,9 +78,38 @@ const Partners = () => {
     );
   };
 
+  const onRefresh = () => {
+    setIsLoading(true);
+    loadAllPartners(currentUser.idSalon).then(
+      () => {
+        setIsLoading(false);
+      },
+      error => {
+        console.log(error);
+        setIsLoading(false);
+      },
+    );
+  };
+  const handleAgenda = item => {
+    setStateAgenda({isShowing: !stateAgenda.isShowing, item: item});
+  };
+
   return (
     <S.Container>
+      <Notification />
+
+      {stateAgenda.isShowing && (
+        <Calendar
+          isVisible={stateAgenda.isShowing}
+          calendarSchedule={stateAgenda.item}
+          color={global.colors.purpleColor}
+          handleModal={handleAgenda}
+        />
+      )}
+
       <List
+        onRefresh={onRefresh}
+        refreshing={isLoading}
         searchPlaceHolder={'Procure pelos seus parceiros'}
         navigateToCalendar={navigateToEmployeeCalendar}
         isOwner={isOwner}

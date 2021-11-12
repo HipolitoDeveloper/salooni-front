@@ -9,7 +9,7 @@ export const Container = styled.View`
   justify-content: space-between;
   align-items: flex-start;
   border-bottom-width: ${StyleSheet.hairlineWidth}px;
-  elevation: 10;
+  elevation: ${props => (props.backButtonHeader ? 0 : 10)};
   padding-top: ${Platform.OS === 'ios' ? '40px' : '0'};
 `;
 
@@ -29,6 +29,7 @@ export const Header = styled.View`
   flex-direction: row;
   justify-content: flex-start;
   align-items: flex-end;
+  height: 30px;
 `;
 
 export const SubHeader = styled.View`
@@ -119,9 +120,37 @@ export const SwitchButton = styled.TouchableOpacity`
   top: -10px;
 `;
 
-export const ChangeIconContent = styled.TouchableOpacity`
+export const CalendarIcon = styled.TouchableOpacity`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 100%;
+  background-color: ${props => props.backgroundColor};
+  padding: 5px;
+  width: 28px;
+  border-radius: 5px;
   position: absolute;
-  right: 50px;
-  transform: scaleX(-1);
+  right: 100px;
+`;
+
+export const ProfileIcon = styled.TouchableOpacity`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+`;
+export const HeaderContent = styled.View`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+`;
+
+export const HeaderText = styled.Text`
+  width: 50%;
+  font-family: ${global.fonts.mainFont};
+  color: ${global.colors.purpleColor};
+  font-size: 24px;
+  text-align: center;
 `;

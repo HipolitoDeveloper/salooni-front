@@ -92,7 +92,7 @@ const PartnerProvider = ({children}) => {
     return new Promise(async (resolve, reject) => {
       try {
         const {id} = payload;
-        dispatch({type: 'DELETE_PARTNER', payload});
+        dispatch({type: 'DELETE_PARTNER', id});
 
         resolve(await deleteEmployeeCRUD(id));
       } catch (e) {

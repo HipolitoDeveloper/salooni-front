@@ -8,17 +8,13 @@ import moment from 'moment';
 export const ScheduleReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_SCHEDULES':
-      state.schedules = action.payload.schedules;
-      state.calendarSchedule = buildCalendar(action.payload.schedules);
-      state.showingCurrentUserSchedule =
-        action.payload.showCurrentUserSchedules;
-
+      state.schedules = action.schedules;
+      state.calendarSchedule = buildCalendar(action.schedules);
       state.isSchedulesLoading = false;
 
       return {
         schedules: state.schedules,
         calendarSchedule: state.calendarSchedule,
-        showingCurrentUserSchedule: state.showingCurrentUserSchedule,
         isSchedulesLoading: state.isSchedulesLoading,
         ...state,
       };
@@ -68,12 +64,10 @@ export const ScheduleReducer = (state, action) => {
         ...state,
       };
     case 'DELETE_SCHEDULE':
-      const deletedScheduleId = action.payload;
-      state.schedules.forEach((schedule, index) => {
-        if (schedule.id === deletedScheduleId) {
-          state.schedules.splice(index, 1);
-        }
-      });
+      const deletedScheduleId = action.deletedScheduleId;
+      state.schedules = state.schedules.filter(
+        schedule => schedule.id !== deletedScheduleId,
+      );
 
       return {
         schedules: state.schedules,

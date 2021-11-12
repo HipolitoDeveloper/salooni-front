@@ -1,6 +1,14 @@
 import React, {useState} from 'react';
-import {StyleSheet, TextInput, Text, View} from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  Text,
+  View,
+  ScrollView,
+  FlatList,
+} from 'react-native';
 import global from '../../../../common/global';
+import * as S from './styled';
 import {
   maskBRL,
   maskCNPJ,
@@ -16,6 +24,8 @@ import {
   PASSVerifier,
   TELVerifier,
 } from './verifier';
+import {InputContent, InputTitle, ShowPasswordButton} from './styled';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 const Input = ({
   handleChange,
   placeholder,
@@ -27,20 +37,27 @@ const Input = ({
   disabled,
   fontSize,
   mask,
-  borderBottomColor,
   leftPlaceholder,
   rightPlaceholder,
   maxLength,
   placeholderTextColor,
   selectTextOnFocus,
   editable,
-  validateForm,
-  validateInput,
+  isToValidate,
+  color,
+  label,
+  noEmpty,
+  ref,
+  originalPassword,
+  onFocus,
+  onKeyPress,
 }) => {
   const [isInputValid, setIsInputValid] = useState({
     state: true,
     message: '',
   });
+
+  const [isShowingPassword, setIsShowingPassword] = useState(true);
 
   const chooseMask = text => {
     switch (mask) {
@@ -69,12 +86,7 @@ const Input = ({
 
   const verifyInput = text => {
     let validationReturn = {};
-    if (
-      value !== undefined &&
-      value !== '' &&
-      value !== null &&
-      validateInput
-    ) {
+    if (value !== undefined && value !== '' && value !== null && isToValidate) {
       switch (mask) {
         case 'cpf':
           validationReturn = CPFVerifier(text);
@@ -86,72 +98,123 @@ const Input = ({
           validationReturn = CNPJVerifier(text);
           break;
         case 'hour':
-          return true;
+          validationReturn = {state: true, message: ''};
+          break;
+
         case 'date':
-          return true;
+          validationReturn = {state: true, message: ''};
+          break;
         case 'brl':
-          return true;
+          validationReturn = {state: true, message: ''};
+          break;
         case 'percentage':
-          return true;
+          validationReturn = {state: true, message: ''};
+          break;
         case 'email':
           validationReturn = EMAILVerifier(text);
           break;
         case 'password':
           validationReturn = PASSVerifier(text);
           break;
+        case 'confirmPassword':
+          if (PASSVerifier(text).state && originalPassword === value) {
+            validationReturn = {state: true, message: ''};
+          } else if (originalPassword !== value) {
+            validationReturn = {
+              state: false,
+              message: 'As senhas precisam ser iguais!',
+            };
+          } else {
+            validationReturn = PASSVerifier(text);
+          }
+
+          break;
+        case 'text':
+          break;
         default:
-          return text;
+          validationReturn = {state: true, message: ''};
+          break;
       }
+
       setIsInputValid(validationReturn);
-      if (validateForm !== undefined) {
-        validateForm(!validationReturn.state);
-      }
     } else {
-      setIsInputValid({state: true, message: ''});
-      if (validateForm !== undefined) validateForm(false);
+      setIsInputValid({
+        state: !noEmpty,
+        message: noEmpty ? 'Campo não pode ser vazio!' : '',
+      });
     }
   };
 
+  const cleanValidation = () => {
+    setIsInputValid({
+      state: true,
+      message: '',
+    });
+  };
+
+  const showPassword = () => {
+    setIsShowingPassword(!isShowingPassword);
+  };
+
   return (
-    <View
-      style={[
-        styles.container,
-        {width: width, borderBottomColor: isInputValid.state ? 'black' : 'red'},
-      ]}>
+    <View style={[styles.container, {width: width}]}>
       {leftPlaceholder && value.length > 0 && (
         <Text style={[styles.leftPlaceholder]}>{leftPlaceholder}</Text>
       )}
-      <TextInput
-        style={[
-          styles.input,
-          {
-            paddingLeft: leftPlaceholder && value.length ? 30 : 0,
-            fontSize: fontSize,
-            borderBottomColor: borderBottomColor
-              ? borderBottomColor
-              : `${global.colors.purpleColor}`,
-          },
-        ]}
-        onChangeText={text => {
-          handleChange(chooseMask(text), name);
-        }}
-        onEndEditing={() => verifyInput(value)}
-        value={value}
-        keyboardType={keyboard}
-        placeholderTextColor={'grey'}
-        placeholder={placeholder}
-        disabled={disabled}
-        secureTextEntry={isSecureTextEntry}
-        clearButtonMode={'always'}
-        maxLength={maxLength}
-        selectTextOnFocus={selectTextOnFocus}
-        editable={editable}
-      />
+      <S.InputContent>
+        <S.InputTitle color={color}>{label}</S.InputTitle>
+        <S.Input
+          ref={ref}
+          style={[
+            {
+              paddingLeft: leftPlaceholder && value.length ? 30 : 0,
+              fontSize: fontSize,
+              borderBottomColor: isInputValid.state ? color : 'red',
+            },
+          ]}
+          onChangeText={text => {
+            handleChange(chooseMask(text), name);
+          }}
+          onEndEditing={() =>
+            isToValidate ? verifyInput(value) : cleanValidation()
+          }
+          value={value}
+          keyboardType={keyboard}
+          placeholderTextColor={'grey'}
+          placeholder={placeholder}
+          disabled={disabled}
+          secureTextEntry={isSecureTextEntry && isShowingPassword}
+          clearButtonMode={'always'}
+          maxLength={maxLength}
+          selectTextOnFocus={selectTextOnFocus}
+          editable={editable}
+          onFocus={() => (onFocus !== undefined ? onFocus() : () => {})}
+          onKeyPress={onKeyPress}
+        />
 
+        {mask === 'password' && (
+          <S.ShowPasswordButton onPress={showPassword}>
+            <Icon
+              name={'eye'}
+              size={24}
+              color={`${global.colors.purpleColor}`}
+              style={{marginLeft: 10}}
+            />
+          </S.ShowPasswordButton>
+        )}
+      </S.InputContent>
       {!isInputValid.state && (
-        <View>
-          <Text style={styles.inputErrorMessage}>{isInputValid.message}</Text>
-        </View>
+        <S.MessageBox>
+          {Array.isArray(isInputValid.message) ? (
+            isInputValid.message.map(message => (
+              <Text key={message} style={styles.inputErrorMessage}>
+                {message}
+              </Text>
+            ))
+          ) : (
+            <Text style={styles.inputErrorMessage}>{isInputValid.message}</Text>
+          )}
+        </S.MessageBox>
       )}
       {rightPlaceholder && value.length > 0 && (
         <Text style={[styles.rightPlaceholder]}>{rightPlaceholder}</Text>
@@ -162,8 +225,10 @@ const Input = ({
 
 export const styles = StyleSheet.create({
   container: {
-    height: 50,
-    borderBottomWidth: 1,
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   input: {
     fontFamily: `${global.fonts.mainFont}`,
@@ -189,6 +254,7 @@ export const styles = StyleSheet.create({
     color: `red`,
     fontStyle: 'italic',
     fontWeight: 'bold',
+    padding: 5,
   },
 });
 

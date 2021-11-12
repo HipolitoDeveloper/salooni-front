@@ -3,10 +3,14 @@ import * as S from './styled';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {FlatList, View} from 'react-native';
 import Modal from 'react-native-modal';
+import {ButtonContent, ButtonText} from './styled';
+import global from '../../../../common/global';
+import Button from '../Button';
+import Search from '../../../../assets/svg/searchSVG.svg';
+import Times from '../../../../assets/svg/timesSVG.svg';
 
 const MultipleSelect = ({
   iconColor,
-  selectTextColor,
   modalHeaderText,
   options,
   plusIconColor,
@@ -17,13 +21,16 @@ const MultipleSelect = ({
   placeholderText,
   disabled,
   inputText,
+  clearValue,
 }) => {
   const [isShowingSuggestionBox, setIsShowingSuggestionBox] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
 
   useEffect(() => {
+    clearValue();
+
     setSuggestions(
-      options.map(option => {
+      options?.map(option => {
         option.selected = false;
 
         return option;
@@ -60,22 +67,6 @@ const MultipleSelect = ({
   return (
     <S.Container>
       <S.SelectContent>
-        <S.IconContainer
-          disabled={disabled}
-          onPress={
-            disabled
-              ? () => {
-                  console.log('Não tem procedimento');
-                }
-              : openModal
-          }>
-          <Icon
-            name={'brush'}
-            size={30}
-            style={{marginRight: 10}}
-            color={iconColor}
-          />
-        </S.IconContainer>
         <S.SelectedContainer>
           <S.InputText color={iconColor}>{inputText}</S.InputText>
           {value.some(v => v.id) > 0 ? (
@@ -98,9 +89,31 @@ const MultipleSelect = ({
               />
             </S.ItemsContainer>
           ) : (
-            <S.SelectedContainerText selectTextColor={selectTextColor}>
-              {placeholderText ? placeholderText : 'Procedimentos'}
-            </S.SelectedContainerText>
+            <S.ButtonContent>
+              <Button
+                disabled={false}
+                marginBottom={'0'}
+                marginTop={'10px'}
+                onPress={openModal}
+                color={global.colors.purpleColor}
+                text={placeholderText ? placeholderText : 'Procedimentos'}
+                width={'180px'}
+                height={'50px'}
+                fontSize={'17px'}
+                textColor={'black'}
+                backgroundColor={iconColor}
+                leftContent={{
+                  show: true,
+                  height: '20px',
+                  width: '20px',
+                  icon: 'brush',
+                  iconColor: 'black',
+                  backgroundColor: `${global.colors.backgroundColor}`,
+                  borderRadius: '20px',
+                  iconSize: 13,
+                }}
+              />
+            </S.ButtonContent>
           )}
         </S.SelectedContainer>
       </S.SelectContent>
@@ -127,6 +140,7 @@ const SuggestionModal = ({
   handleSelect,
 }) => {
   const [suggestions, setSuggestions] = useState([]);
+  const [search, setSearch] = useState('');
 
   const onShow = () => {
     setSuggestions(
@@ -142,6 +156,14 @@ const SuggestionModal = ({
     setSuggestions(handleSelect(item, !item.selected));
   };
 
+  const searchItems = text => {
+    const regex = new RegExp(`${text.trim()}`, 'i');
+    setSuggestions(
+      options.filter(i => i.name.search(regex) >= 0 || i.selected),
+    );
+    setSearch(text);
+  };
+
   return (
     <S.ModalContainer>
       <Modal
@@ -153,6 +175,37 @@ const SuggestionModal = ({
         <S.SuggestionContainer>
           <S.SuggestionHeader>
             <S.SuggestionHeaderText>{modalHeaderText}</S.SuggestionHeaderText>
+            <S.SearchContainer>
+              <S.SearchIcon>
+                <Search
+                  fill={'#fff'}
+                  borderFill={'black'}
+                  width={20}
+                  height={20}
+                />
+              </S.SearchIcon>
+              <S.SearchInput
+                value={search}
+                onChangeText={text => {
+                  searchItems(text);
+                }}
+                placeholder={'Procure por procedimentos'}
+                placeholderTextColor={'black'}
+              />
+
+              <S.CancelInput
+                onPress={() => {
+                  searchItems('');
+                }}
+                hitSlop={{top: 12, left: 12, right: 12, bottom: 12}}>
+                <Times
+                  fill={'#fff'}
+                  borderFill={'black'}
+                  width={10}
+                  height={10}
+                />
+              </S.CancelInput>
+            </S.SearchContainer>
           </S.SuggestionHeader>
           <S.SuggestionContent>
             <S.SuggestionBody>
@@ -163,8 +216,8 @@ const SuggestionModal = ({
                 renderItem={({item}) => {
                   if (!item.empty)
                     return (
-                      <S.SuggestionItemContent>
-                        <S.SuggestionItemIcon onPress={() => selectItem(item)}>
+                      <S.SuggestionItemContent onPress={() => selectItem(item)}>
+                        <S.SuggestionItemIcon>
                           {item.selected ? (
                             <Icon
                               name={'minus-circle'}

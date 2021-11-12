@@ -1,18 +1,21 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {LocaleConfig, Agenda} from 'react-native-calendars';
+import React, {useEffect, useState} from 'react';
+import {Agenda, LocaleConfig} from 'react-native-calendars';
 import global from '../../../../common/global';
-import {Alert, Text, TouchableOpacity, View, StyleSheet} from 'react-native';
+import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {UserContext} from '../../../../contexts/User/UserContext';
-import {ScheduleContext} from '../../../../contexts/Schedule/ScheduleContext';
+import Modal from 'react-native-modal';
+import * as S from './styled';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import moment from 'moment';
-
-const Calendar = ({calendarSchedule}) => {
+import {DayContent, ScheduleAddButton} from './styled';
+const Calendar = ({calendarSchedule, isVisible, handleModal}) => {
   const navigate = useNavigation();
 
-  const [items, setItems] = useState(calendarSchedule);
-  const {currentUser} = useContext(UserContext);
-  const {loadAllSchedules} = useContext(ScheduleContext);
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    setItems(calendarSchedule);
+  }, []);
 
   LocaleConfig.locales['br'] = {
     monthNames: [
@@ -164,77 +167,104 @@ const Calendar = ({calendarSchedule}) => {
     </View>
   );
 
-  const renderDay = (day, item) => (
-    <View>
-      <Text>{JSON.stringify(day)}</Text>
-    </View>
-  );
+  const renderDay = (day, item) => {
+    const dayDate = moment(day.dateString).format('DD');
+    const dayName =
+      LocaleConfig.locales['br'].dayNamesShort[
+        new Date(day.dateString).getDay()
+      ];
+    const isCurrentDate =
+      moment(day.dateString).format('yyyy/MM/DD') ===
+      moment(new Date()).format('yyyy/MM/DD');
+    const dayColor = isCurrentDate
+      ? global.colors.purpleColor
+      : global.colors.darkGreyColor;
 
-  return (
-    <>
-      <Agenda
+    return (
+      <S.DayContainer
+        color={dayColor}
         onPress={date =>
           navigate.push('ApplicationStack', {
-            screen: 'SchedulingRegister',
+            screen: 'ScheduleRegister',
             params: {
               schedule: [],
-              date: new Date(date),
+              date: moment(day.dateString),
             },
           })
-        }
-        items={items}
-        loadItemsForMonth={month => {
-          loadItems(month);
+        }>
+        <Icon name={'plus'} size={12} color={global.colors.lightGreyColor} />
+        <S.Day>{dayDate}</S.Day>
+        <S.DayName>{dayName}</S.DayName>
+      </S.DayContainer>
+    );
+  };
+
+  return (
+    <S.ModalContainer>
+      <Modal
+        isVisible={isVisible}
+        style={{
+          margin: 0,
         }}
-        onCalendarToggled={calendarOpened => {
-          console.log(calendarOpened);
-        }}
-        onDayPress={day => {
-          console.log('day pressed');
-        }}
-        onDayChange={day => {
-          console.log('day changed');
-        }}
-        // renderDay={renderDay}
-        pastScrollRange={50}
-        futureScrollRange={50}
-        renderItem={(item, firstItemInDay) => (
-          <>
-            {firstItemInDay && (
-              <View
-                style={[
-                  styles.firtsItemDay,
-                  {backgroundColor: global.colors.backgroundColor},
-                ]}
-              />
+        onBackButtonPress={handleModal}
+        onBackdropPress={handleModal}
+        onRequestClose={handleModal}>
+        <S.ModalContent>
+          <S.CloseButtonContainer>
+            <S.CloseButtonContent onPress={handleModal}>
+              <Icon name={'times'} size={20} color={'black'} />
+            </S.CloseButtonContent>
+          </S.CloseButtonContainer>
+          <Agenda
+            items={items}
+            loadItemsForMonth={month => {
+              loadItems(month);
+            }}
+            onCalendarToggled={calendarOpened => {
+              console.log(calendarOpened);
+            }}
+            onDayPress={day => {
+              console.log('day pressed');
+            }}
+            onDayChange={day => {
+              console.log('day changed');
+            }}
+            renderDay={renderDay}
+            pastScrollRange={50}
+            futureScrollRange={50}
+            renderItem={(item, firstItemInDay) => (
+              <>
+                {firstItemInDay && (
+                  <View
+                    style={[
+                      styles.firtsItemDay,
+                      {backgroundColor: global.colors.backgroundColor},
+                    ]}
+                  />
+                )}
+                {renderItems(item)}
+              </>
             )}
-            {renderItems(item)}
-          </>
-        )}
-        renderEmptyDate={renderEmptyDate}
-        renderKnob={renderKnob}
-        rowHasChanged={(r1, r2) => {
-          return r1.name !== r2.name;
-        }}
-        showClosingKnob={true}
-        onRefresh={async () =>
-          await loadAllSchedules({
-            salonId: currentUser.idSalon,
-            employeeId: currentUser.idFunc,
-            employeeType: currentUser.employeeType,
-          })
-        }
-        refreshing={false}
-        refreshControl={null}
-        theme={{
-          ...theme,
-          agendaDayTextColor: `${global.colors.lightBlueColor}`,
-          agendaDayNumColor: `${global.colors.blueColor}`,
-          agendaTodayColor: `${global.colors.purpleColor}`,
-          agendaKnobColor: `${global.colors.purpleColor}`,
-        }}
-      />
-    </>
+            renderEmptyDate={renderEmptyDate}
+            renderKnob={renderKnob}
+            rowHasChanged={(r1, r2) => {
+              return r1.name !== r2.name;
+            }}
+            showClosingKnob={true}
+            // onRefresh={onRefresh(
+            // refreshing={false}
+            // refreshControl={null}
+            theme={{
+              ...theme,
+              agendaDayTextColor: `${global.colors.lightBlueColor}`,
+              agendaDayNumColor: `${global.colors.blueColor}`,
+              agendaTodayColor: `${global.colors.purpleColor}`,
+              agendaKnobColor: `${global.colors.purpleColor}`,
+            }}
+          />
+        </S.ModalContent>
+      </Modal>
+    </S.ModalContainer>
   );
 };
 

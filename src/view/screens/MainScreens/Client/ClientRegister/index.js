@@ -1,28 +1,22 @@
 import React, {useContext, useEffect, useState} from 'react';
 import * as S from './styled';
 import Input from '../../../../components/small/Input';
-import SubmitButton from '../../../../components/small/SubmitButton';
 import global from '../../../../../common/global';
 import ErrorMessage from '../../../../components/small/ErrorMessage';
 import {useNavigation} from '@react-navigation/native';
 import {ClientContext} from '../../../../../contexts/Client/ClientContext';
 import errorMessages from '../../../../../common/errorMessages';
 import AlertModal from '../../../../components/small/AlertModal';
-import {ActivityIndicator} from 'react-native';
-import BackButton from '../../../../components/small/BackButton';
 import {UserContext} from '../../../../../contexts/User/UserContext';
-import {SalonObject} from '../../../../../services/SalonService';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import RegisterComponent from '../../../../components/huge/RegisterComponent';
 import Loading from '../../../../components/small/Loading';
 import {
-  CNPJVerifier,
   CPFVerifier,
   TELVerifier,
 } from '../../../../components/small/Input/verifier';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
-import {DateText} from './styled';
 import moment from 'moment';
+import {InputTitle} from '../../../../components/small/Input/styled';
 
 const ClientRegister = ({route}) => {
   const {
@@ -30,7 +24,6 @@ const ClientRegister = ({route}) => {
     editClient,
     registeredClients,
     saveClient,
-
     cleanRegisteredClients,
     updateClientInView,
     updateClient,
@@ -71,6 +64,7 @@ const ClientRegister = ({route}) => {
   }, []);
 
   const handleChange = (text, name) => {
+    console.log('text', text);
     setClient({
       ...client,
       [name]: text,
@@ -82,6 +76,7 @@ const ClientRegister = ({route}) => {
   };
 
   const onChangeDate = (event, selectedDate) => {
+    selectedDate = selectedDate || client.bornDate;
     handleChange(selectedDate, 'bornDate');
     setShowDate(false);
   };
@@ -89,14 +84,14 @@ const ClientRegister = ({route}) => {
   const chooseAddClientMethod = async () => {
     const {isInView, indexInView} = {...client};
 
-    if (verifyInformation() && isInView) {
+    if (verifyInformation(true) && isInView) {
       client.isInView = false;
       editClient({client: client, index: indexInView});
       setErrorMessage('');
       setClient({});
     }
 
-    if (verifyInformation() && !isInView) {
+    if (verifyInformation(true) && !isInView) {
       client.salonId = currentUser.idSalon;
       addClient(client);
       setErrorMessage('');
@@ -198,7 +193,7 @@ const ClientRegister = ({route}) => {
     return ableToGo;
   };
 
-  const verifyInformation = () => {
+  const verifyInformation = showErrorMessages => {
     let ableToGo = true;
     let errorMessage = '';
 
@@ -217,21 +212,31 @@ const ClientRegister = ({route}) => {
     ) {
       ableToGo = false;
       errorMessage = errorMessages.clientMessage;
-      setIsLoading(false);
+      if (showErrorMessages) setIsLoading(false);
     } else {
       if (!CPFVerifier(client.cpf).state) {
         ableToGo = false;
         errorMessage = errorMessages.invalidCPF;
-        setIsLoading(false);
+        if (showErrorMessages) setIsLoading(false);
       }
       if (!TELVerifier(client.tel).state) {
         ableToGo = false;
         errorMessage = errorMessages.invalidTel;
-        setIsLoading(false);
+        if (showErrorMessages) setIsLoading(false);
       }
     }
 
-    setErrorMessage(errorMessage);
+    if (
+      client.tel2 !== '' &&
+      client.tel2 !== undefined &&
+      !TELVerifier(client.tel2).state
+    ) {
+      ableToGo = false;
+      errorMessage = errorMessages.invalidTel;
+      if (showErrorMessages) setIsLoading(false);
+    }
+
+    if (showErrorMessages) setErrorMessage(errorMessage);
     return ableToGo;
   };
 
@@ -249,61 +254,72 @@ const ClientRegister = ({route}) => {
       onAdd={chooseAddClientMethod}
       registeredItemRightInformation={'tel'}
       headerTitle={'Clientes'}
-      invalidForm={invalidForm}>
+      validForm={() => verifyInformation(false)}>
       {errorMessage !== '' && (
         <ErrorMessage
           text={errorMessage}
           width={'70%'}
-          textColor={`${global.colors.blueColor}`}
+          textColor={global.colors.blueColor}
         />
       )}
-      <Loading isLoading={isLoading} color={`${global.colors.blueColor}`} />
+      <Loading isLoading={isLoading} color={global.colors.blueColor} />
       <S.BodyContent>
         <Input
           handleChange={handleChange}
           name={'name'}
-          placeholder={'Nome*'}
+          placeholder={'Nome do Cliente'}
           value={client.name}
           width={'80%'}
           keyboard={'default'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
-          mask="none"
-          validateInput={false}
+          color={global.colors.blueColor}
+          label={'Nome*'}
+          isToValidate={true}
+          noEmpty={true}
         />
 
         <Input
           handleChange={handleChange}
           name={'email'}
-          placeholder={'E-mail*'}
+          placeholder={'E-mail do Cliente'}
           value={client.email}
           width={'80%'}
           keyboard={'email-address'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
           mask="email"
-          validateForm={state => setInvalidForm(state)}
-          validateInput={true}
+          color={global.colors.blueColor}
+          label={'E-mail*'}
+          isToValidate={true}
+          noEmpty={true}
         />
 
         <Input
           handleChange={handleChange}
           name={'cpf'}
-          placeholder={'CPF*'}
+          placeholder={'CPF'}
           value={client.cpf}
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
           mask={'cpf'}
-          validateForm={state => setInvalidForm(state)}
-          validateInput={true}
+          color={global.colors.blueColor}
+          label={'CPF*'}
+          isToValidate={true}
+          noEmpty={true}
         />
 
-        <S.DateTextContent onPress={() => setShowDate(true)}>
+        <S.DateTextContent
+          borderBottomColor={global.colors.blueColor}
+          onPress={() => setShowDate(true)}>
+          <InputTitle color={global.colors.blueColor}>
+            Data de Nascimento*
+          </InputTitle>
           <S.DateText>
             {moment(client.bornDate).format('DD/MM/YYYY')}
           </S.DateText>
@@ -315,8 +331,7 @@ const ClientRegister = ({route}) => {
             is24Hour={true}
             display="default"
             minimumDate={new Date(1950, 0, 1)}
-            maximumDate={new Date(2300, 10, 20)}
-            minuteInterval={1}
+            maximumDate={new Date()}
             onChange={onChangeDate}
             locale="pt-BR"
           />
@@ -325,16 +340,18 @@ const ClientRegister = ({route}) => {
         <Input
           handleChange={handleChange}
           name={'tel'}
-          placeholder={'Celular*'}
+          placeholder={'Celular'}
           value={client.tel}
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
           mask={'phone'}
-          validateForm={state => setInvalidForm(state)}
-          validateInput={true}
+          color={global.colors.blueColor}
+          label={'Celular*'}
+          isToValidate={true}
+          noEmpty={true}
         />
 
         <Input
@@ -345,11 +362,13 @@ const ClientRegister = ({route}) => {
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
           mask={'phone'}
-          validateForm={state => setInvalidForm(state)}
-          validateInput={true}
+          color={global.colors.blueColor}
+          label={'Telefone Residencial'}
+          isToValidate={true}
+          noEmpty={false}
         />
       </S.BodyContent>
 

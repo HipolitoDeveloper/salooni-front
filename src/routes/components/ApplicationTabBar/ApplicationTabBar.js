@@ -10,7 +10,6 @@ import {UserContext} from '../../../contexts/User/UserContext';
 import Loading from '../../../view/components/small/Loading';
 import {Button, TouchableOpacity, View, Text} from 'react-native';
 
-
 export default ({state, navigation}) => {
   const {currentUser} = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,30 +33,7 @@ export default ({state, navigation}) => {
   };
 
   const goTo = (screenName, params) => {
-    if (screenName === 'SchedulingCalendar') {
-      if (showingCurrentUserSchedule) {
-        navigation.navigate(screenName, params);
-      } else {
-        setIsLoading(true);
-        loadAllSchedules({
-          salonId: currentUser.idSalon,
-          employeeId: currentUser.idFunc,
-          employeeType: currentUser.employeeType,
-          showCurrentUserSchedules: true,
-        }).then(
-          () => {
-            setIsLoading(false);
-            navigation.navigate(screenName, params);
-          },
-          error => {
-            console.log(error);
-            setIsLoading(false);
-          },
-        );
-      }
-    } else {
-      navigation.navigate(screenName);
-    }
+    navigation.navigate(screenName);
   };
 
   return (
@@ -85,7 +61,7 @@ export default ({state, navigation}) => {
       </View>
       <TabItem
         onPress={() =>
-          goTo('SchedulingCalendar', {
+          goTo('Schedules', {
             calendarViewState: true,
             employee: undefined,
             employeeView: false,

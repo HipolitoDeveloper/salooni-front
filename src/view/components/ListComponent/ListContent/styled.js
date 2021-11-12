@@ -44,15 +44,27 @@ export const InformationContent = styled.View`
 export const NameText = styled.Text`
   font-size: 16px;
   font-family: ${global.fonts.mainFont};
-  opacity: ${props => (props.passedHour ? 0.4 : 1)};
-  color: ${props =>
-    props.nextHour ? `${global.colors.purpleColor}` : 'black'};
+  color: black;
 `;
 
 export const TelText = styled.Text`
   font-size: 13px;
   font-family: ${global.fonts.mainFont};
-  opacity: ${props => (props.passedHour ? 0.4 : 1)};
+  color: black;
+`;
+
+export const ScheduleNameText = styled.Text`
+  font-size: 16px;
+  font-family: ${global.fonts.mainFont};
+  opacity: ${props => (props.nextHour ? 1 : 0.4)};
+  color: ${props =>
+    props.nextHour ? `${global.colors.purpleColor}` : 'black'};
+`;
+
+export const ScheduleDateText = styled.Text`
+  font-size: 13px;
+  font-family: ${global.fonts.mainFont};
+  opacity: ${props => (props.nextHour ? 1 : 0.4)};
   color: ${props =>
     props.nextHour ? `${global.colors.purpleColor}` : 'black'};
 `;

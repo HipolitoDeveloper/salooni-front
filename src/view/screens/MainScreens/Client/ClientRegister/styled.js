@@ -80,7 +80,7 @@ export const DateTextContent = styled.TouchableOpacity`
   align-items: flex-start;
   width: 80%;
   border-bottom-width: 1px;
-  border-bottom-color: black;
+  border-bottom-color: ${props => props.borderBottomColor};
   height: 60px;
 `;
 

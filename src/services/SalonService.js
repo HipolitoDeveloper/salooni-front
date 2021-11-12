@@ -62,3 +62,21 @@ export const updateSalon = (salonObj, returnParseObject) => {
     }
   });
 };
+
+export const getSalonById = (salonId, returnParseObject) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const SalonQuery = new Parse.Query(SalonObject);
+      SalonQuery.equalTo('objectId', salonId);
+
+      if (returnParseObject) {
+        resolve(await SalonQuery.first());
+      } else {
+        resolve(buildSalonObject(convertToObj(await SalonQuery.first())));
+      }
+    } catch (e) {
+      console.error(`Salão   ${e}`);
+      reject(`Salão ${JSON.stringify(e)}`);
+    }
+  });
+};

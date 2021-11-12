@@ -8,6 +8,7 @@ export default {
     blueColor: '#6EBEDB',
     greenColor: '#89CC9E',
     lightBlueColor: '#88d1ce',
+    darkBlueColor: '#575BA8',
   },
   fonts: {
     auxiliarFont: 'SaniTrixieSans',

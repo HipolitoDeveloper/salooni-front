@@ -72,6 +72,10 @@ const SignInOwner = () => {
           disabled={false}
           mask="email"
           validateInput={true}
+          color={global.colors.purpleColor}
+          label={'Usuário'}
+          isToValidate={true}
+          noEmpty={true}
         />
 
         <Input
@@ -86,6 +90,10 @@ const SignInOwner = () => {
           disabled={false}
           mask="password"
           validateInput={false}
+          color={global.colors.purpleColor}
+          label={'Senha'}
+          isToValidate={true}
+          noEmpty={true}
         />
 
         <S.PasswordResetButton>

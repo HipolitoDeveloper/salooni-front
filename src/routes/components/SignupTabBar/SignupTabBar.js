@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import global from '../../../common/global';
 
 import TopTabBar from '../../patterns/TopTabBar';
@@ -10,6 +10,9 @@ import {UserContext} from '../../../contexts/User/UserContext';
 import AlertModal from '../../../view/components/small/AlertModal';
 import ErrorMessage from '../../../view/components/small/ErrorMessage';
 import InformationModal from '../../../view/components/small/InformationModal';
+import {getAllVideos, getVideoByRef} from '../../../services/VideoService';
+import * as S from './styled';
+import {Image} from 'react-native';
 
 const SignupTabBar = ({children, state, navigation}) => {
   const {registeredProcedures, cleanProceduresInformation} =
@@ -19,6 +22,7 @@ const SignupTabBar = ({children, state, navigation}) => {
   const {doSignup, saveSignupInformation, cleanOwnerInformation, verifySignup} =
     useContext(UserContext);
 
+  const [tutorial, setTutorial] = useState({windowVideo: {}, signupVideo: {}});
   const [isLoadingSignup, setIsLoadingSignup] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showAlertModal, setShowAlertModal] = useState({
@@ -42,6 +46,29 @@ const SignupTabBar = ({children, state, navigation}) => {
     procedures: registeredProcedures,
     partners: registeredPartners,
   }).isOk;
+
+  navigate.addListener(
+    'focus',
+    () => {
+      setIsLoadingSignup(true);
+      const getTutorial = async () => {
+        Promise.all([getVideoByRef('PAB'), getVideoByRef('CAD')]).then(
+          data => {
+            setTutorial({windowVideo: data[0], signupVideo: data[1]});
+            setIsLoadingSignup(false);
+            console.log('data', data);
+          },
+          error => {
+            console.error(error);
+            setIsLoadingSignup(false);
+          },
+        );
+      };
+
+      getTutorial();
+    },
+    [],
+  );
 
   const handleModal = (
     title,
@@ -172,7 +199,50 @@ const SignupTabBar = ({children, state, navigation}) => {
 
       <InformationModal
         modalState={showInformationModal}
-        closeModal={() => setShowInformationModal(false)}></InformationModal>
+        closeModal={() => setShowInformationModal(false)}>
+        <S.ItemInformation>
+          <S.VideoTitle>{tutorial.signupVideo.name}</S.VideoTitle>
+          <S.WrittenTutorialContent>
+            <S.WrittenTutorialText>
+              {tutorial.signupVideo.description}
+            </S.WrittenTutorialText>
+          </S.WrittenTutorialContent>
+
+          <S.VideoContent>
+            <Image
+              source={{uri: tutorial.signupVideo.url}}
+              style={{
+                width: 250,
+                height: 480,
+                borderRadius: 10,
+                overlayColor: 'white',
+                marginBottom: 20,
+              }}
+            />
+          </S.VideoContent>
+        </S.ItemInformation>
+        <S.ItemInformation>
+          <S.VideoTitle>{tutorial.windowVideo.name}</S.VideoTitle>
+          <S.WrittenTutorialContent>
+            <S.WrittenTutorialText>
+              {tutorial.windowVideo.description}
+            </S.WrittenTutorialText>
+          </S.WrittenTutorialContent>
+
+          <S.VideoContent>
+            <Image
+              source={{uri: tutorial.windowVideo.url}}
+              style={{
+                width: 250,
+                height: 480,
+                borderRadius: 10,
+                overlayColor: 'white',
+              }}
+            />
+          </S.VideoContent>
+          {/*<S.CoverWindowChange />*/}
+        </S.ItemInformation>
+      </InformationModal>
     </>
   );
 };

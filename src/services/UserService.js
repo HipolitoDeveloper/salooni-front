@@ -48,7 +48,7 @@ export const updateUser = userObj => {
       const {email, username, password} = userObj;
       const user = new UserObject({objectId: userObj.id});
 
-      user.set('username', username.trim());
+      user.set('username', email.trim());
       user.set('email', email.trim());
 
       if (password !== undefined) user.set('password', password.trim());

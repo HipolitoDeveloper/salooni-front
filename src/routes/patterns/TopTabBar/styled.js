@@ -20,9 +20,8 @@ export const Content = styled.View`
   justify-content: space-around;
 
   width: 100%;
-  margin-bottom: ${Platform.OS === "ios" ? '10px' : '20px'};
-  margin-top: ${Platform.OS === "ios" ? '40px' : '0'};
-
+  margin-bottom: ${Platform.OS === 'ios' ? '10px' : '20px'};
+  margin-top: ${Platform.OS === 'ios' ? '40px' : '5px'};
 `;
 
 export const ButtonContent = styled.View`

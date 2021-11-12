@@ -3,7 +3,7 @@ import * as S from './styled';
 import Button from '../../small/Button';
 import global from '../../../../common/global';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {FlatList, View} from 'react-native';
+import {FlatList, ScrollView, View} from 'react-native';
 import RoundedTimes from '../../../../assets/svg/roundedTimesSVG.svg';
 import {Switch} from '../../small/Switch';
 import Modal from 'react-native-modal';
@@ -111,13 +111,16 @@ const ListMenu = ({
                         data={menuState.itemToShow[`${item}`]}
                         renderItem={({item}) => (
                           <S.ProcedureContent
-                            onPress={() => deleteProcedure(item)}>
+                            disabled={!isOwner && itemType !== 'schedule'}
+                            onPress={() =>
+                              deleteProcedure(item, menuState.itemToShow.id)
+                            }>
                             <S.ProcedureDeleteIcon>
                               <RoundedTimes
                                 fill={'#fff'}
                                 borderFill={color}
-                                width={20}
-                                height={20}
+                                width={30}
+                                height={30}
                               />
                             </S.ProcedureDeleteIcon>
                             <S.ProcedureText>{item.name}</S.ProcedureText>
@@ -139,6 +142,7 @@ const ListMenu = ({
                 {isConfirming ? (
                   <>
                     <Button
+                      disabled={false}
                       marginBottom={'20px'}
                       onPress={onConfirm}
                       color={color}
@@ -160,6 +164,7 @@ const ListMenu = ({
                       }}
                     />
                     <Button
+                      disabled={false}
                       marginBottom={'20px'}
                       onPress={() => checkItem(-1)}
                       color={color}
@@ -175,6 +180,7 @@ const ListMenu = ({
                   <>
                     {showCalendarButton && (
                       <Button
+                        disabled={false}
                         marginBottom={'20px'}
                         onPress={() => {
                           navigateToCalendar(menuState.itemToShow);
@@ -201,6 +207,7 @@ const ListMenu = ({
                     )}
 
                     <Button
+                      disabled={false}
                       marginBottom={'20px'}
                       onPress={() => {
                         onEditNavigateTo(menuState.itemToShow);
@@ -224,6 +231,7 @@ const ListMenu = ({
                       }}
                     />
                     <Button
+                      disabled={false}
                       marginBottom={'20px'}
                       onPress={() => {
                         deleteItem(menuState.itemToShow);

@@ -72,6 +72,7 @@ const AutoComplete = ({
       {value.length >= searchLengthToSuggest && (
         <S.SuggestionContent>
           <FlatList
+            keyboardShouldPersistTaps={'handled'}
             keyExtractor={item => item.id}
             data={suggestions}
             renderItem={({item}) => (

@@ -4,6 +4,7 @@ import global from '../../../../common/global';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {ConfirmQuestionText, EmployeeNameText} from './styled';
+import {ScrollView} from 'react-native';
 
 const ListContent = ({
   name,
@@ -18,7 +19,7 @@ const ListContent = ({
   checked,
   formattedDateHour,
   nextHour,
-  passedHour,
+
   itemType,
   selected,
   selectItem,
@@ -31,12 +32,12 @@ const ListContent = ({
     if (itemType === 'schedule') {
       return (
         <>
-          <S.NameText nextHour={nextHour} passedHour={passedHour}>
+          <S.ScheduleNameText nextHour={nextHour}>
             {client.name}
-          </S.NameText>
-          <S.TelText nextHour={nextHour} passedHour={passedHour}>
+          </S.ScheduleNameText>
+          <S.ScheduleDateText nextHour={nextHour}>
             {formattedDateHour}
-          </S.TelText>
+          </S.ScheduleDateText>
           <S.EmployeeNameText>Responsável: {employee.name}</S.EmployeeNameText>
         </>
       );
@@ -45,7 +46,7 @@ const ListContent = ({
         <>
           <S.NameText>{name}</S.NameText>
           <S.InlineInformationContent>
-            <S.GenericText>{time} min - </S.GenericText>
+            <S.GenericText>{time} min </S.GenericText>
             <S.GenericText>R$ {value}</S.GenericText>
           </S.InlineInformationContent>
         </>
@@ -102,7 +103,9 @@ const ListContent = ({
             </S.CheckContent>
           )}
 
-          <S.MenuIconContent onPress={onPressItem}>
+          <S.MenuIconContent
+            onPress={onPressItem}
+            hitSlop={{top: 12, left: 12, right: 12, bottom: 12}}>
             <Icon name="ellipsis-v" size={18} color={color} />
           </S.MenuIconContent>
         </S.RightContent>

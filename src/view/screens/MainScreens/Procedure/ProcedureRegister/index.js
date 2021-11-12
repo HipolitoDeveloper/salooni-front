@@ -9,10 +9,7 @@ const ProcedureRegister = ({route}) => {
     <>
       <ProcedureForm
         route={route}
-        pageTitle={'Procedimentos'}
-        goBack={() =>
-          navigate.push('UserInformationStack', {screen: 'Procedures'})
-        }
+        goBack={() => navigate.push('ApplicationStack', {screen: 'Procedures'})}
         isSigningUp={false}
       />
     </>

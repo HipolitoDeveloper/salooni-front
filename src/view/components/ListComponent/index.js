@@ -5,17 +5,20 @@ import ListContent from './ListContent';
 import ListHeader from './ListHeader';
 import Button from '../small/Button';
 import ListMenu from './ListMenu';
-import {FlatList, Animated} from 'react-native';
+import {FlatList, Animated, Platform, RefreshControl} from 'react-native';
 import FloatButton from '../small/FloatButton';
 import Times from '../../../assets/svg/timesSVG.svg';
 import Loading from '../small/Loading';
 import {getCloser} from '../../../common/headerFunctions';
 import {useNavigation} from '@react-navigation/native';
+import AlertModal from '../small/AlertModal';
 const {diffClamp} = Animated;
 
 const headerHeight = Platform.OS === 'ios' ? 90 * 2 : 70 * 2;
 
 const List = ({
+  backButtonHeader,
+  showBackButton,
   showCalendarButton,
   showHeader,
   color,
@@ -32,10 +35,13 @@ const List = ({
   onAddNavigateTo,
   onEditNavigateTo,
   deleteProcedure,
-  handleState,
+  handleAgenda,
   navigateToCalendar,
   isOwner,
   searchPlaceHolder,
+  showProfileIcon,
+  onRefresh,
+  refreshing,
 }) => {
   const scrollY = useRef(new Animated.Value(0));
   const scrollYClamped = diffClamp(scrollY.current, 0, headerHeight);
@@ -55,6 +61,15 @@ const List = ({
   const [isConfirming, setIsConfirming] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
   const [scrolling, setScrolling] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState({
+    text: '',
+    isVisible: false,
+    onOk: () => {},
+    title: '',
+    onClose: () => {},
+    cancelTitle: '',
+    okTitle: '',
+  });
 
   const isDeleting = items.some(item => item.selected);
   const selectedItems = items.filter(item => item.selected);
@@ -160,6 +175,7 @@ const List = ({
 
   const deleteItem = itemToDelete => {
     deleteUniqueItem(itemToDelete);
+
     setItems(items.filter(item => item.id !== itemToDelete.id));
   };
   const deleteItems = itemsToDelete => {
@@ -177,20 +193,49 @@ const List = ({
     setItems(newItems);
   };
 
-  const deleteItemProcedure = itemProcedure => {
-    deleteProcedure(itemProcedure);
-    const newItemList = itemList;
-    newItemList.forEach(item => {
-      if (item.id === itemProcedure.employeeId) {
-        item.procedures.forEach((procedure, index) => {
-          if (procedure.id === itemProcedure.id) {
-            item.procedures.splice(index, 1);
-          }
-        });
-      }
-    });
+  const deleteItemProcedure = (itemProcedure, itemId, forceDelete, item) => {
+    if (handleItemProcedure(itemProcedure, itemId) || forceDelete) {
+      deleteProcedure(itemProcedure);
+      const newItemList = itemList;
+      newItemList.forEach(item => {
+        if (item.id === itemId) {
+          item.procedures.forEach((procedure, index) => {
+            if (procedure.id === itemProcedure.id) {
+              item.procedures.splice(index, 1);
+            }
+          });
+        }
+      });
 
-    setItems(newItemList);
+      setItems(newItemList);
+
+      if (forceDelete) deleteItem(item);
+    }
+  };
+
+  const handleItemProcedure = (itemProcedure, itemId) => {
+    let ableToDelete = true;
+    const item = items.find(item => item.id === itemId);
+    const {procedures} = item;
+
+    if (procedures.length === 1) {
+      ableToDelete = false;
+      setShowAlertModal({
+        text: 'Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!',
+        isVisible: true,
+        onOk: () => {
+          deleteItemProcedure(itemProcedure, itemId, true, item);
+          setShowAlertModal({isVisible: false});
+          handleMenu(item);
+        },
+        title: 'Atenção',
+        onClose: () => setShowAlertModal({isVisible: false}),
+        cancelTitle: 'Cancelar',
+        okTitle: 'Apagar',
+      });
+    }
+
+    return ableToDelete;
   };
 
   const checkItem = id => {
@@ -218,10 +263,6 @@ const List = ({
   };
 
   const handleMenu = item => {
-    console.log(
-      'Procedure',
-      itemList.find(itemToShow => itemToShow.id === item.id),
-    );
     setMenuState({
       open: !menuState.open,
       itemToShow: itemList.find(itemToShow => itemToShow.id === item.id),
@@ -262,6 +303,8 @@ const List = ({
             {transform: [{translateY}]},
           ]}>
           <ListHeader
+            backButtonHeader={backButtonHeader}
+            showBackButton={showBackButton}
             isDeleting={isDeleting}
             items={items}
             headerColor={color}
@@ -269,7 +312,8 @@ const List = ({
             searchItems={searchItems}
             selectedItemsLength={selectedItems.length}
             cancelDelete={unselectItems}
-            handleState={handleState}
+            handleAgenda={handleAgenda}
+            showProfileIcon={showProfileIcon}
             headerHeight={headerHeight}
             searchPlaceHolder={searchPlaceHolder}
             scrolling={scrolling}
@@ -285,6 +329,13 @@ const List = ({
           onScroll={handleScroll}
           keyExtractor={item => item.id}
           data={items}
+          refreshControl={
+            <RefreshControl
+              onRefresh={onRefresh}
+              refreshing={refreshing}
+              progressViewOffset={180}
+            />
+          }
           renderItem={({item}) => (
             <ListContent
               {...item}
@@ -296,7 +347,6 @@ const List = ({
               selectItem={selectItem}
               checkItem={checkItem}
               onPressItem={() => {
-                setItems(itemList);
                 handleMenu(item);
               }}
             />
@@ -318,6 +368,7 @@ const List = ({
           <S.FooterButtons>
             {isDeleting && (
               <Button
+                disabled={false}
                 onPress={() => deleteItems(selectedItems)}
                 text={'Apagar'}
                 width={'120px'}
@@ -331,6 +382,7 @@ const List = ({
             {isConfirming && (
               <>
                 <Button
+                  disabled={false}
                   onPress={onConfirm}
                   text={'Confirmar'}
                   width={'120px'}
@@ -356,6 +408,17 @@ const List = ({
           </S.FooterButtons>
         </S.Footer>
       )}
+      <AlertModal
+        text={
+          'Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!'
+        }
+        isVisible={showAlertModal.isVisible}
+        onOk={showAlertModal.onOk}
+        title={showAlertModal.title}
+        onClose={showAlertModal.onClose}
+        cancelTitle={showAlertModal.cancelTitle}
+        okTitle={showAlertModal.okTitle}
+      />
     </S.Container>
   );
 };

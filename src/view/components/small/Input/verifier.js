@@ -108,10 +108,10 @@ export const PASSVerifier = password => {
   let specialCaracterRegex = /\W|_/;
   let hasUppercase = false;
   let hasLowercase = false;
-  let message = '';
+  let message = [];
 
   for (let letter of password) {
-    let excludeSpecialCaracter = /\w|_/;
+    let excludeSpecialCaracter = /[A-z]|_+/;
     if (excludeSpecialCaracter.test(letter)) {
       if (letter === letter.toLowerCase()) {
         hasLowercase = true;
@@ -123,17 +123,15 @@ export const PASSVerifier = password => {
     }
   }
 
-  if (!hasUppercase)
-    message = 'Sua senha precisa de ao menos uma letra maiúscula';
+  if (!hasUppercase) message.push('*É necessário ao menos uma letra maiúscula');
 
-  if (!hasLowercase)
-    message = 'Sua senha precisa de ao menos uma letra minúscula';
+  if (!hasLowercase) message.push('*É necessário ao menos uma letra minúscula');
 
   if (password.length < 6)
-    message = 'Sua senha precisa de no mínimo 6 caracteres';
+    message.push('*É necessário de no mínimo 6 caracteres');
 
   if (!specialCaracterRegex.test(password))
-    message = 'Sua senha precisa de ao menos um caracter especial';
+    message.push('*É necessário de ao menos um caracter especial');
 
   return {
     state:

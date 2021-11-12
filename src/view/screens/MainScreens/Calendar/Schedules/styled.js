@@ -3,15 +3,7 @@ import global from '../../../../../common/global';
 import {StyleSheet} from 'react-native';
 
 export const Container = styled.View`
-  background-color: ${global.colors.lightGreyColor};
-  border: 1px solid red;
-  width: 100%;
-  height: 100%;
-`;
-
-export const Content = styled.View`
-  width: 100%;
-  height: 100%;
+  flex: 1;
 `;
 
 export const ActionButtonContainer = styled.TouchableOpacity`

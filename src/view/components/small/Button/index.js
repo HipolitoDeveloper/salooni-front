@@ -16,13 +16,17 @@ const Button = ({
   fontSize,
   leftContent,
   marginBottom,
+  marginTop,
+  disabled,
 }) => {
   const existsLeftContent = leftContent.show;
 
   return (
     <>
       <S.Button
+        disabled={typeof disabled === 'function' ? !disabled() : disabled}
         marginBottom={marginBottom}
+        marginTop={marginTop}
         onPress={onPress}
         width={width}
         height={height}

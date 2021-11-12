@@ -7,7 +7,13 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import BackButton from '../../../small/BackButton';
 import tourMessages from '../../../../../common/tourMessages';
 
-const CalendarHeader = ({color, headerTitle, handleState, navigate, route}) => {
+const CalendarHeader = ({
+  color,
+  headerTitle,
+  handleAgenda,
+  navigate,
+  route,
+}) => {
   const employeeView = route.params?.employeeView;
   const employee = route.params?.employee;
   return (
@@ -28,7 +34,7 @@ const CalendarHeader = ({color, headerTitle, handleState, navigate, route}) => {
       {employeeView && (
         <S.EmployeeName headerColor={color}>do {employee.name}</S.EmployeeName>
       )}
-      <S.ChangeIconContent onPress={handleState} employeeView={employeeView}>
+      <S.ChangeIconContent onPress={handleAgenda} employeeView={employeeView}>
         <Icon name={'exchange-alt'} size={20} color={color} />
       </S.ChangeIconContent>
 

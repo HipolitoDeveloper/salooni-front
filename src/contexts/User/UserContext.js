@@ -4,18 +4,17 @@ import {convertToObj} from '../../pipe/conversor';
 import {getUsersByEmail, signUp, updateUser} from '../../services/UserService';
 import {
   getEmployeeByEmail,
-  getEmployeeById,
   saveEmployee,
-  saveEmployeeSignup,
   saveEmployeeWithoutProcedures,
   updateEmployeeCRUD,
 } from '../../services/EmployeeService';
 import {UserReducer} from './UserReducer';
+import {saveProcedure} from '../../services/ProcedureService';
 import {
-  getProcedureByName,
-  saveProcedure,
-} from '../../services/ProcedureService';
-import {saveSalon, updateSalon} from '../../services/SalonService';
+  getSalonById,
+  saveSalon,
+  updateSalon,
+} from '../../services/SalonService';
 import {buildCurrentUser} from '../../factory/User';
 import errorMessages from '../../common/errorMessages';
 import {convertUserToProfileObject} from '../../pipe/userPipe';
@@ -25,6 +24,7 @@ import {
   PASSVerifier,
   TELVerifier,
 } from '../../view/components/small/Input/verifier';
+import notificationsMessages from '../../common/notificationsMessages';
 
 export const UserContext = createContext();
 
@@ -40,6 +40,7 @@ const initialState = {
     email: '',
     password: '',
   },
+  notifications: [],
 };
 
 const UserProvider = ({children}) => {
@@ -47,7 +48,8 @@ const UserProvider = ({children}) => {
 
   useEffect(() => {
     const verifyUser = async () => {
-      await setCurrentUser(true, await Parse.User.currentAsync());
+      const user = convertToObj(await Parse.User.currentAsync());
+      await setCurrentUser(true, user);
     };
     verifyUser();
   }, []);
@@ -118,8 +120,13 @@ const UserProvider = ({children}) => {
   };
 
   const setCurrentUser = async (isLogging, user) => {
+    console.log('user', user);
     if (isLogging && user !== null) {
-      const currentUser = buildCurrentUser(user);
+      const salon = await getSalonById(
+        user.employee_id.salon_id.objectId,
+        false,
+      );
+      const currentUser = buildCurrentUser(user, salon);
 
       const loginStatus = Object.keys(currentUser).length > 0 ? 'IN' : 'OUT';
 
@@ -214,12 +221,13 @@ const UserProvider = ({children}) => {
       try {
         await Parse.User.logIn(userData.email.trim(), userData.password).then(
           async user => {
-            await setCurrentUser(true, user);
+            const convertedUser = convertToObj(user);
+            await setCurrentUser(true, convertedUser);
             resolve('Deu certo');
           },
         );
       } catch (e) {
-        reject(`Logar usuário ${JSON.stringify(e)}`);
+        reject(`Deu ruim ao logar usuário ${JSON.stringify(e)}`);
       }
     });
   };
@@ -303,7 +311,26 @@ const UserProvider = ({children}) => {
     dispatch({type: 'CLEAN_OWNER', payload});
   };
 
+  const verifyNotification = payload => {
+    let notification = '';
+    const {name, verification, method} = payload;
+
+    switch (name) {
+      case notificationsMessages.notifications[0].name:
+        notification = verification
+          ? {
+              ...notificationsMessages.notifications[0],
+              method: method,
+            }
+          : '';
+        break;
+    }
+
+    dispatch({type: 'SET_NOTIFICATION', notification});
+  };
+
   const contextValues = {
+    verifyNotification,
     updateProfile,
     doLogin,
     setCurrentUser,

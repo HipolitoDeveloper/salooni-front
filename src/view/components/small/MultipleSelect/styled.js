@@ -9,7 +9,6 @@ export const Container = styled.View`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 20px 0 20px 0;
 `;
 
 export const SelectContent = styled.View`
@@ -28,17 +27,15 @@ export const IconContainer = styled.TouchableOpacity`
 `;
 
 export const SelectedContainer = styled.View`
-  width: 90%;
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 `;
 
-export const SelectedContainerText = styled.Text`
-  font-size: 16px;
-  color: ${props =>
-    props.selectTextColor ? `${props.selectTextColor}` : 'black'};
+export const ButtonContent = styled.View`
+  display: flex;
 `;
 
 export const EmptyItem = styled.View`
@@ -47,6 +44,7 @@ export const EmptyItem = styled.View`
 
 export const ItemsContainer = styled.View`
   width: 100%;
+  margin-top: 20px;
 `;
 
 export const InputText = styled.Text`
@@ -89,9 +87,8 @@ export const SelectedContentIcon = styled.TouchableOpacity`
 export const ModalContainer = styled.View``;
 
 export const SuggestionContainer = styled.View`
-  border-radius: 20px;
+  border-radius: 10px;
   background-color: white;
-
   elevation: 30;
 `;
 
@@ -110,7 +107,6 @@ export const SuggestionHeader = styled.View`
   align-items: center;
   justify-content: center;
   background-color: white;
-  elevation: 5;
 `;
 
 export const SuggestionHeaderText = styled.Text`
@@ -126,11 +122,11 @@ export const SuggestionBody = styled.View`
   justify-content: center;
 `;
 
-export const SuggestionItemIcon = styled.TouchableOpacity`
+export const SuggestionItemIcon = styled.View`
   margin: 20px;
 `;
 
-export const SuggestionItemContent = styled.View`
+export const SuggestionItemContent = styled.TouchableOpacity`
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -142,4 +138,34 @@ export const SuggestionItemContent = styled.View`
 
 export const SuggestionItemText = styled.Text`
   font-size: 16px;
+`;
+
+export const SearchIconContainer = styled.TouchableOpacity`
+  margin-right: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 30px;
+`;
+
+export const SearchContainer = styled.View`
+  width: 85%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom-width: ${StyleSheet.hairlineWidth}px;
+  border-bottom-color: black;
+`;
+
+export const SearchIcon = styled.View``;
+export const CancelInput = styled.TouchableOpacity``;
+export const SearchInput = styled.TextInput`
+  color: black;
+  width: 70%;
+  font-size: 16px;
+  opacity: 0.6;
+  font-family: ${global.fonts.mainFont};
+  height: 40px;
 `;

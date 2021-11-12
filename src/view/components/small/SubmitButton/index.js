@@ -19,7 +19,7 @@ const SubmitButton = ({
         width={width}
         height={height}
         buttonColor={buttonColor}
-        disabled={disabled}>
+        disabled={typeof disabled === 'function' ? !disabled() : disabled}>
         <ContentButtonText fontSize={fontSize}>{text}</ContentButtonText>
       </ContentButton>
     </>

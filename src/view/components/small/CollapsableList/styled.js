@@ -29,6 +29,7 @@ export const HeaderContent = styled.View`
 `;
 
 export const HeaderText = styled.Text`
+  width: 70%;
   font-family: ${global.fonts.mainFont};
   font-size: 20px;
   font-weight: bold;
@@ -50,6 +51,7 @@ export const ItemContent = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
+  background-color: ${global.colors.backgroundColor};
 `;
 
 export const ItemContentText = styled.Text`
@@ -75,11 +77,11 @@ export const ItemInformation = styled.ScrollView`
 `;
 
 export const VideoContent = styled.View`
-  height: 500px;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-bottom: 20px;
 `;
 
 export const VideoTitle = styled.Text`
@@ -90,12 +92,13 @@ export const VideoTitle = styled.Text`
 `;
 
 export const WrittenTutorialContent = styled.View`
-  height: 80px;
   margin: 20px;
 `;
 
 export const WrittenTutorialText = styled.Text`
   font-family: ${global.fonts.mainFont};
+  text-align: justify;
+  font-size: 18px;
 `;
 
 export const CloseButtonContent = styled.View`

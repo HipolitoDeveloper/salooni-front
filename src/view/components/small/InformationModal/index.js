@@ -3,6 +3,7 @@ import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import global from '../../../../common/global';
 import React from 'react';
+import {ScrollView} from 'react-native';
 
 const InformationModal = ({modalState, closeModal, children}) => {
   return (
@@ -25,7 +26,7 @@ const InformationModal = ({modalState, closeModal, children}) => {
               />
             </S.CloseButton>
           </S.CloseButtonContent>
-          {children}
+          <ScrollView>{children}</ScrollView>
         </S.ModalContent>
       </Modal>
     </S.ModalContainer>

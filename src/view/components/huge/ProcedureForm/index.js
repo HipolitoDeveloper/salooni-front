@@ -1,10 +1,10 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import * as S from './styled';
 import Input from '../../small/Input';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import global from '../../../../common/global';
 import ErrorMessage from '../../small/ErrorMessage';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import errorMessages from '../../../../common/errorMessages';
 import AlertModal from '../../small/AlertModal';
 import {UserContext} from '../../../../contexts/User/UserContext';
@@ -15,8 +15,7 @@ import Loading from '../../small/Loading';
 
 const ProcedureForm = ({
   route,
-  pageTitle,
-  pageDescription,
+
   goBack,
   isSigningUp,
 }) => {
@@ -37,7 +36,7 @@ const ProcedureForm = ({
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
+  const [validForm, setValidForm] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState({
     isShowing: false,
     text: '',
@@ -55,19 +54,20 @@ const ProcedureForm = ({
   });
 
   const navigate = useNavigation();
+  const isFocused = useIsFocused();
 
-  useEffect(() => {
-    navigate.addListener('focus', () => {
-      if (!isSigningUp) {
-        const procedureInView = route.params?.procedure;
+  console.log('isFocused', isFocused);
 
-        if (Object.keys(procedureInView).length !== 0) {
-          setProcedure(procedureInView);
-          setIsEditing(true);
-        }
+  navigate.addListener('focus', () => {
+    if (!isSigningUp) {
+      const procedureInView = route.params?.procedure;
+
+      if (Object.keys(procedureInView).length !== 0) {
+        setProcedure(procedureInView);
+        setIsEditing(true);
       }
-    });
-  }, [navigate]);
+    }
+  });
 
   useEffect(() => {
     registeredProcedures.forEach(procedure => (procedure.isInView = false));
@@ -87,22 +87,22 @@ const ProcedureForm = ({
     });
   };
 
-  const handleChange = (text, name) => {
+  const handleChange = (text, name, isSwitch) => {
     if (name === 'commissionPercentage') {
       delete procedure.isFixedValue;
-      procedure.commissionValue = 0;
+      procedure.commissionValue = '';
       setProcedure({
         ...procedure,
         ['isPercentage']: !!text,
-        [name]: text,
+        [name]: isSwitch ? '' : text,
       });
     } else if (name === 'commissionValue') {
       delete procedure.isPercentage;
-      procedure.commissionPercentage = 0;
+      procedure.commissionPercentage = '';
       setProcedure({
         ...procedure,
         ['isFixedValue']: !!text,
-        [name]: text,
+        [name]: isSwitch ? '' : text,
       });
     } else {
       setProcedure({
@@ -122,14 +122,14 @@ const ProcedureForm = ({
 
   const chooseAddProcedureMethod = () => {
     const {isInView, indexInView} = {...procedure};
-    if (verifyInformation() && isInView) {
+    if (verifyInformation(true) && isInView) {
       procedure.isInView = false;
       editProcedure({procedure: procedure, index: indexInView});
       setErrorMessage('');
       clearProcedure();
     }
 
-    if (verifyInformation() && !isInView) {
+    if (verifyInformation(true) && !isInView) {
       if (!isSigningUp) {
         procedure.salonId = currentUser.idSalon;
         procedure.employeeId = currentUser.idFunc;
@@ -179,7 +179,7 @@ const ProcedureForm = ({
         () => {
           setTimeout(() => {
             setIsLoading(false);
-            navigate.navigate('ApplicationStack', {screen: 'Procedures'});
+            goBack();
             clearProcedure();
             cleanProceduresInformation();
           }, 3000);
@@ -195,7 +195,7 @@ const ProcedureForm = ({
 
   const updateProcedures = () => {
     setIsLoading(true);
-    if (verifyInformation()) {
+    if (verifyInformation(true)) {
       updateProcedure(procedure).then(
         async () => {
           setTimeout(() => {
@@ -218,7 +218,7 @@ const ProcedureForm = ({
     deleteProcedure(procedure).then(
       () => {
         setIsLoading(false);
-        navigate.navigate('Procedures');
+        goBack();
         setErrorMessage('');
         clearProcedure();
       },
@@ -244,7 +244,7 @@ const ProcedureForm = ({
     return ableToGo;
   };
 
-  const verifyInformation = () => {
+  const verifyInformation = showErrorMessages => {
     let ableToGo = true;
     let errorMessage = '';
     if (
@@ -258,7 +258,7 @@ const ProcedureForm = ({
     ) {
       ableToGo = false;
       errorMessage = errorMessages.procedureMessage;
-      setIsLoading(false);
+      if (showErrorMessages) setIsLoading(false);
     }
 
     if (!procedure.hasMaintenance.state) {
@@ -273,7 +273,7 @@ const ProcedureForm = ({
     ) {
       ableToGo = false;
       errorMessage = errorMessages.maintenanceMessage;
-      setIsLoading(false);
+      if (showErrorMessages) setIsLoading(false);
     }
 
     if (!procedure.hasCommission.state) {
@@ -290,11 +290,12 @@ const ProcedureForm = ({
     ) {
       ableToGo = false;
       errorMessage = errorMessages.commissionMessage;
-      setIsLoading(false);
+      if (showErrorMessages) setIsLoading(false);
     } else {
       const procedureValue = parseFloat(
         procedure.value !== 0 ? procedure.value.replace(',', '') : 0,
       );
+
       const commissionValue = parseFloat(
         procedure.commissionValue !== 0
           ? procedure.commissionValue.replace(',', '')
@@ -303,17 +304,20 @@ const ProcedureForm = ({
 
       if (commissionValue > procedureValue) {
         errorMessage = errorMessages.commissionMismatchMessage;
+        setErrorMessage(errorMessage);
         ableToGo = false;
-        setIsLoading(false);
+        if (showErrorMessages) setIsLoading(false);
       }
     }
 
-    setErrorMessage(errorMessage);
+    if (showErrorMessages) setErrorMessage(errorMessage);
+    if (errorMessage === '') setErrorMessage('');
     return ableToGo;
   };
 
   return (
     <RegisterComponent
+      validForm={() => verifyInformation(false)}
       isSigningUp={isSigningUp}
       onCancel={goBack}
       color={`${global.colors.purpleColor}`}
@@ -340,46 +344,54 @@ const ProcedureForm = ({
         <Input
           handleChange={handleChange}
           name={'name'}
-          placeholder={'Nome*'}
+          placeholder={'Nome do Procedimento'}
           value={procedure.name}
           width={'80%'}
           keyboard={'default'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
-          mask="none"
-          validateInput={false}
+          color={global.colors.purpleColor}
+          label={'Nome*'}
+          isToValidate={isFocused}
+          noEmpty={true}
         />
 
         <Input
           handleChange={handleChange}
           name={'time'}
-          placeholder={'Hora: minutos*'}
+          placeholder={'Duração do Procedimento'}
           value={procedure.time}
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
           mask={'hour'}
           maxLength={3}
           rightPlaceholder={'minutos'}
-          validateInput={false}
+          color={global.colors.purpleColor}
+          label={'Duração*'}
+          isToValidate={isFocused}
+          noEmpty={true}
         />
 
         <Input
           handleChange={handleChange}
           name={'value'}
-          placeholder={'Preço*'}
+          placeholder={'Valor do Procedimento*'}
           value={procedure.value}
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={14}
           disabled={false}
           mask={'brl'}
           leftPlaceholder={'R$'}
-          validateInput={false}
+          color={global.colors.purpleColor}
+          label={'Valor*'}
+          isToValidate={isFocused}
+          noEmpty={true}
         />
 
         <InputModal
@@ -390,29 +402,35 @@ const ProcedureForm = ({
           <Input
             handleChange={handleChange}
             name={'maintenanceValue'}
-            placeholder={'Valor'}
+            placeholder={'Valor de Manutenção'}
             value={procedure.maintenanceValue}
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
-            fontSize={18}
+            fontSize={14}
             disabled={false}
             mask="brl"
             leftPlaceholder={'R$'}
-            validateInput={false}
+            color={global.colors.purpleColor}
+            label={'Valor*'}
+            isToValidate={isFocused}
+            noEmpty={true}
           />
           <Input
             handleChange={handleChange}
             name={'maintenanceDays'}
-            placeholder={'Dias'}
+            placeholder={'Dias para Manutenção'}
             value={procedure.maintenanceDays}
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
-            fontSize={18}
+            fontSize={14}
             disabled={false}
             mask="none"
-            validateInput={false}
+            color={global.colors.purpleColor}
+            label={'Dias*'}
+            isToValidate={isFocused}
+            noEmpty={true}
           />
         </InputModal>
 
@@ -428,8 +446,8 @@ const ProcedureForm = ({
                 onPress={isChecked =>
                   handleChange(
                     !procedure.isPercentage,
-
                     'commissionPercentage',
+                    true,
                   )
                 }
                 fillColor={`${global.colors.purpleColor}`}
@@ -442,14 +460,16 @@ const ProcedureForm = ({
                 value={procedure.commissionPercentage}
                 width={'73%'}
                 keyboard={'numeric'}
-                placeholder={'Porc.'}
+                placeholder={'Porcentagem da Comissão'}
                 isSecureTextEntry={false}
-                fontSize={18}
+                fontSize={13}
                 disabled={false}
                 mask={'percentage'}
                 maxLength={3}
                 rightPlaceholder={'%'}
                 validateInput={false}
+                color={global.colors.purpleColor}
+                label={'Porcentagem'}
               />
             </S.CheckboxContent>
             <S.CheckboxContent>
@@ -457,7 +477,7 @@ const ProcedureForm = ({
                 style={{borderColor: global.colors.purpleColor}}
                 isChecked={procedure.isFixedValue}
                 onPress={isChecked =>
-                  handleChange(!procedure.isFixedValue, 'commissionValue')
+                  handleChange(!procedure.isFixedValue, 'commissionValue', true)
                 }
                 fillColor={`${global.colors.purpleColor}`}
                 disableBuiltInState={true}
@@ -468,14 +488,16 @@ const ProcedureForm = ({
                 name={'commissionValue'}
                 value={procedure.commissionValue}
                 width={'73%'}
-                placeholder={'Valor.'}
+                placeholder={'Valor da Comissão.'}
                 keyboard={'numeric'}
                 isSecureTextEntry={false}
-                fontSize={18}
+                fontSize={13}
                 disabled={false}
                 mask={'brl'}
                 leftPlaceholder={'R$'}
                 validateInput={false}
+                color={global.colors.purpleColor}
+                label={'Valor'}
               />
             </S.CheckboxContent>
           </S.CheckboxContainer>

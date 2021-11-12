@@ -82,10 +82,10 @@ export const ProcedureContent = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  width: 120px;
-  height: 30px;
   border-radius: 40px;
   margin-bottom: 10px;
+  padding: 10px;
+  max-width: 300px;
 `;
 
 export const ProcedureDeleteIcon = styled.View`
@@ -96,6 +96,7 @@ export const ProcedureText = styled.Text`
   margin-left: 20px;
   font-family: ${global.fonts.mainFont};
   font-size: 16px;
+  padding: 10px;
 `;
 
 export const FooterButtons = styled.View`

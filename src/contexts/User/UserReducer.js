@@ -24,8 +24,8 @@ export const UserReducer = (state, action) => {
     case 'UPDATE_USER':
       state.currentUser = action.payload;
       return {
-        ...state,
         currentUser: state.currentUser,
+        ...state,
       };
 
     case 'CLEAN_OWNER':
@@ -49,7 +49,13 @@ export const UserReducer = (state, action) => {
         ...state,
         loginStatus: state.loginStatus,
       };
-
+    case 'SET_NOTIFICATION':
+      const notification = action.notification;
+      state.notifications.push(notification);
+      return {
+        ...state,
+        notifications: state.notifications,
+      };
     default:
       return state;
   }

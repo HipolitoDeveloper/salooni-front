@@ -114,7 +114,9 @@ export const deleteScheduleProcedureById = (
           resolve(deletedScheduleProcedure);
         } else {
           resolve(
-            buildScheduleProcedure(convertToObj(deletedScheduleProcedure)),
+            deletedScheduleProcedure !== undefined
+              ? buildScheduleProcedure(convertToObj(deletedScheduleProcedure))
+              : [],
           );
         }
       });

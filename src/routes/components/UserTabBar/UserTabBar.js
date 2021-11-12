@@ -3,6 +3,7 @@ import global from '../../../common/global';
 
 import TopTabBar from '../../patterns/TopTabBar';
 import {UserContext} from '../../../contexts/User/UserContext';
+import Notification from '../../../view/components/small/Notification';
 
 const UserTabBar = ({children, state, navigation}) => {
   const {isOwner} = useContext(UserContext);
@@ -13,13 +14,14 @@ const UserTabBar = ({children, state, navigation}) => {
 
   const goBack = () => {
     navigation.navigate('TabStack', {
-      screen: 'SchedulingCalendar',
+      screen: 'Schedules',
       params: {calendarViewState: true},
     });
   };
 
   return (
     <>
+      <Notification />
       <TopTabBar
         showSignoutButton={true}
         isOwner={isOwner}

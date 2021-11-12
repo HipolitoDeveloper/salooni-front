@@ -23,8 +23,11 @@ import moment from 'moment';
 import RegisterComponent from '../../../../components/huge/RegisterComponent';
 import {buildDateTime} from '../../../../../pipe/dateBuilder';
 import Loading from '../../../../components/small/Loading';
+import {InputTitle} from '../../../../components/small/Input/styled';
+import {IconContainer} from './styled';
+import {Text} from '../../../../components/small/InputModal/styled';
 
-const SchedulingRegister = ({route}) => {
+const ScheduleRegister = ({route}) => {
   const {
     saveSchedule,
     registeredSchedules,
@@ -68,7 +71,6 @@ const SchedulingRegister = ({route}) => {
   // });
 
   navigate.addListener('focus', () => {
-    console.log('data', route.params.date);
     const scheduleInView = route.params?.schedule ? route.params?.schedule : {};
 
     if (Object.keys(scheduleInView).length !== 0) {
@@ -118,13 +120,13 @@ const SchedulingRegister = ({route}) => {
 
   const chooseAddScheduleMethod = async () => {
     const {isInView, indexInView} = schedule;
-    if (verifyInformation() && isInView) {
+    if (verifyInformation(true) && isInView) {
       schedule.isInView = false;
       editSchedule({schedule: schedule, index: indexInView});
       setErrorMessage('');
       clearSchedule();
     }
-    if (verifyInformation() && !isInView) {
+    if (verifyInformation(true) && !isInView) {
       schedule.salonId = currentUser.idSalon;
       addSchedule(schedule);
       setErrorMessage('');
@@ -143,7 +145,7 @@ const SchedulingRegister = ({route}) => {
           setErrorMessage('');
           clearSchedule();
           navigate.push('TabStack', {
-            screen: 'SchedulingCalendar',
+            screen: 'Schedules',
             params: {
               calendarViewState: false,
             },
@@ -165,7 +167,7 @@ const SchedulingRegister = ({route}) => {
         sortScheduleList();
         setIsLoading(false);
         navigate.replace('TabStack', {
-          screen: 'SchedulingCalendar',
+          screen: 'Schedules',
           params: {
             calendarViewState: false,
           },
@@ -188,7 +190,7 @@ const SchedulingRegister = ({route}) => {
       () => {
         setIsLoading(false);
         navigate.push('TabStack', {
-          screen: 'SchedulingCalendar',
+          screen: 'Schedules',
           params: {
             calendarViewState: false,
           },
@@ -241,7 +243,7 @@ const SchedulingRegister = ({route}) => {
     return ableToGo;
   };
 
-  const verifyInformation = () => {
+  const verifyInformation = showErrorMessages => {
     let ableToGo = true;
     let errorMessage = '';
 
@@ -256,10 +258,10 @@ const SchedulingRegister = ({route}) => {
     ) {
       ableToGo = false;
       errorMessage = errorMessages.scheduleMessage;
-      setIsLoading(false);
+      if (showErrorMessages) setIsLoading(false);
     }
 
-    setErrorMessage(errorMessage);
+    if (showErrorMessages) setErrorMessage(errorMessage);
     return ableToGo;
   };
   const onChange = (event, selectedDate) => {
@@ -287,17 +289,21 @@ const SchedulingRegister = ({route}) => {
     }
   };
 
+  const clearProcedures = () => {
+    setSchedule({...schedule, procedures: []});
+  };
+
   return (
     <RegisterComponent
+      validForm={() => verifyInformation(false)}
       onCancel={() =>
         navigate.push('TabStack', {
-          screen: 'SchedulingCalendar',
+          screen: 'Schedules',
           params: {
             calendarState: true,
           },
         })
       }
-      showAddButton={true}
       color={global.colors.purpleColor}
       preRegisteredItems={registeredSchedules}
       handleSelect={handleSchedule}
@@ -327,7 +333,7 @@ const SchedulingRegister = ({route}) => {
             mode={mode}
             is24Hour={true}
             display="default"
-            minimumDate={new Date(1950, 0, 1)}
+            minimumDate={new Date()}
             maximumDate={new Date(2300, 10, 20)}
             minuteInterval={1}
             onChange={onChange}
@@ -335,11 +341,25 @@ const SchedulingRegister = ({route}) => {
           />
         )}
 
-        <S.HeaderText onPress={() => showMode(true, 'date')}>
-          {moment(schedule.scheduleDate).format('DD/MM/YYYY HH:mm')}
-        </S.HeaderText>
+        <S.DateTextContainer onPress={() => showMode(true, 'date')}>
+          <InputTitle color={global.colors.purpleColor}>
+            Data de Agendamento*
+          </InputTitle>
+          <S.DateTextContent>
+            <S.IconContainer>
+              <Icon
+                name={'calendar'}
+                size={30}
+                color={global.colors.purpleColor}
+              />
+            </S.IconContainer>
+            <S.DateText>
+              {moment(schedule.scheduleDate).format('DD/MM/YYYY HH:mm')}
+            </S.DateText>
+          </S.DateTextContent>
+        </S.DateTextContainer>
         <AutoComplete
-          inputText={'Cliente'}
+          inputText={'Cliente*'}
           placeholder={'Procure por um cliente'}
           iconName={'user'}
           textColor={global.colors.darkGreyColor}
@@ -352,7 +372,7 @@ const SchedulingRegister = ({route}) => {
         />
 
         <AutoComplete
-          inputText={'Parceiro'}
+          inputText={'Parceiro*'}
           editable={isOwner}
           placeholder={'Procure por um parceiro'}
           textColor={global.colors.darkGreyColor}
@@ -369,25 +389,27 @@ const SchedulingRegister = ({route}) => {
           handleChange={handleChange}
         />
 
-        {Object.keys(schedule.employee).length > 5 && (
-          <MultipleSelect
-            inputText={'Procedimentos'}
-            disabled={Object.keys(schedule.employee).length <= 5}
-            iconColor={global.colors.purpleColor}
-            plusIconColor={global.colors.purpleColor}
-            modalHeaderText={'Escolha os procedimentos'}
-            options={
-              currentUser.idFunc === schedule.employee.id
-                ? procedures
-                : schedule.employee.procedures
-            }
-            selectTextColor={global.colors.darkGreyColor}
-            selectedItemBorderColor={global.colors.purpleColor}
-            value={schedule.procedures}
-            handleMultiSelect={handleMultiSelect}
-            placeholderText={'Procure por um procedimento'}
-          />
-        )}
+        {Object.keys(schedule.employee).length > 5 &&
+          typeof schedule.employee !== 'string' && (
+            <MultipleSelect
+              inputText={'Procedimentos*'}
+              disabled={Object.keys(schedule.employee).length > 5}
+              iconColor={global.colors.purpleColor}
+              plusIconColor={global.colors.purpleColor}
+              modalHeaderText={'Escolha os procedimentos'}
+              options={
+                currentUser.idFunc === schedule.employee.id
+                  ? procedures
+                  : schedule.employee.procedures
+              }
+              selectTextColor={global.colors.darkGreyColor}
+              selectedItemBorderColor={global.colors.purpleColor}
+              value={schedule.procedures}
+              handleMultiSelect={handleMultiSelect}
+              placeholderText={'Procedimentos'}
+              clearValue={clearProcedures}
+            />
+          )}
       </S.BodyContent>
 
       <AlertModal
@@ -405,4 +427,4 @@ const SchedulingRegister = ({route}) => {
   );
 };
 
-export default SchedulingRegister;
+export default ScheduleRegister;

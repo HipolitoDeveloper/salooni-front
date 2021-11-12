@@ -1,14 +1,14 @@
-import {maskBRL} from '../pipe/inputMasks';
+import {maskBRL, teste} from '../pipe/inputMasks';
+import {convertToBRL} from '../pipe/conversor';
 
 export const buildProcedureList = procedures => {
   return procedures.map(procedure => {
     return {
       id: procedure.objectId,
       name: procedure.name,
-      commissionValue:
-        procedure.commission_value !== 0
-          ? maskBRL(procedure.commission_value)
-          : '',
+      commissionValue: procedure.commission_value
+        ? convertToBRL(procedure.commission_percentage)
+        : '',
       commissionPercentage:
         procedure.commission_percentage !== 0
           ? procedure.commission_percentage.toString()
@@ -16,11 +16,11 @@ export const buildProcedureList = procedures => {
       isPercentage: procedure.commission_percentage !== 0,
 
       isFixedValue: procedure.commission_value !== 0,
-      value: maskBRL(procedure.value),
+      value: convertToBRL(procedure.value),
       time: procedure.time.toString(),
       maintenanceValue:
         procedure.maintenance_value !== 0
-          ? maskBRL(procedure.maintenance_value)
+          ? convertToBRL(procedure.maintenance_value)
           : '',
       maintenanceDays:
         procedure.maintenance_days !== 0
@@ -50,7 +50,7 @@ export const buildProcedure = procedure => {
     name: procedure.name,
     commissionValue:
       procedure.commission_value !== 0
-        ? maskBRL(procedure.commission_value)
+        ? convertToBRL(procedure.commission_value)
         : '',
     commissionPercentage:
       procedure.commission_percentage !== 0
@@ -58,9 +58,9 @@ export const buildProcedure = procedure => {
         : '',
     isPercentage: procedure.commission_percentage !== 0,
     isFixedValue: procedure.commission_value !== 0,
-    value: maskBRL(procedure.value),
+    value: convertToBRL(procedure.value),
     time: procedure.time.toString(),
-    maintenanceValue: maskBRL(procedure.maintenance_value),
+    maintenanceValue: convertToBRL(procedure.maintenance_value),
     maintenanceDays: procedure.maintenance_days.toString(),
     hasCommission: {
       state:

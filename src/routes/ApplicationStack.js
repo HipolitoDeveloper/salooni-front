@@ -2,12 +2,13 @@ import React from 'react';
 
 import ClientRegister from '../view/screens/MainScreens/Client/ClientRegister';
 import Procedures from '../view/screens/MainScreens/Procedure/Procedures';
-import SchedulingRegister from '../view/screens/MainScreens/Calendar/SchedulingRegister';
+import ScheduleRegister from '../view/screens/MainScreens/Calendar/ScheduleRegister';
 import PartnerRegister from '../view/screens/MainScreens/Partner/PartnerRegister';
 import ProcedureRegister from '../view/screens/MainScreens/Procedure/ProcedureRegister';
 import {createStackNavigator} from '@react-navigation/stack';
 import UserInformationStack from './UserInformationStack';
-import SchedulingCalendar from '../view/screens/MainScreens/Calendar/SchedulingCalendar';
+import Schedules from '../view/screens/MainScreens/Calendar/Schedules';
+import UnconfirmedSchedules from '../view/screens/MainScreens/Calendar/UnconfirmedSchedules';
 
 const Stack = createStackNavigator();
 
@@ -20,17 +21,14 @@ const ApplicationStack = () => {
       <Stack.Group>
         <Stack.Screen name="Procedures" component={Procedures} />
         <Stack.Screen name="ClientRegister" component={ClientRegister} />
-        <Stack.Screen
-          name="SchedulingRegister"
-          component={SchedulingRegister}
-        />
+        <Stack.Screen name="ScheduleRegister" component={ScheduleRegister} />
         <Stack.Screen name="PartnerRegister" component={PartnerRegister} />
         <Stack.Screen name="ProcedureRegister" component={ProcedureRegister} />
-
         <Stack.Screen
-          name="SchedulingCalendar"
-          component={SchedulingCalendar}
+          name="UnconfirmedSchedules"
+          component={UnconfirmedSchedules}
         />
+
         <Stack.Screen
           name="UserInformationStack"
           component={UserInformationStack}

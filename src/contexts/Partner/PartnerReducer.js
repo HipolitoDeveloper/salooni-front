@@ -76,9 +76,9 @@ export const PartnerReducer = (state, action) => {
         ...state,
       };
     case 'DELETE_PARTNER':
-      const {objectId} = action.payload;
+      const deletedPartnerId = action.id;
       state.partners.forEach((partner, index) => {
-        if (partner.objectId === objectId) {
+        if (partner.id === deletedPartnerId) {
           state.partners.splice(index, 1);
         }
       });

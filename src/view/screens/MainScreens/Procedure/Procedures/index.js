@@ -50,9 +50,25 @@ const Procedures = () => {
     );
   };
 
+  const onRefresh = () => {
+    setIsLoading(true);
+    loadAllProcedures(currentUser.idSalon).then(
+      () => {
+        setIsLoading(false);
+      },
+      error => {
+        console.log(error);
+        setIsLoading(false);
+      },
+    );
+  };
+
   return (
     <S.Container>
       <List
+        onRefresh={onRefresh}
+        refreshing={isLoading}
+        showBackButton={true}
         searchPlaceHolder={'Procure pelos seus procedimentos'}
         isOwner={isOwner}
         itemType={'procedure'}
