@@ -42,6 +42,7 @@ const List = ({
   showProfileIcon,
   onRefresh,
   refreshing,
+  showAddButton,
 }) => {
   const scrollY = useRef(new Animated.Value(0));
   const scrollYClamped = diffClamp(scrollY.current, 0, headerHeight);
@@ -218,23 +219,24 @@ const List = ({
     const item = items.find(item => item.id === itemId);
     const {procedures} = item;
 
-    if (procedures.length === 1) {
-      ableToDelete = false;
-      setShowAlertModal({
-        text: 'Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!',
-        isVisible: true,
-        onOk: () => {
-          deleteItemProcedure(itemProcedure, itemId, true, item);
-          setShowAlertModal({isVisible: false});
-          handleMenu(item);
-        },
-        title: 'Atenção',
-        onClose: () => setShowAlertModal({isVisible: false}),
-        cancelTitle: 'Cancelar',
-        okTitle: 'Apagar',
-      });
+    if (itemType === 'schedule') {
+      if (procedures.length === 1) {
+        ableToDelete = false;
+        setShowAlertModal({
+          text: 'Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!',
+          isVisible: true,
+          onOk: () => {
+            deleteItemProcedure(itemProcedure, itemId, true, item);
+            setShowAlertModal({isVisible: false});
+            handleMenu(item);
+          },
+          title: 'Atenção',
+          onClose: () => setShowAlertModal({isVisible: false}),
+          cancelTitle: 'Cancelar',
+          okTitle: 'Apagar',
+        });
+      }
     }
-
     return ableToDelete;
   };
 
@@ -246,11 +248,13 @@ const List = ({
       setCheckedItems([]);
     } else {
       setIsConfirming(true);
-      newItemList.forEach(item => {
-        if (checkedItems.length === 0) setCheckedItems([...checkedItems, item]);
-        else if (!checkedItems.some(checkedItem => checkedItem.id === item.id))
-          setCheckedItems([...checkedItems, item]);
-      });
+      const itemToConfirm = newItemList.find(item => item.id === id);
+      if (checkedItems.length === 0)
+        setCheckedItems([...checkedItems, itemToConfirm]);
+      else if (
+        !checkedItems.some(checkedItem => checkedItem.id === itemToConfirm.id)
+      )
+        setCheckedItems([...checkedItems, itemToConfirm]);
     }
 
     setItems(newItemList);
@@ -303,6 +307,7 @@ const List = ({
             {transform: [{translateY}]},
           ]}>
           <ListHeader
+            onBack={checkItem}
             backButtonHeader={backButtonHeader}
             showBackButton={showBackButton}
             isDeleting={isDeleting}
@@ -353,7 +358,7 @@ const List = ({
           )}
         />
       </S.Body>
-      {!showFooter && (
+      {!showFooter && showAddButton && (
         <FloatButton
           bottom={'40px'}
           right={'30px'}

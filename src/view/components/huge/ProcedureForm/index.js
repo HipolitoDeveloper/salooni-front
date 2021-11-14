@@ -273,6 +273,7 @@ const ProcedureForm = ({
     ) {
       ableToGo = false;
       errorMessage = errorMessages.maintenanceMessage;
+      setErrorMessage(errorMessage);
       if (showErrorMessages) setIsLoading(false);
     }
 

@@ -61,6 +61,7 @@ const Clients = () => {
     <S.Container>
       <Notification />
       <List
+        showAddButton={true}
         onRefresh={onRefresh}
         refreshing={isLoading}
         isOwner={true}

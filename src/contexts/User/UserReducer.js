@@ -56,6 +56,18 @@ export const UserReducer = (state, action) => {
         ...state,
         notifications: state.notifications,
       };
+    case 'CLEAN_NOTIFICATION':
+      state.notifications = [];
+      return {
+        ...state,
+        notifications: state.notifications,
+      };
+    case 'HANDLE_NOTIFICATION':
+      state.showingNotification = action.payload;
+      return {
+        ...state,
+        showingNotification: state.showingNotification,
+      };
     default:
       return state;
   }

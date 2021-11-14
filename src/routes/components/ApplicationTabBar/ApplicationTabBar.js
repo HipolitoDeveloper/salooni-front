@@ -9,6 +9,7 @@ import {ScheduleContext} from '../../../contexts/Schedule/ScheduleContext';
 import {UserContext} from '../../../contexts/User/UserContext';
 import Loading from '../../../view/components/small/Loading';
 import {Button, TouchableOpacity, View, Text} from 'react-native';
+import Notification from '../../../view/components/small/Notification';
 
 export default ({state, navigation}) => {
   const {currentUser} = useContext(UserContext);

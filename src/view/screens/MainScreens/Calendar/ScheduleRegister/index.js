@@ -147,7 +147,7 @@ const ScheduleRegister = ({route}) => {
           navigate.push('TabStack', {
             screen: 'Schedules',
             params: {
-              calendarViewState: false,
+              isToShowAgenda: false,
             },
           });
           setIsLoading(false);
@@ -169,7 +169,7 @@ const ScheduleRegister = ({route}) => {
         navigate.replace('TabStack', {
           screen: 'Schedules',
           params: {
-            calendarViewState: false,
+            isToShowAgenda: false,
           },
         });
         setIsLoading(false);
@@ -192,7 +192,7 @@ const ScheduleRegister = ({route}) => {
         navigate.push('TabStack', {
           screen: 'Schedules',
           params: {
-            calendarViewState: false,
+            isToShowAgenda: false,
           },
         });
         setErrorMessage('');
@@ -300,7 +300,7 @@ const ScheduleRegister = ({route}) => {
         navigate.push('TabStack', {
           screen: 'Schedules',
           params: {
-            calendarState: true,
+            isToShowAgenda: false,
           },
         })
       }

@@ -297,12 +297,19 @@ export const getScheduleByEmployeeId = (employeeId, returnParseObject) => {
 };
 
 export const confirmSchedulesList = async (scheduleId, procedures, checked) => {
-  try {
-    const schedule = new ScheduleObject({objectId: scheduleId});
-    schedule.set('analyzed_schedule', true);
-    await schedule.save();
-    await confirmScheduleProcedure(procedures, checked);
-  } catch (e) {
-    console.error(`Agendamento ${e}`);
-  }
+  return new Promise(async (resolve, reject) => {
+    try {
+      const schedule = new ScheduleObject({objectId: scheduleId});
+      schedule.set('analyzed_schedule', true);
+      const confirmedSchedule = await schedule.save();
+      await confirmScheduleProcedure(procedures, checked);
+      procedures.forEach(procedure => {
+        procedure.accomplishedSchedule = checked;
+      });
+      resolve(buildSchedule(convertToObj(confirmedSchedule), procedures));
+    } catch (e) {
+      reject(`Agendamento ${JSON.stringify(e)}`);
+      console.error(`Agendamento ${e}`);
+    }
+  });
 };

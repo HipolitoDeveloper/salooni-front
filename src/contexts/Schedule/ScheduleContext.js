@@ -65,11 +65,13 @@ const ScheduleProvider = ({children}) => {
     dispatch({type: 'CHECK_SCHEDULE', id});
   };
 
-  const confirmSchedules = async payload => {
-    const schedules = payload;
-    schedules.forEach(({id, procedures, checked}) => {
-      confirmSchedulesList(id, procedures, checked);
-      dispatch({type: 'CONFIRM_SCHEDULE', id});
+  const confirmSchedules = payload => {
+    const toConfirmSchedules = payload;
+
+    toConfirmSchedules.forEach(({id, procedures, checked}) => {
+      confirmSchedulesList(id, procedures, checked).then(confirmedSchedule => {
+        dispatch({type: 'CONFIRM_SCHEDULE', confirmedSchedule});
+      });
     });
   };
 

@@ -113,7 +113,11 @@ const ListMenu = ({
                           <S.ProcedureContent
                             disabled={!isOwner && itemType !== 'schedule'}
                             onPress={() =>
-                              deleteProcedure(item, menuState.itemToShow.id)
+                              deleteProcedure(
+                                item,
+                                menuState.itemToShow.id,
+                                false,
+                              )
                             }>
                             <S.ProcedureDeleteIcon>
                               <RoundedTimes

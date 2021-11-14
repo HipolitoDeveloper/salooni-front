@@ -27,6 +27,7 @@ const ListHeader = ({
   searchPlaceHolder,
   scrolling,
   showBackButton,
+  onBack,
 }) => {
   const [scheduleView, setScheduleView] = useState('');
   const [search, setSearch] = useState('');
@@ -50,7 +51,10 @@ const ListHeader = ({
           <BackButton
             positionLeft={'20px'}
             positionTop={'60px'}
-            onPress={() => navigation.push('TabStack', {screen: 'Schedules'})}
+            onPress={() => {
+              onBack(-1);
+              navigation.push('TabStack', {screen: 'Schedules'});
+            }}
             buttonColor={global.colors.purpleColor}
           />
           <S.HeaderText>Agendamentos a confirmar</S.HeaderText>

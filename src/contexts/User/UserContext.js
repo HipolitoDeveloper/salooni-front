@@ -41,6 +41,7 @@ const initialState = {
     password: '',
   },
   notifications: [],
+  showingNotification: false,
 };
 
 const UserProvider = ({children}) => {
@@ -322,14 +323,22 @@ const UserProvider = ({children}) => {
               ...notificationsMessages.notifications[0],
               method: method,
             }
-          : '';
+          : {};
         break;
     }
 
-    dispatch({type: 'SET_NOTIFICATION', notification});
+    if (verification) dispatch({type: 'SET_NOTIFICATION', notification});
+    else dispatch({type: 'CLEAN_NOTIFICATION', notification});
+
+    dispatch({type: 'HANDLE_NOTIFICATION', payload: verification});
+  };
+
+  const handleNotification = payload => {
+    dispatch({type: 'HANDLE_NOTIFICATION', payload});
   };
 
   const contextValues = {
+    handleNotification,
     verifyNotification,
     updateProfile,
     doLogin,

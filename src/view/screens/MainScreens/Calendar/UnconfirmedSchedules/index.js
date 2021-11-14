@@ -11,9 +11,10 @@ import List from '../../../../components/ListComponent';
 import AlertModal from '../../../../components/small/AlertModal';
 import Notification from '../../../../components/small/Notification';
 import {HeaderContent} from './styled';
+import notificationsMessages from '../../../../../common/notificationsMessages';
 
 const UnconfirmedSchedules = ({route}) => {
-  const {currentUser, isOwner} = useContext(UserContext);
+  const {currentUser, verifyNotification} = useContext(UserContext);
   const {
     calendarSchedule,
     schedules,
@@ -42,6 +43,21 @@ const UnconfirmedSchedules = ({route}) => {
 
   const handleAgenda = state => {
     setIsShowingAgenda(!isShowingAgenda);
+  };
+
+  const confirmSchedule = checkedItems => {
+    confirmSchedules(checkedItems);
+
+    verifyNotification({
+      name: notificationsMessages.notifications[0].name,
+      verification: checkedItems.some(
+        schedule => !schedule.checked && schedule.passedHour,
+      ),
+      method: () =>
+        navigate.push('ApplicationStack', {
+          screen: 'UnconfirmedSchedules',
+        }),
+    });
   };
 
   const deleteSchedule = scheduleToDelete => {
@@ -98,19 +114,20 @@ const UnconfirmedSchedules = ({route}) => {
         onRefresh={onRefresh}
         refreshing={isLoading}
         searchPlaceHolder={'Procure pela sua agenda '}
-        isOwner={true}
+        isOwner={false}
         showHeader={true}
+        showAddButton={false}
         handleAgenda={handleAgenda}
-        showProfileIcon={true}
+        showProfileIcon={false}
         headerText={'Calendário'}
         color={global.colors.purpleColor}
-        itemList={schedules}
+        itemList={schedules.filter(schedule => !schedule.nextHour)}
         menuItems={['name', 'tel', 'email', 'procedures']}
         objectMenuItems={['client', 'client', 'client']}
         itemType={'schedule'}
         listProperty={['name', 'scheduleHour']}
         checkItems={checkSchedules}
-        confirmItems={confirmSchedules}
+        confirmItems={confirmSchedule}
         deleteItemList={deleteSchedules}
         deleteUniqueItem={deleteSchedule}
         deleteProcedure={deleteScheduleProcedure}

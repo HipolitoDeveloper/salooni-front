@@ -124,8 +124,7 @@ const Calendar = ({calendarSchedule, isVisible, handleModal}) => {
               ? `${global.colors.purpleColor}`
               : 'white',
           },
-        ]}
-        onPress={() => Alert.alert(JSON.stringify(item.nextHour))}>
+        ]}>
         <View style={[styles.itemContent]}>
           <View>
             <Text

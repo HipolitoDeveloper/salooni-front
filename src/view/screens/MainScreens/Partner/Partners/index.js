@@ -108,6 +108,7 @@ const Partners = () => {
       )}
 
       <List
+        showAddButton={true}
         onRefresh={onRefresh}
         refreshing={isLoading}
         searchPlaceHolder={'Procure pelos seus parceiros'}

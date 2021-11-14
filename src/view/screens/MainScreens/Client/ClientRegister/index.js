@@ -203,8 +203,6 @@ const ClientRegister = ({route}) => {
       client.name === '' ||
       client.email === undefined ||
       client.email === '' ||
-      client.cpf === undefined ||
-      client.cpf === '' ||
       client.tel === undefined ||
       client.tel === '' ||
       client.bornDate === undefined ||
@@ -214,11 +212,6 @@ const ClientRegister = ({route}) => {
       errorMessage = errorMessages.clientMessage;
       if (showErrorMessages) setIsLoading(false);
     } else {
-      if (!CPFVerifier(client.cpf).state) {
-        ableToGo = false;
-        errorMessage = errorMessages.invalidCPF;
-        if (showErrorMessages) setIsLoading(false);
-      }
       if (!TELVerifier(client.tel).state) {
         ableToGo = false;
         errorMessage = errorMessages.invalidTel;
@@ -233,6 +226,16 @@ const ClientRegister = ({route}) => {
     ) {
       ableToGo = false;
       errorMessage = errorMessages.invalidTel;
+      if (showErrorMessages) setIsLoading(false);
+    }
+
+    if (
+      client.cpf !== '' &&
+      client.cpf !== undefined &&
+      !CPFVerifier(client.cpf).state
+    ) {
+      ableToGo = false;
+      errorMessage = errorMessages.invalidCPF;
       if (showErrorMessages) setIsLoading(false);
     }
 
@@ -311,7 +314,7 @@ const ClientRegister = ({route}) => {
           color={global.colors.blueColor}
           label={'CPF*'}
           isToValidate={true}
-          noEmpty={true}
+          noEmpty={false}
         />
 
         <S.DateTextContent

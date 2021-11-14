@@ -167,11 +167,10 @@ export const ScheduleReducer = (state, action) => {
       };
 
     case 'CONFIRM_SCHEDULE':
-      const scheduleIdToConfirm = action.id;
-
+      const {confirmedSchedule} = action;
       state.schedules = state.schedules.map(schedule => {
-        if (schedule.id == scheduleIdToConfirm) {
-          schedule.firstCheckedState = schedule.checked;
+        if (schedule.id === confirmedSchedule.id) {
+          schedule = {...confirmedSchedule};
         }
         return schedule;
       });
