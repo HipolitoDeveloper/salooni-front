@@ -3,7 +3,7 @@ import * as S from './styled';
 import RoundedTimes from '../../../assets/svg/roundedTimesSVG.svg';
 import Salooni from '../../../assets/svg/salooniSVG.svg';
 import Confirm from '../../../assets/svg/confirmSVG.svg';
-import {Animated, StyleSheet} from 'react-native';
+import {Animated, Dimensions, StyleSheet} from 'react-native';
 import BackButton from '../../../view/components/small/BackButton';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {UserContext} from '../../../contexts/User/UserContext';
@@ -28,6 +28,9 @@ const TopTabBar = ({
   const {setCurrentUser} = useContext(UserContext);
   const headerLinePosition = useRef(new Animated.Value(0)).current;
 
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
   const unsubscribe = navigation.addListener(
     'tabPress',
     e => {
@@ -40,14 +43,14 @@ const TopTabBar = ({
 
   const handleState = currentPage => {
     let position = 0;
-
+    console.log('screenHeight', screenHeight);
     if (pages.length === 3) {
       switch (currentPage) {
         case 1:
-          position = 115;
+          position = isSmallerScreen ? 105 : 113;
           break;
         case 2:
-          position = 250;
+          position = isSmallerScreen ? 250 : 260;
           break;
         default:
           position = 0;
@@ -90,7 +93,7 @@ const TopTabBar = ({
   handleState(state.index);
 
   return (
-    <S.Container headerColor={color}>
+    <S.Container headerColor={color} isSmallerScreen={screenHeight < 650}>
       <Loading isLoading={isLoading} color={color} />
       <S.Content>
         {backButton && (
@@ -108,15 +111,20 @@ const TopTabBar = ({
               <RoundedTimes
                 fill={'white'}
                 borderFill={color}
-                width={35}
-                height={35}
+                width={screenHeight / 25}
+                height={screenHeight / 25}
               />
             </S.CancelButton>
             <S.ButtonText>Cancelar</S.ButtonText>
           </S.ButtonContent>
         )}
 
-        <Salooni fill={color} borderFill={'white'} width={60} height={60} />
+        <Salooni
+          fill={color}
+          borderFill={'white'}
+          width={screenHeight / 12}
+          height={screenHeight / 12}
+        />
 
         {!disableButtons && (
           <S.ButtonContent>
@@ -127,8 +135,8 @@ const TopTabBar = ({
               <Confirm
                 fill={color}
                 borderFill={'white'}
-                width={35}
-                height={35}
+                width={screenHeight / 25}
+                height={screenHeight / 25}
               />
             </S.ConfirmButton>
             <S.ButtonText>Concluir</S.ButtonText>
@@ -152,13 +160,19 @@ const TopTabBar = ({
               goTo(page.screen);
               handleState(index);
             }}>
-            <S.HeaderTitle headerColor={color}>{page.name}</S.HeaderTitle>
+            <S.HeaderTitle screenHeight={screenHeight} headerColor={color}>
+              {page.name}
+            </S.HeaderTitle>
           </S.HeaderTitleContent>
         ))}
       </S.HeaderTitleContainer>
       <Animated.View
         style={[
-          {left: headerLinePosition, backgroundColor: color},
+          {
+            left: headerLinePosition,
+            backgroundColor: color,
+            width: screenHeight / 6,
+          },
           styles.headerLine,
         ]}
       />
@@ -173,6 +187,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     height: 3,
-    width: 110,
   },
 });

@@ -54,7 +54,8 @@ export const ConfimationMessageContent = styled.View`
 
 export const ConfimationMessageText = styled.Text`
   font-family: ${global.fonts.mainFont};
-  font-size: 16px;
+  font-size: ${props => props.screenHeight / 40}px;
+  margin-top: 15px;
   text-align: center;
   color: ${global.colors.lightGreyColor};
 `;
@@ -63,17 +64,17 @@ export const ItemInformation = styled.View`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex: ${props => (props.hasProcedure ? 3 : 1)};
+  height: 40%;
 `;
 export const ItemProperty = styled.Text`
   font-family: ${global.fonts.mainFont};
-  margin: 20px 0 20px 0;
-  font-size: 20px;
+  margin: 10px 0 20px 0;
+  font-size: ${props => props.screenHeight / 45}px;
   color: ${global.colors.lightGreyColor};
 `;
 
 export const ProcedureContainer = styled.View`
-  height: 75%;
+  height: 60%;
 `;
 
 export const ProcedureContent = styled.TouchableOpacity`
@@ -84,7 +85,7 @@ export const ProcedureContent = styled.TouchableOpacity`
   justify-content: flex-start;
   border-radius: 40px;
   margin-bottom: 10px;
-  padding: 10px;
+  padding: ${props => props.screenHeight / 165}px;
   max-width: 300px;
 `;
 
@@ -95,13 +96,15 @@ export const ProcedureDeleteIcon = styled.View`
 export const ProcedureText = styled.Text`
   margin-left: 20px;
   font-family: ${global.fonts.mainFont};
-  font-size: 16px;
+  font-size: ${props => props.screenHeight / 60}px;
   padding: 10px;
 `;
 
 export const FooterButtons = styled.View`
   display: flex;
+  flex-direction: ${props => (props.isSmallerScreen ? 'row' : 'column')};
   align-items: flex-end;
   justify-content: flex-end;
-  flex: 1;
+  height: 20%;
+  margin-top: 20px;
 `;

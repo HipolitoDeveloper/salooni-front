@@ -82,6 +82,7 @@ export const DateTextContent = styled.TouchableOpacity`
   border-bottom-width: 1px;
   border-bottom-color: ${props => props.borderBottomColor};
   height: 60px;
+  margin-top: 20px;
 `;
 
 export const DateText = styled.Text`

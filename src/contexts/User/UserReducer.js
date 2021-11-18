@@ -8,6 +8,12 @@ export const UserReducer = (state, action) => {
         [inputName]: text,
       };
 
+      state.owner.errorProperties.forEach((property, index) => {
+        if (property === inputName) {
+          state.owner.errorProperties.splice(index, 1);
+        }
+      });
+
       return {
         ...state,
         owner: state.owner,
@@ -36,6 +42,7 @@ export const UserReducer = (state, action) => {
         tel: '',
         email: '',
         password: '',
+        errorProperties: [],
       };
 
       return {
@@ -68,6 +75,20 @@ export const UserReducer = (state, action) => {
         ...state,
         showingNotification: state.showingNotification,
       };
+    case 'HANDLE_ERROR':
+      const {item, property} = action.payload;
+
+      const treatedOwner = state.owner;
+
+      treatedOwner.errorProperties.push(property);
+
+      state.owner = treatedOwner;
+
+      return {
+        ...state,
+        owner: state.owner,
+      };
+
     default:
       return state;
   }

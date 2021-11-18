@@ -48,12 +48,12 @@ export const HeaderTitleContent = styled.View``;
 
 export const HeaderTitle = styled.Text`
   font-family: ${global.fonts.mainFont};
-  font-size: 16px;
+  font-size: ${props => props.screenHeight / 46}px;
   color: ${props => props.headerColor};
 `;
 
 export const HeaderLine = styled.View`
-  margin-top: 5px;
+  margin-top: ${props => props.screenHeight / 140}px;
   height: 6px;
   width: 55px;
   background-color: ${props => props.headerColor};

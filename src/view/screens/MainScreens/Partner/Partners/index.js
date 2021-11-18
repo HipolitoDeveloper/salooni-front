@@ -35,6 +35,7 @@ const Partners = () => {
     }).then(
       calendarSchedule => {
         setIsLoading(false);
+        console.log('calendarSchedule', calendarSchedule);
         handleAgenda(calendarSchedule);
         // navigate.push('ApplicationStack', {
         //   screen: 'Schedules',

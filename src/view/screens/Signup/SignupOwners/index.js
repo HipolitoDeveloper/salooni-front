@@ -52,6 +52,9 @@ const SignupOwners = () => {
       <S.Content>
         <S.BodyContent>
           <Input
+            invalidValue={owner?.errorProperties.some(
+              property => property === 'salonName',
+            )}
             handleChange={handleChange}
             name={'salonName'}
             placeholder={'Salão'}
@@ -59,7 +62,7 @@ const SignupOwners = () => {
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={false}
-            fontSize={18}
+            fontSize={40}
             disabled={false}
             color={global.colors.purpleColor}
             label={'Nome do Salão*'}
@@ -67,6 +70,9 @@ const SignupOwners = () => {
             noEmpty={true}
           />
           <Input
+            invalidValue={owner?.errorProperties.some(
+              property => property === 'cnpj',
+            )}
             handleChange={handleChange}
             name={'cnpj'}
             placeholder={'CNPJ'}
@@ -74,7 +80,7 @@ const SignupOwners = () => {
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
-            fontSize={18}
+            fontSize={40}
             disabled={false}
             mask={'cnpj'}
             color={global.colors.purpleColor}
@@ -83,6 +89,9 @@ const SignupOwners = () => {
             noEmpty={true}
           />
           <Input
+            invalidValue={owner?.errorProperties.some(
+              property => property === 'userName',
+            )}
             handleChange={handleChange}
             name={'userName'}
             placeholder={'Nome do Proprietário'}
@@ -90,7 +99,7 @@ const SignupOwners = () => {
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={false}
-            fontSize={18}
+            fontSize={40}
             disabled={false}
             color={global.colors.purpleColor}
             label={'Nome do Proprietário*'}
@@ -98,6 +107,9 @@ const SignupOwners = () => {
             noEmpty={true}
           />
           <Input
+            invalidValue={owner?.errorProperties.some(
+              property => property === 'tel',
+            )}
             handleChange={handleChange}
             name={'tel'}
             placeholder={'Telefone'}
@@ -105,7 +117,7 @@ const SignupOwners = () => {
             width={'80%'}
             keyboard={'numeric'}
             isSecureTextEntry={false}
-            fontSize={18}
+            fontSize={40}
             disabled={false}
             mask={'phone'}
             color={global.colors.purpleColor}
@@ -114,6 +126,9 @@ const SignupOwners = () => {
             noEmpty={true}
           />
           <Input
+            invalidValue={owner?.errorProperties.some(
+              property => property === 'email',
+            )}
             handleChange={handleChange}
             name={'email'}
             placeholder={'E-mail'}
@@ -121,7 +136,7 @@ const SignupOwners = () => {
             width={'80%'}
             keyboard={'email-address'}
             isSecureTextEntry={false}
-            fontSize={18}
+            fontSize={40}
             disabled={false}
             mask="email"
             color={global.colors.purpleColor}
@@ -131,6 +146,9 @@ const SignupOwners = () => {
           />
 
           <Input
+            invalidValue={owner?.errorProperties.some(
+              property => property === 'password',
+            )}
             handleChange={handleChange}
             name={'password'}
             placeholder={'Senha'}
@@ -138,7 +156,7 @@ const SignupOwners = () => {
             width={'80%'}
             keyboard={'default'}
             isSecureTextEntry={true}
-            fontSize={18}
+            fontSize={40}
             disabled={false}
             mask="password"
             color={global.colors.purpleColor}

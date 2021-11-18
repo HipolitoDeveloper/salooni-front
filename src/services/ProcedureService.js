@@ -89,7 +89,6 @@ export const saveProcedure = (procedureObj, returnParseObject) => {
             : 0,
         ),
       );
-      //
       newProcedure.set(
         'commission_percentage',
         hasCommission.state && isPercentage
@@ -215,15 +214,16 @@ export const updateProcedureCRUD = (procedureObj, returnParseObject) => {
       procedure.set(
         'commission_value',
         parseFloat(
-          hasCommission.state && isPercentage
+          hasCommission.state && isFixedValue
             ? commissionValue.replace('.', '').replace(',', '.')
             : 0,
         ),
       );
+      console.log('teste', hasCommission.state && isPercentage);
 
       procedure.set(
         'commission_percentage',
-        hasCommission.state && isFixedValue
+        hasCommission.state && isPercentage
           ? parseInt(commissionPercentage)
           : 0,
       );

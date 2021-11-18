@@ -6,6 +6,7 @@ import {
   View,
   ScrollView,
   FlatList,
+  Dimensions,
 } from 'react-native';
 import global from '../../../../common/global';
 import * as S from './styled';
@@ -27,6 +28,7 @@ import {
 import {InputContent, InputTitle, ShowPasswordButton} from './styled';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 const Input = ({
+  invalidValue,
   handleChange,
   placeholder,
   value,
@@ -58,6 +60,9 @@ const Input = ({
   });
 
   const [isShowingPassword, setIsShowingPassword] = useState(true);
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
 
   const chooseMask = text => {
     switch (mask) {
@@ -161,14 +166,18 @@ const Input = ({
       {leftPlaceholder && value.length > 0 && (
         <Text style={[styles.leftPlaceholder]}>{leftPlaceholder}</Text>
       )}
+
       <S.InputContent>
-        <S.InputTitle color={color}>{label}</S.InputTitle>
+        {invalidValue && <Text>Ooewqe</Text>}
+        <S.InputTitle screenHeight={screenHeight} color={color}>
+          {label}
+        </S.InputTitle>
         <S.Input
           ref={ref}
           style={[
             {
               paddingLeft: leftPlaceholder && value.length ? 30 : 0,
-              fontSize: fontSize,
+              fontSize: screenHeight / fontSize,
               borderBottomColor: isInputValid.state ? color : 'red',
             },
           ]}
@@ -229,6 +238,7 @@ export const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     width: '100%',
+    marginTop: 20,
   },
   input: {
     fontFamily: `${global.fonts.mainFont}`,

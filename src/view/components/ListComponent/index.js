@@ -5,7 +5,13 @@ import ListContent from './ListContent';
 import ListHeader from './ListHeader';
 import Button from '../small/Button';
 import ListMenu from './ListMenu';
-import {FlatList, Animated, Platform, RefreshControl} from 'react-native';
+import {
+  FlatList,
+  Animated,
+  Platform,
+  RefreshControl,
+  Dimensions,
+} from 'react-native';
 import FloatButton from '../small/FloatButton';
 import Times from '../../../assets/svg/timesSVG.svg';
 import Loading from '../small/Loading';
@@ -13,8 +19,6 @@ import {getCloser} from '../../../common/headerFunctions';
 import {useNavigation} from '@react-navigation/native';
 import AlertModal from '../small/AlertModal';
 const {diffClamp} = Animated;
-
-const headerHeight = Platform.OS === 'ios' ? 90 * 2 : 70 * 2;
 
 const List = ({
   backButtonHeader,
@@ -44,6 +48,13 @@ const List = ({
   refreshing,
   showAddButton,
 }) => {
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
+
+  // const headerHeight = Platform.OS === 'ios' ? 90 * 2 : 70 * 2;
+  const headerHeight = Platform.OS === 'ios' ? 90 * 2 : (screenHeight / 10) * 2;
+
   const scrollY = useRef(new Animated.Value(0));
   const scrollYClamped = diffClamp(scrollY.current, 0, headerHeight);
   const translateY = scrollYClamped.interpolate({

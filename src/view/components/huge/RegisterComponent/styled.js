@@ -16,7 +16,7 @@ export const ButtonsContent = styled.View``;
 export const CancelButton = styled.TouchableOpacity`
   background-color: ${props => props.color};
   position: absolute;
-  bottom: 165px;
+  bottom: ${props => props.bottom};
   right: 120px;
   padding: 10px;
   border-radius: 30px;
@@ -24,9 +24,6 @@ export const CancelButton = styled.TouchableOpacity`
 
 export const AddMessage = styled.Text`
   font-family: ${global.fonts.mainFont};
-  font-size: 10px;
+  font-size: 12px;
   opacity: 0.4;
-  position: absolute;
-  bottom: 130px;
-  right: 20px;
 `;

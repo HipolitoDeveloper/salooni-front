@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {ActivityIndicator, Platform} from 'react-native';
+import {ActivityIndicator, Dimensions, Platform} from 'react-native';
 
 import * as S from './styled';
 import BackButton from '../../../../components/small/BackButton';
@@ -40,6 +40,7 @@ const ScheduleRegister = ({route}) => {
     deleteScheduleInView,
     sortScheduleList,
   } = useContext(ScheduleContext);
+  const screenHeight = Dimensions.get('screen').height;
 
   const {partners} = useContext(PartnerContext);
   const {clients} = useContext(ClientContext);
@@ -54,9 +55,14 @@ const ScheduleRegister = ({route}) => {
     text: '',
   });
 
+  const currentEmployee =
+    partners.find(partner => partner.id === currentUser.idFunc) !== undefined
+      ? partners.find(partner => partner.id === currentUser.idFunc)
+      : {};
+
   const [schedule, setSchedule] = useState({
     client: '',
-    employee: partners.find(partner => partner.id === currentUser.idFunc),
+    employee: currentEmployee,
     procedures: [],
     scheduleDate: new Date(route.params?.date),
   });
@@ -71,6 +77,10 @@ const ScheduleRegister = ({route}) => {
   // });
 
   navigate.addListener('focus', () => {
+    console.log(
+      'partners.find(partner => partner.id === currentUser.idFunc)',
+      partners.find(partner => partner.id === currentUser.idFunc),
+    );
     const scheduleInView = route.params?.schedule ? route.params?.schedule : {};
 
     if (Object.keys(scheduleInView).length !== 0) {
@@ -142,15 +152,17 @@ const ScheduleRegister = ({route}) => {
         () => {
           sortScheduleList();
           cleanRegisteredSchedules();
-          setErrorMessage('');
-          clearSchedule();
-          navigate.push('TabStack', {
-            screen: 'Schedules',
-            params: {
-              isToShowAgenda: false,
-            },
-          });
-          setIsLoading(false);
+          setTimeout(() => {
+            setErrorMessage('');
+            clearSchedule();
+            navigate.push('TabStack', {
+              screen: 'Schedules',
+              params: {
+                isToShowAgenda: false,
+              },
+            });
+            setIsLoading(false);
+          }, 5000);
         },
         error => {
           setIsLoading(false);
@@ -342,7 +354,9 @@ const ScheduleRegister = ({route}) => {
         )}
 
         <S.DateTextContainer onPress={() => showMode(true, 'date')}>
-          <InputTitle color={global.colors.purpleColor}>
+          <InputTitle
+            color={global.colors.purpleColor}
+            screenHeight={screenHeight}>
             Data de Agendamento*
           </InputTitle>
           <S.DateTextContent>

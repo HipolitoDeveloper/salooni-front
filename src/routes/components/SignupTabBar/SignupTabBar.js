@@ -13,14 +13,28 @@ import InformationModal from '../../../view/components/small/InformationModal';
 import {getAllVideos, getVideoByRef} from '../../../services/VideoService';
 import * as S from './styled';
 import {Image} from 'react-native';
+import {
+  verifyInformation,
+  verifyInformationBeforeInsertion,
+} from '../../../services/CloudFunctions';
 
 const SignupTabBar = ({children, state, navigation}) => {
   const {registeredProcedures, cleanProceduresInformation} =
     useContext(ProcedureContext);
-  const {addPartner, registeredPartners, cleanPartnersInformation} =
-    useContext(PartnerContext);
-  const {doSignup, saveSignupInformation, cleanOwnerInformation, verifySignup} =
-    useContext(UserContext);
+  const {
+    addPartner,
+    registeredPartners,
+    cleanPartnersInformation,
+    handlePartnerRegisterError,
+  } = useContext(PartnerContext);
+  const {
+    doSignup,
+    saveSignupInformation,
+    cleanOwnerInformation,
+    verifySignup,
+    owner,
+    handleRegisterError,
+  } = useContext(UserContext);
 
   const [tutorial, setTutorial] = useState({windowVideo: {}, signupVideo: {}});
   const [isLoadingSignup, setIsLoadingSignup] = useState(false);
@@ -121,46 +135,71 @@ const SignupTabBar = ({children, state, navigation}) => {
     }
   };
 
-  const saveInformations = () => {
+  const saveInformations = async () => {
     setIsLoadingSignup(true);
-
-    saveSignupInformation({
+    const verifications = await verifyInformationBeforeInsertion({
       procedures: registeredProcedures,
       partners: registeredPartners,
-    }).then(
-      ownerEmployee => {
-        doSignup(ownerEmployee, '').then(
-          user => {
-            setIsLoadingSignup(false);
-            cleanProceduresInformation();
-            cleanOwnerInformation();
-            cleanPartnersInformation();
-            handleModal(
-              'O cadastro foi concluído.',
-              true,
-              `Realize a entrada como proprietário com o usuário ${user.email}`,
-              null,
-              () => navigate.navigate('EntranceStack', {screen: 'SignInOwner'}),
-              'IR',
-            );
-          },
-          error => {
-            handleModal('', false, ``, () => {}, closeModal);
-            setIsLoadingSignup(false);
-            setErrorMessage(errorMessages.salonWarningMessage);
-          },
-        );
-      },
-      error => {
-        console.error(error);
-        setIsLoadingSignup(false);
-        setErrorMessage(errorMessages.userWarningMessage);
-      },
-    );
+      owner: owner,
+    });
+
+    if (verifications.length === 0) {
+      saveSignupInformation({
+        procedures: registeredProcedures,
+        partners: registeredPartners,
+      }).then(
+        ownerEmployee => {
+          doSignup(ownerEmployee, '').then(
+            user => {
+              setIsLoadingSignup(false);
+              cleanProceduresInformation();
+              cleanOwnerInformation();
+              cleanPartnersInformation();
+              handleModal(
+                'O cadastro foi concluído.',
+                true,
+                `Realize a entrada como proprietário com o usuário ${user.email}`,
+                null,
+                () =>
+                  navigate.navigate('EntranceStack', {screen: 'SignInOwner'}),
+                'IR',
+              );
+            },
+            error => {
+              handleModal('', false, ``, () => {}, closeModal);
+              setIsLoadingSignup(false);
+              setErrorMessage(errorMessages.genericErrorMessage);
+            },
+          );
+        },
+        error => {
+          setIsLoadingSignup(false);
+        },
+      );
+    } else {
+      setIsLoadingSignup(false);
+      setErrorMessage(errorMessages.signupErrorMessage);
+
+      verifications.forEach(({item, property, type}) => {
+        switch (type) {
+          case 'OWN':
+            handleRegisterError({item: item, property: property});
+            break;
+          case 'PRC':
+            handlePartnerRegisterError({item: item, property: property});
+            break;
+          case 'salon':
+            handleRegisterError({item: item, property: property});
+            break;
+        }
+      });
+
+      console.log('verifications', verifications);
+    }
   };
-  const goWithoutProceduresOrPartners = () => {
+  const goWithoutProceduresOrPartners = async () => {
     closeModal();
-    saveInformations();
+    await saveInformations();
   };
 
   const goBack = () => {
@@ -180,7 +219,7 @@ const SignupTabBar = ({children, state, navigation}) => {
         isConfirmAvailable={isConfirmAvailable}
       />
 
-      {errorMessage !== '' && (
+      {errorMessage !== '' && !isConfirmAvailable && (
         <ErrorMessage
           text={errorMessage}
           width={'70%'}

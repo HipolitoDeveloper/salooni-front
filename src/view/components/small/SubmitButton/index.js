@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ContentButton, ContentButtonText} from './styled';
 import Input from '../Input';
+import {Dimensions} from 'react-native';
 
 const SubmitButton = ({
   text,
@@ -12,15 +13,21 @@ const SubmitButton = ({
   buttonColor,
   disabled,
 }) => {
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
+
   return (
     <>
       <ContentButton
         onPress={onPress}
-        width={width}
-        height={height}
+        width={`${screenWidth / width}px`}
+        height={`${screenHeight / height}px`}
         buttonColor={buttonColor}
         disabled={typeof disabled === 'function' ? !disabled() : disabled}>
-        <ContentButtonText fontSize={fontSize}>{text}</ContentButtonText>
+        <ContentButtonText fontSize={`${screenHeight / fontSize}px`}>
+          {text}
+        </ContentButtonText>
       </ContentButton>
     </>
   );

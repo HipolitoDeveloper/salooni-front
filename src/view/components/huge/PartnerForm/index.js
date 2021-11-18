@@ -39,12 +39,14 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
     updatePartner,
     deletePartner,
     deletePartnerInView,
+    handlePartnerRegisterError,
   } = useContext(PartnerContext);
 
   const {currentUser} = useContext(UserContext);
 
   const [partner, setPartner] = useState({
     procedures: [],
+    errorProperties: [],
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -76,10 +78,16 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
   }, []);
 
   const clearPartner = () => {
-    setPartner({procedures: []});
+    setPartner({procedures: [], errorProperties: []});
   };
 
   const handleChange = (text, name) => {
+    partner?.errorProperties?.forEach((property, index) => {
+      if (property === name) {
+        partner.errorProperties?.splice(index, 1);
+      }
+    });
+
     setPartner({
       ...partner,
       [name]: text,
@@ -133,27 +141,37 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
     return registeredPartners.some(partner => partner.isInView === true);
   };
 
-  const savePartners = () => {
+  const savePartners = async () => {
+    let isSaving = false;
     setIsLoading(true);
 
     if (verifyInformationToGo()) {
-      savePartner().then(
-        () => {
-          setTimeout(() => {
+      for (const partner of registeredPartners) {
+        await savePartner(partner).then(
+          () => {
+            setErrorMessage('');
+            isSaving = true;
+          },
+          error => {
             setIsLoading(false);
-            navigate.push('TabStack', {screen: 'Partners'});
-            clearPartner();
 
-            cleanPartnersInformation();
-          }, 3000);
+            if (error === 137) {
+              handlePartnerRegisterError({item: partner, property: 'email'});
+              setErrorMessage(errorMessages.duplicateInformation);
+            }
+          },
+        );
+      }
 
-          setErrorMessage('');
-        },
-        error => {
+      if (isSaving) {
+        setTimeout(() => {
           setIsLoading(false);
-          console.log(error);
-        },
-      );
+          navigate.push('TabStack', {screen: 'Partners'});
+          clearPartner();
+
+          cleanPartnersInformation();
+        }, 3000);
+      }
     }
   };
 
@@ -171,7 +189,10 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
       },
       error => {
         setIsLoading(false);
-        console.log(error);
+        if (error === 137) {
+          handlePartnerRegisterError({item: partner, property: 'email'});
+          setErrorMessage(errorMessages.duplicateInformation);
+        }
       },
     );
   };
@@ -266,7 +287,31 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
       if (showErrorMessages) setIsLoading(false);
     }
 
+    if (
+      registeredPartners.some(
+        registeredPartner =>
+          registeredPartner.name !== partner.name &&
+          registeredPartner.email === partner.email,
+      )
+    ) {
+      ableToGo = false;
+      errorMessage = errorMessages.duplicateInformation;
+      setErrorMessage(errorMessages.duplicateInformation);
+      if (showErrorMessages) setIsLoading(false);
+    }
+
+    if (
+      registeredPartners.some(
+        registeredPartner => registeredPartner.errorProperties.length > 0,
+      )
+    ) {
+      ableToGo = false;
+      errorMessage = errorMessages.duplicateInformation;
+      setErrorMessage(errorMessages.duplicateInformation);
+      if (showErrorMessages) setIsLoading(false);
+    }
     if (showErrorMessages) setErrorMessage(errorMessage);
+    if (errorMessage === '') setErrorMessage('');
     return ableToGo;
   };
 
@@ -284,6 +329,9 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
 
       <S.BodyContent>
         <Input
+          invalidValue={partner?.errorProperties?.some(
+            property => property === 'name',
+          )}
           handleChange={handleChange}
           name={'name'}
           placeholder={'Nome do Parceiro'}
@@ -291,7 +339,7 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
           width={'80%'}
           keyboard={'default'}
           isSecureTextEntry={false}
-          fontSize={14}
+          fontSize={44}
           disabled={false}
           isToValidate={isFocused}
           noEmpty={true}
@@ -300,6 +348,9 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
         />
 
         <Input
+          invalidValue={partner?.errorProperties?.some(
+            property => property === 'email',
+          )}
           handleChange={handleChange}
           name={'email'}
           placeholder={'E-mail'}
@@ -307,7 +358,7 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
           width={'80%'}
           keyboard={'email-address'}
           isSecureTextEntry={false}
-          fontSize={14}
+          fontSize={44}
           disabled={false}
           mask="email"
           isToValidate={isFocused}
@@ -317,6 +368,9 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
         />
 
         <Input
+          invalidValue={partner?.errorProperties?.some(
+            property => property === 'tel',
+          )}
           handleChange={handleChange}
           name={'tel'}
           placeholder={'Celular do Parceiro'}
@@ -324,7 +378,7 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={14}
+          fontSize={44}
           disabled={false}
           mask={'phone'}
           isToValidate={isFocused}
@@ -334,6 +388,9 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
         />
 
         <Input
+          invalidValue={partner?.errorProperties?.some(
+            property => property === 'cnpj',
+          )}
           handleChange={handleChange}
           name={'cnpj'}
           placeholder={'CNPJ do Parceiro'}
@@ -341,7 +398,7 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={44}
           disabled={false}
           mask={'cnpj'}
           isToValidate={isFocused}
@@ -353,7 +410,7 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
         <View
           style={{
             width: '80%',
-            marginTop: 20,
+            marginTop: 40,
           }}>
           {isFocused ? (
             <MultipleSelect
@@ -402,7 +459,10 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
     <RegisterComponent
       validForm={() => verifyInformation(false)}
       isSigningUp={isSigningUp}
-      onCancel={goBack}
+      onCancel={() => {
+        goBack();
+        cleanPartnersInformation();
+      }}
       color={color}
       preRegisteredItems={registeredPartners}
       handleSelect={handlePartner}

@@ -21,7 +21,7 @@ export const Input = styled.TextInput`
 
 export const InputTitle = styled.Text`
   font-family: ${global.fonts.mainFont};
-  font-size: 12px;
+  font-size: ${props => `${props.screenHeight / 50}px`};
   position: absolute;
   left: 0;
   top: 0;

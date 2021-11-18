@@ -12,8 +12,8 @@ export default {
     'Tem certeza que deseja realizar o cadastro sem procedimentos pré-registrados?',
   saveErrorProcedureMessage:
     'Não é possível salvar sem procedimentos pré-registrados.',
-  salonWarningMessage:
-    'Algo deu errado ao salvar as informações do seu salão, estamos trabalhando nisso!',
+  signupErrorMessage:
+    'As informações do seu cadastro estão inconsistentes!! Verifique os dados informados.',
   userWarningMessage:
     'Algo deu errado ao realizar o seu cadastro, estamos trabalhando nisso!',
   commissionMessage: 'Adicione um tipo de comissão ao procedimento',
@@ -34,4 +34,9 @@ export default {
   invalidEmail: 'E-mail inválido',
   invalidTel: 'Telefone inválido',
   partnerSignupMessage: 'Preencha todas as informações!',
+  duplicateInformation: 'CNPJ ou E-mail informados já estão sendo utilizados!',
+  duplicateEmailPreRegisteredItems:
+    'Um dos itens pré-registrados não pode ser salvo, pois possui um e-mail já registrado em nosso sistema.',
+  genericErrorMessage:
+    'Algo de errado aconteceu. Estamos trabalhando em melhorias!',
 };

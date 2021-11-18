@@ -121,7 +121,7 @@ const UnconfirmedSchedules = ({route}) => {
         showProfileIcon={false}
         headerText={'Calendário'}
         color={global.colors.purpleColor}
-        itemList={schedules.filter(schedule => !schedule.nextHour)}
+        itemList={schedules.filter(schedule => schedule.passedHour)}
         menuItems={['name', 'tel', 'email', 'procedures']}
         objectMenuItems={['client', 'client', 'client']}
         itemType={'schedule'}

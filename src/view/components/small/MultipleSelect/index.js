@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import * as S from './styled';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {FlatList, View} from 'react-native';
+import {Dimensions, FlatList, View} from 'react-native';
 import Modal from 'react-native-modal';
-import {ButtonContent, ButtonText} from './styled';
+import {BrushIcon, ButtonContent, ButtonText} from './styled';
 import global from '../../../../common/global';
 import Button from '../Button';
 import Search from '../../../../assets/svg/searchSVG.svg';
@@ -25,6 +25,9 @@ const MultipleSelect = ({
 }) => {
   const [isShowingSuggestionBox, setIsShowingSuggestionBox] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
 
   useEffect(() => {
     clearValue();
@@ -71,6 +74,12 @@ const MultipleSelect = ({
           <S.InputText color={iconColor}>{inputText}</S.InputText>
           {value.some(v => v.id) > 0 ? (
             <S.ItemsContainer>
+              <S.BrushIcon
+                onPress={openModal}
+                selectedItemBorderColor={selectedItemBorderColor}>
+                <Icon name={'brush'} size={20} color={iconColor} />
+              </S.BrushIcon>
+
               <FlatList
                 horizontal={true}
                 data={value}
@@ -97,9 +106,9 @@ const MultipleSelect = ({
                 onPress={openModal}
                 color={global.colors.purpleColor}
                 text={placeholderText ? placeholderText : 'Procedimentos'}
-                width={'180px'}
-                height={'50px'}
-                fontSize={'17px'}
+                width={`${screenWidth / 2}px`}
+                height={`${screenHeight / 15}px`}
+                fontSize={`${screenHeight / 40}px`}
                 textColor={'black'}
                 backgroundColor={iconColor}
                 leftContent={{

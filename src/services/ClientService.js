@@ -19,14 +19,23 @@ export const insertClientCRUD = (clientObj, returnParseObject) => {
       client.set('tel2', tel2);
       client.set('birthdate', bornDate.toString());
       client.set('salon_id', new SalonObject({objectId: salonId}));
-      if (returnParseObject) {
-        resolve(await client.save());
-      } else {
-        resolve(buildClientObject(convertToObj(await client.save())));
-      }
+
+      client.save().then(
+        savedClient => {
+          if (returnParseObject) {
+            resolve(savedClient);
+          } else {
+            resolve(buildClientObject(convertToObj(savedClient)));
+          }
+        },
+        error => {
+          console.error(`Cliente ${JSON.stringify(error)}`);
+          reject(error);
+        },
+      );
     } catch (e) {
       console.error(`Cliente ${JSON.stringify(e)}`);
-      reject(`Cliente ${JSON.stringify(e)}`);
+      reject(e);
     }
   });
 };
@@ -52,7 +61,7 @@ export const updateClientCRUD = (clientObj, returnParseObject) => {
       }
     } catch (e) {
       console.error(`Cliente ${e}`);
-      reject(`Cliente ${JSON.stringify(e)}`);
+      reject(e);
     }
   });
 };

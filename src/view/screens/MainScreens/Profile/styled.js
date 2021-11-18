@@ -50,6 +50,7 @@ export const ProcedureContent = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
+  margin-top: ${props => (props.isSmallerScreen ? '30px' : 0)};
 `;
 
 export const ProcedureText = styled.Text`

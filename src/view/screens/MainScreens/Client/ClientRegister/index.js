@@ -17,6 +17,7 @@ import {
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import {InputTitle} from '../../../../components/small/Input/styled';
+import {Dimensions} from 'react-native';
 
 const ClientRegister = ({route}) => {
   const {
@@ -29,6 +30,7 @@ const ClientRegister = ({route}) => {
     updateClient,
     deleteClient,
     deleteClientInView,
+    handleClientRegisterError,
   } = useContext(ClientContext);
 
   const {currentUser} = useContext(UserContext);
@@ -42,12 +44,13 @@ const ClientRegister = ({route}) => {
   });
   const [client, setClient] = useState({
     bornDate: new Date(),
+    errorProperties: [],
   });
   const [invalidForm, setInvalidForm] = useState(false);
   const [showDate, setShowDate] = useState(false);
 
   const navigate = useNavigation();
-
+  const screenHeight = Dimensions.get('screen').height;
   useEffect(() => {
     navigate.addListener('focus', () => {
       if (Object.keys(route.params?.client).length !== 0) {
@@ -63,8 +66,20 @@ const ClientRegister = ({route}) => {
     registeredClients.forEach(client => (client.isInView = false));
   }, []);
 
+  const cleanClient = () => {
+    setClient({
+      bornDate: new Date(),
+      errorProperties: [],
+    });
+  };
+
   const handleChange = (text, name) => {
-    console.log('text', text);
+    client.errorProperties?.forEach((property, index) => {
+      if (property === name) {
+        client.errorProperties?.splice(index, 1);
+      }
+    });
+
     setClient({
       ...client,
       [name]: text,
@@ -88,14 +103,14 @@ const ClientRegister = ({route}) => {
       client.isInView = false;
       editClient({client: client, index: indexInView});
       setErrorMessage('');
-      setClient({});
+      cleanClient();
     }
 
     if (verifyInformation(true) && !isInView) {
       client.salonId = currentUser.idSalon;
       addClient(client);
       setErrorMessage('');
-      setClient({});
+      cleanClient();
     }
   };
 
@@ -107,7 +122,7 @@ const ClientRegister = ({route}) => {
     setClient(client);
 
     if (!verifyIfIsPreRegisteredEditing()) {
-      setClient({});
+      cleanClient();
     }
   };
 
@@ -115,53 +130,64 @@ const ClientRegister = ({route}) => {
     return registeredClients.some(client => client.isInView === true);
   };
 
-  const saveClients = () => {
+  const saveClients = async () => {
+    let isSaving = false;
     setIsLoading(true);
     if (verifyInformationToGo()) {
-      saveClient().then(
-        () => {
-          setTimeout(() => {
+      for (const client of registeredClients) {
+        await saveClient(client).then(
+          () => {
+            setErrorMessage('');
+            isSaving = true;
+          },
+          error => {
             setIsLoading(false);
-            navigate.push('TabStack', {screen: 'Clients'});
-            setClient({});
-          }, 3000);
-          cleanRegisteredClients();
-          setErrorMessage('');
-        },
-        error => {
+            if (error === 137)
+              handleClientRegisterError({item: client, property: 'email'});
+            setErrorMessage(errorMessages.duplicateEmailPreRegisteredItems);
+          },
+        );
+      }
+
+      if (isSaving) {
+        setTimeout(() => {
           setIsLoading(false);
-          console.log(error);
-        },
-      );
+          navigate.push('TabStack', {screen: 'Clients'});
+          cleanClient();
+          cleanRegisteredClients();
+        }, 3000);
+      }
     }
   };
 
-  const updateClients = () => {
+  const updateClients = async () => {
     setIsLoading(true);
-    updateClient(client).then(
+    await updateClient(client).then(
       () => {
         setTimeout(() => {
           setIsLoading(false);
           navigate.push('TabStack', {screen: 'Clients'});
-          setClient({});
+          cleanClient();
         }, 500);
         setErrorMessage('');
       },
       error => {
         setIsLoading(false);
-        console.log(error);
+        if (error.code === 137)
+          handleClientRegisterError({item: client, property: 'email'});
+        setErrorMessage(errorMessages.duplicateEmailPreRegisteredItems);
       },
     );
   };
 
   const deletePreRegisteredItem = client => {
     deleteClientInView(client);
-    setClient({});
+    cleanClient();
   };
 
   const cancelEditing = () => {
     updateClientInView(-1);
-    setClient({});
+    cleanClient();
   };
 
   const deleteClients = () => {
@@ -171,7 +197,7 @@ const ClientRegister = ({route}) => {
         setIsLoading(false);
         navigate.navigate('Clients');
         setErrorMessage('');
-        setClient({});
+        cleanClient();
       },
       error => {
         setIsLoading(false);
@@ -182,10 +208,14 @@ const ClientRegister = ({route}) => {
 
   const verifyInformationToGo = () => {
     let ableToGo = true;
-    if (Object.keys(client).length === 5) {
-      addClient(client);
-      return ableToGo;
-    } else if (registeredClients.length === 0) {
+    // if (Object.keys(client).length < 4) {
+    // addClient(client);
+    // return ableToGo;
+    // ableToGo = false;
+    // setErrorMessage(errorMessages.noClientMessage);
+    // setIsLoading(false);
+    // } else
+    if (registeredClients.length === 0) {
       ableToGo = false;
       setErrorMessage(errorMessages.noClientMessage);
       setIsLoading(false);
@@ -239,13 +269,30 @@ const ClientRegister = ({route}) => {
       if (showErrorMessages) setIsLoading(false);
     }
 
+    if (
+      registeredClients.some(
+        registeredClient =>
+          registeredClient.name !== client.name &&
+          registeredClient.email === client.email,
+      )
+    ) {
+      ableToGo = false;
+      errorMessage = errorMessages.duplicateInformation;
+      setErrorMessage(errorMessages.duplicateInformation);
+      if (showErrorMessages) setIsLoading(false);
+    }
+
     if (showErrorMessages) setErrorMessage(errorMessage);
+    if (errorMessage === '') setErrorMessage('');
     return ableToGo;
   };
 
   return (
     <RegisterComponent
-      onCancel={() => navigate.goBack()}
+      onCancel={() => {
+        navigate.goBack();
+        cleanRegisteredClients();
+      }}
       color={`${global.colors.blueColor}`}
       preRegisteredItems={registeredClients}
       handleSelect={handleClient}
@@ -268,6 +315,9 @@ const ClientRegister = ({route}) => {
       <Loading isLoading={isLoading} color={global.colors.blueColor} />
       <S.BodyContent>
         <Input
+          invalidValue={client?.errorProperties?.some(
+            property => property === 'name',
+          )}
           handleChange={handleChange}
           name={'name'}
           placeholder={'Nome do Cliente'}
@@ -275,7 +325,7 @@ const ClientRegister = ({route}) => {
           width={'80%'}
           keyboard={'default'}
           isSecureTextEntry={false}
-          fontSize={14}
+          fontSize={50}
           disabled={false}
           color={global.colors.blueColor}
           label={'Nome*'}
@@ -284,6 +334,9 @@ const ClientRegister = ({route}) => {
         />
 
         <Input
+          invalidValue={client?.errorProperties?.some(
+            property => property === 'email',
+          )}
           handleChange={handleChange}
           name={'email'}
           placeholder={'E-mail do Cliente'}
@@ -291,7 +344,7 @@ const ClientRegister = ({route}) => {
           width={'80%'}
           keyboard={'email-address'}
           isSecureTextEntry={false}
-          fontSize={14}
+          fontSize={50}
           disabled={false}
           mask="email"
           color={global.colors.blueColor}
@@ -301,6 +354,9 @@ const ClientRegister = ({route}) => {
         />
 
         <Input
+          invalidValue={client?.errorProperties?.some(
+            property => property === 'cpf',
+          )}
           handleChange={handleChange}
           name={'cpf'}
           placeholder={'CPF'}
@@ -308,11 +364,11 @@ const ClientRegister = ({route}) => {
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={14}
+          fontSize={50}
           disabled={false}
           mask={'cpf'}
           color={global.colors.blueColor}
-          label={'CPF*'}
+          label={'CPF'}
           isToValidate={true}
           noEmpty={false}
         />
@@ -320,7 +376,9 @@ const ClientRegister = ({route}) => {
         <S.DateTextContent
           borderBottomColor={global.colors.blueColor}
           onPress={() => setShowDate(true)}>
-          <InputTitle color={global.colors.blueColor}>
+          <InputTitle
+            color={global.colors.blueColor}
+            screenHeight={screenHeight}>
             Data de Nascimento*
           </InputTitle>
           <S.DateText>
@@ -341,6 +399,9 @@ const ClientRegister = ({route}) => {
         )}
 
         <Input
+          invalidValue={client?.errorProperties?.some(
+            property => property === 'tel',
+          )}
           handleChange={handleChange}
           name={'tel'}
           placeholder={'Celular'}
@@ -348,7 +409,7 @@ const ClientRegister = ({route}) => {
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={14}
+          fontSize={50}
           disabled={false}
           mask={'phone'}
           color={global.colors.blueColor}
@@ -358,6 +419,9 @@ const ClientRegister = ({route}) => {
         />
 
         <Input
+          invalidValue={client?.errorProperties?.some(
+            property => property === 'tel2',
+          )}
           handleChange={handleChange}
           name={'tel2'}
           placeholder={'Telefone'}
@@ -365,7 +429,7 @@ const ClientRegister = ({route}) => {
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={14}
+          fontSize={50}
           disabled={false}
           mask={'phone'}
           color={global.colors.blueColor}

@@ -11,6 +11,7 @@ import List from '../../../../components/ListComponent';
 import AlertModal from '../../../../components/small/AlertModal';
 import Notification from '../../../../components/small/Notification';
 import notificationsMessages from '../../../../../common/notificationsMessages';
+import Loading from '../../../../components/small/Loading';
 
 const Schedules = ({route}) => {
   const {currentUser, verifyNotification} = useContext(UserContext);
@@ -158,6 +159,9 @@ const Schedules = ({route}) => {
           })
         }
       />
+
+      <Loading isLoading={isLoading} color={`${global.colors.purpleColor}`} />
+
       <AlertModal
         text={
           'Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!'

@@ -20,8 +20,14 @@ export const ClientReducer = (state, action) => {
 
     case 'SAVE_CLIENTS':
       state.clients.push(action.newClient);
+      state.registeredClients.forEach((registeredClient, index) => {
+        if (registeredClient.email === action.newClient.email) {
+          state.registeredClients.splice(index, 1);
+        }
+      });
       return {
         clients: state.clients,
+        registeredClients: state.registeredClients,
         ...state,
       };
 
@@ -120,6 +126,19 @@ export const ClientReducer = (state, action) => {
       return {
         clients: state.clients,
         ...state,
+      };
+    case 'HANDLE_ERROR':
+      const {item, property} = action.payload;
+
+      state.registeredClients.forEach(client => {
+        if (item.name === client.name) {
+          client.errorProperties.push(property);
+        }
+      });
+
+      return {
+        ...state,
+        registeredClients: state.registeredClients,
       };
 
     default:

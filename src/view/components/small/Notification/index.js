@@ -11,20 +11,16 @@ const Notification = ({}) => {
     useContext(UserContext);
   const {checkSchedule} = useContext(ScheduleContext);
 
-  useEffect(() => {
-    handleNotification(notifications.length > 0);
-  }, []);
-
   return showingNotification ? (
     <S.Container>
       <S.Content>
         <S.NotificationMessage
           onPress={() => {
-            notifications[0].method();
+            notifications[0]?.method();
             checkSchedule(-1);
           }}>
           <S.NotificationText>
-            {notifications[0].description}
+            {notifications[0]?.description}
           </S.NotificationText>
         </S.NotificationMessage>
         <S.CloseButton onPress={() => handleNotification(false)}>

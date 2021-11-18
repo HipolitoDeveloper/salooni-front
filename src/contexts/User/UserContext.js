@@ -39,6 +39,7 @@ const initialState = {
     tel: '',
     email: '',
     password: '',
+    errorProperties: [],
   },
   notifications: [],
   showingNotification: false,
@@ -55,6 +56,11 @@ const UserProvider = ({children}) => {
     verifyUser();
   }, []);
 
+  useEffect(() => {
+    console.log('testewqe21');
+    handleNotification(state.notifications.length > 0);
+  }, []);
+
   const verifySignup = payload => {
     const {procedures, partners} = payload;
     let isOk = true;
@@ -66,6 +72,22 @@ const UserProvider = ({children}) => {
       return {
         isOk: false,
         errorMessage: 'Nenhuma informação do cadastro foi preenchida.',
+        showReconfirmModal: false,
+      };
+    }
+
+    if (ownerToBeVerified.errorProperties.length > 0) {
+      return {
+        isOk: false,
+        errorMessage: '',
+        showReconfirmModal: false,
+      };
+    }
+
+    if (partners.some(partner => partner.errorProperties.length > 0)) {
+      return {
+        isOk: false,
+        errorMessage: '',
         showReconfirmModal: false,
       };
     }
@@ -101,11 +123,10 @@ const UserProvider = ({children}) => {
       isOk = false;
       errorMessage = 'A senha não é forte o suficiente.';
     } else if (procedures.length === 0) {
-      errorMessage = partners.length === 0 && errorMessages.noProcedureMessage;
+      errorMessage = errorMessages.noProcedureMessage;
       showReconfirmModal = true;
     } else if (partners.length === 0) {
-      errorMessage =
-        partners.length === 0 && errorMessages.noPartnerSignupMessage;
+      errorMessage = errorMessages.noPartnerSignupMessage;
       showReconfirmModal = true;
     }
 
@@ -283,8 +304,8 @@ const UserProvider = ({children}) => {
 
         resolve(ownerEmployee);
       } catch (e) {
-        console.log(e);
-        reject(`Deu ruim ao salvar as informações do Salão ${e}`);
+        console.log(`Deu ruim ao salvar as informações do Salão ${e}`);
+        reject(e);
       }
     });
   };
@@ -337,7 +358,12 @@ const UserProvider = ({children}) => {
     dispatch({type: 'HANDLE_NOTIFICATION', payload});
   };
 
+  const handleRegisterError = payload => {
+    dispatch({type: 'HANDLE_ERROR', payload});
+  };
+
   const contextValues = {
+    handleRegisterError,
     handleNotification,
     verifyNotification,
     updateProfile,

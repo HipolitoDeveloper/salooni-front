@@ -125,13 +125,13 @@ export const saveEmployee = (employeeObj, returnParseObject, isSigningUp) => {
           }
         },
         error => {
-          console.error(`Empregador ${error}`);
-          reject(`Empregador ${JSON.stringify(error)}`);
+          console.log(`Empregador ${error}`);
+          reject(error);
         },
       );
     } catch (e) {
-      console.error(`Empregador ${e}`);
-      reject(`Empregador ${JSON.stringify(e)}`);
+      console.log(`Empregador ${e}`);
+      reject(e);
     }
   });
 };
@@ -164,12 +164,12 @@ export const saveEmployeeWithoutProcedures = (
         },
         error => {
           console.error(`Empregador ${error}`);
-          reject(`Empregador ${JSON.stringify(error)}`);
+          reject(error);
         },
       );
     } catch (e) {
       console.error(`Empregador ${e}`);
-      reject(`Empregador ${JSON.stringify(e)}`);
+      reject(e);
     }
   });
 };
@@ -227,40 +227,48 @@ export const updateEmployeeCRUD = (partnerObj, returnParseObject) => {
       employee.set('tel2', tel2);
       employee.set('email', email.trim());
 
-      employee.save().then(async employee => {
-        if (returnParseObject) {
-          resolve(employee);
-        } else {
-          if (procedures.length > 0) {
-            for (const procedure of procedureListWithoutChanges) {
-              if (!procedures.some(p => p.name === procedure.name)) {
-                await deleteProcedureEmployee(procedure.procedureEmployeeId);
+      employee.save().then(
+        async employee => {
+          if (returnParseObject) {
+            resolve(employee);
+          } else {
+            if (procedures.length > 0) {
+              for (const procedure of procedureListWithoutChanges) {
+                if (!procedures.some(p => p.name === procedure.name)) {
+                  await deleteProcedureEmployee(procedure.procedureEmployeeId);
+                }
               }
-            }
 
-            for (const procedure of procedures) {
-              if (
-                !procedureListWithoutChanges.some(pl => pl.id === procedure.id)
-              ) {
-                const procedureEmployee = await saveProcedureEmployee(
-                  {
-                    procedureId: procedure.id,
-                    employeeId: employee.id,
-                  },
-                  false,
-                );
-                procedure.procedureEmployeeId = procedureEmployee.objectId;
+              for (const procedure of procedures) {
+                if (
+                  !procedureListWithoutChanges.some(
+                    pl => pl.id === procedure.id,
+                  )
+                ) {
+                  const procedureEmployee = await saveProcedureEmployee(
+                    {
+                      procedureId: procedure.id,
+                      employeeId: employee.id,
+                    },
+                    false,
+                  );
+                  procedure.procedureEmployeeId = procedureEmployee.objectId;
+                }
               }
             }
+            resolve(
+              await buildEmployeeObject(convertToObj(employee), procedures),
+            );
           }
-          resolve(
-            await buildEmployeeObject(convertToObj(employee), procedures),
-          );
-        }
-      });
+        },
+        error => {
+          console.error(`Empregador ${error}`);
+          reject(error);
+        },
+      );
     } catch (e) {
       console.error(`Empregador ${e}`);
-      reject(`Empregador ${JSON.stringify(e)}`);
+      reject(e);
     }
   });
 };

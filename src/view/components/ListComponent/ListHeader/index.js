@@ -6,7 +6,7 @@ import Salooni from '../../../../assets/svg/salooniSVG.svg';
 import Search from '../../../../assets/svg/searchSVG.svg';
 import Times from '../../../../assets/svg/timesSVG.svg';
 import tourMessages from '../../../../common/tourMessages';
-import {View, Text} from 'react-native';
+import {View, Text, Dimensions} from 'react-native';
 import {CalendarIcon, ProfileIcon} from './styled';
 import Profile from '../../../../assets/svg/profileSVG.svg';
 import BackButton from '../../small/BackButton';
@@ -29,6 +29,10 @@ const ListHeader = ({
   showBackButton,
   onBack,
 }) => {
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
+
   const [scheduleView, setScheduleView] = useState('');
   const [search, setSearch] = useState('');
 
@@ -79,8 +83,8 @@ const ListHeader = ({
                   <Salooni
                     fill={headerColor}
                     borderFill={'#fff'}
-                    width={60}
-                    height={60}
+                    width={screenWidth / 8}
+                    height={screenHeight / 8}
                   />
                 )}
               </S.IconContent>
@@ -99,14 +103,17 @@ const ListHeader = ({
               </S.DeleteContent>
             ) : (
               <>
-                <S.TitleName headerColor={headerColor}>
+                <S.TitleName
+                  screenHeight={screenHeight}
+                  headerColor={headerColor}>
                   {headerTitle}
                 </S.TitleName>
                 {handleAgenda && (
                   <S.CalendarIcon
+                    screenWidth={screenWidth}
                     onPress={handleAgenda}
                     backgroundColor={headerColor}>
-                    <Icon name={'calendar'} size={18} color={'black'} />
+                    <Icon name={'calendar'} size={14} color={'black'} />
                   </S.CalendarIcon>
                 )}
 
@@ -120,8 +127,8 @@ const ListHeader = ({
                     <Profile
                       fill={headerColor}
                       borderFill={'#fff'}
-                      width={40}
-                      height={40}
+                      width={screenWidth / 12}
+                      height={screenHeight / 12}
                     />
                   </S.ProfileIcon>
                 )}
@@ -140,6 +147,7 @@ const ListHeader = ({
                 />
               </S.SearchIcon>
               <S.SearchInput
+                screenHeight={screenHeight}
                 value={search.text}
                 onChangeText={text => {
                   searchItems(text);

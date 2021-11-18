@@ -167,35 +167,39 @@ const Calendar = ({calendarSchedule, isVisible, handleModal}) => {
   );
 
   const renderDay = (day, item) => {
-    const dayDate = moment(day.dateString).format('DD');
-    const dayName =
-      LocaleConfig.locales['br'].dayNamesShort[
-        new Date(day.dateString).getDay()
-      ];
-    const isCurrentDate =
-      moment(day.dateString).format('yyyy/MM/DD') ===
-      moment(new Date()).format('yyyy/MM/DD');
-    const dayColor = isCurrentDate
-      ? global.colors.purpleColor
-      : global.colors.darkGreyColor;
+    if (day !== undefined) {
+      const dayDate = moment(day?.dateString).format('DD');
+      const dayName =
+        LocaleConfig.locales['br'].dayNamesShort[
+          new Date(day?.dateString).getDay()
+        ];
+      const isCurrentDate =
+        moment(day?.dateString).format('yyyy/MM/DD') ===
+        moment(new Date()).format('yyyy/MM/DD');
+      const dayColor = isCurrentDate
+        ? global.colors.purpleColor
+        : global.colors.darkGreyColor;
 
-    return (
-      <S.DayContainer
-        color={dayColor}
-        onPress={date =>
-          navigate.push('ApplicationStack', {
-            screen: 'ScheduleRegister',
-            params: {
-              schedule: [],
-              date: moment(day.dateString),
-            },
-          })
-        }>
-        <Icon name={'plus'} size={12} color={global.colors.lightGreyColor} />
-        <S.Day>{dayDate}</S.Day>
-        <S.DayName>{dayName}</S.DayName>
-      </S.DayContainer>
-    );
+      return (
+        <S.DayContainer
+          color={dayColor}
+          onPress={date =>
+            navigate.push('ApplicationStack', {
+              screen: 'ScheduleRegister',
+              params: {
+                schedule: [],
+                date: moment(day.dateString),
+              },
+            })
+          }>
+          <Icon name={'plus'} size={12} color={global.colors.lightGreyColor} />
+          <S.Day>{dayDate}</S.Day>
+          <S.DayName>{dayName}</S.DayName>
+        </S.DayContainer>
+      );
+    } else {
+      return <></>;
+    }
   };
 
   return (
@@ -275,6 +279,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   itemContent: {
+    marginTop: 10,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',

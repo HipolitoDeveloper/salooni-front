@@ -6,7 +6,7 @@ export const buildEmployeeObject = (employee, procedures) => {
   return {
     id: employee.objectId,
     salon: buildSalonObject(employee.salon_id),
-    cnpj: employee.cnpj !== undefined ? employee.cnpj : '',
+    cnpj: employee.cnpj,
     tel2: employee.tel2,
     tel: employee.tel,
     name: employee.name,
@@ -21,7 +21,7 @@ export const buildEmployeeList = employees => {
     const newEmployees = employees.map(employee => {
       return {
         id: employee.objectId,
-        // cnpj: employee.cnpj !== undefined ? employee.cnpj : '',
+        cnpj: employee.cnpj,
         tel2: employee.tel2,
         tel: employee.tel,
         // salon: buildSalonObject(employee.IdSalaoFK),

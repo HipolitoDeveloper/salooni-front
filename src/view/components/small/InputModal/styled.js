@@ -27,7 +27,7 @@ export const TextContent = styled.View`
 `;
 
 export const Text = styled.Text`
-  font-size: 18px;
+  font-size: ${props => `${props.screenHeight / 40}px}`};
   font-family: ${global.fonts.mainFont};
 `;
 
@@ -36,13 +36,19 @@ export const InputsContainer = styled.View`
   margin: auto auto;
   border-radius: 40px;
   background-color: white;
-  width: 80%;
-  height: 180px;
+  width: ${props =>
+    props.isSmallerScreen
+      ? `${props.screenWidth / 1.25}px}`
+      : `${props.screenWidth / 1.3}px}`};
+  height: ${props =>
+    props.isSmallerScreen
+      ? `${props.screenHeight / 3}px}`
+      : `${props.screenHeight / 4}px}`};
   elevation: 5;
 `;
 
 export const InputsContent = styled.View`
-  margin-top: 20px;
+  margin-top: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -58,7 +64,8 @@ export const CloseButtonContent = styled.TouchableOpacity`
   border-top-right-radius: 50px;
   position: absolute;
   top: 0;
-  left: ${Platform.OS === "ios" ? '252px' : '230px'};;
+  left: ${props =>
+    Platform.OS === 'ios' ? '252px' : props.screenWidth / 1.63}px;
   display: flex;
   align-items: center;
   justify-content: center;

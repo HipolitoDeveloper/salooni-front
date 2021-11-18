@@ -56,8 +56,14 @@ export const PartnerReducer = (state, action) => {
       };
     case 'SAVE_PARTNERS':
       state.partners.push(action.newPartner);
+      state.registeredPartners.forEach((registeredPartner, index) => {
+        if (registeredPartner.email === action.newPartner.email) {
+          state.registeredPartners.splice(index, 1);
+        }
+      });
       return {
         partners: state.partners,
+        registeredPartners: state.registeredPartners,
         ...state,
       };
     case 'UPDATE_PARTNER':
@@ -113,6 +119,19 @@ export const PartnerReducer = (state, action) => {
       return {
         partners: state.partners,
         ...state,
+      };
+    case 'HANDLE_ERROR':
+      const {item, property} = action.payload;
+
+      state.registeredPartners.forEach(partner => {
+        if (item.name === partner.name) {
+          partner.errorProperties.push(property);
+        }
+      });
+
+      return {
+        ...state,
+        registeredPartners: state.registeredPartners,
       };
 
     default:

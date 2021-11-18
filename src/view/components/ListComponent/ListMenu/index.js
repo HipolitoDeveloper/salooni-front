@@ -3,10 +3,11 @@ import * as S from './styled';
 import Button from '../../small/Button';
 import global from '../../../../common/global';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {FlatList, ScrollView, View} from 'react-native';
+import {Dimensions, FlatList, ScrollView, View} from 'react-native';
 import RoundedTimes from '../../../../assets/svg/roundedTimesSVG.svg';
 import {Switch} from '../../small/Switch';
 import Modal from 'react-native-modal';
+import {useNavigation} from '@react-navigation/native';
 
 const ListMenu = ({
   navigateToCalendar,
@@ -26,26 +27,40 @@ const ListMenu = ({
   handleMenu,
   isOwner,
 }) => {
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
+
   const hasProcedure = menuItems?.some(item => item === 'procedure');
   const showingItem = Object.keys(menuState.itemToShow).length > 0;
+
+  const navigate = useNavigation();
 
   const showItemProperty = item => {
     if (item === 'value') {
       return (
-        <S.ItemProperty>R$ {menuState.itemToShow[`${item}`]}</S.ItemProperty>
+        <S.ItemProperty screenHeight={screenHeight}>
+          R$ {menuState.itemToShow[`${item}`]}
+        </S.ItemProperty>
       );
     } else if (item === 'time') {
       return (
-        <S.ItemProperty>{menuState.itemToShow[`${item}`]} min.</S.ItemProperty>
+        <S.ItemProperty screenHeight={screenHeight}>
+          {menuState.itemToShow[`${item}`]} min.
+        </S.ItemProperty>
       );
     } else {
-      return <S.ItemProperty>{menuState.itemToShow[`${item}`]}</S.ItemProperty>;
+      return (
+        <S.ItemProperty screenHeight={screenHeight}>
+          {menuState.itemToShow[`${item}`]}
+        </S.ItemProperty>
+      );
     }
   };
 
   const showObjectItemProperty = (object, item) => {
     return (
-      <S.ItemProperty>
+      <S.ItemProperty screenHeight={screenHeight}>
         {menuState.itemToShow[`${object}`][`${item}`]}
       </S.ItemProperty>
     );
@@ -84,7 +99,7 @@ const ListMenu = ({
           <S.Content color={color}>
             {itemType === 'schedule' && (
               <S.ConfimationMessageContent>
-                <S.ConfimationMessageText>
+                <S.ConfimationMessageText screenHeight={screenHeight}>
                   Os procedimentos do agendamento foram realizados?
                 </S.ConfimationMessageText>
                 <Switch
@@ -111,6 +126,7 @@ const ListMenu = ({
                         data={menuState.itemToShow[`${item}`]}
                         renderItem={({item}) => (
                           <S.ProcedureContent
+                            screenHeight={screenHeight}
                             disabled={!isOwner && itemType !== 'schedule'}
                             onPress={() =>
                               deleteProcedure(
@@ -123,11 +139,13 @@ const ListMenu = ({
                               <RoundedTimes
                                 fill={'#fff'}
                                 borderFill={color}
-                                width={30}
-                                height={30}
+                                width={screenWidth / 20}
+                                height={screenHeight / 20}
                               />
                             </S.ProcedureDeleteIcon>
-                            <S.ProcedureText>{item.name}</S.ProcedureText>
+                            <S.ProcedureText screenHeight={screenHeight}>
+                              {item.name}
+                            </S.ProcedureText>
                           </S.ProcedureContent>
                         )}
                       />
@@ -142,7 +160,7 @@ const ListMenu = ({
               ))}
             </S.ItemInformation>
             {isOwner && (
-              <S.FooterButtons>
+              <S.FooterButtons isSmallerScreen={isSmallerScreen}>
                 {isConfirming ? (
                   <>
                     <Button
@@ -215,6 +233,7 @@ const ListMenu = ({
                       marginBottom={'20px'}
                       onPress={() => {
                         onEditNavigateTo(menuState.itemToShow);
+                        handleMenu(menuState?.itemToShow);
                       }}
                       color={color}
                       text={'Editar'}

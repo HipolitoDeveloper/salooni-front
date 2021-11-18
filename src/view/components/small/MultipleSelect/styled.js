@@ -45,6 +45,19 @@ export const EmptyItem = styled.View`
 export const ItemsContainer = styled.View`
   width: 100%;
   margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+`;
+
+export const BrushIcon = styled.TouchableOpacity`
+  margin-left: 10px;
+  border: 3px solid ${props => props.selectedItemBorderColor};
+  border-radius: 50px;
+  width: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const InputText = styled.Text`

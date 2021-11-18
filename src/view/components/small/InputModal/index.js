@@ -3,7 +3,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import React, {useRef, useState} from 'react';
 import {InputsContainer, InputsContent} from './styled';
 import {Switch} from '../Switch';
-import {Animated, StyleSheet, TouchableOpacity} from 'react-native';
+import {Animated, Dimensions, StyleSheet, TouchableOpacity} from 'react-native';
 import global from '../../../../common/global';
 import Modal from 'react-native-modal';
 
@@ -16,6 +16,9 @@ export const InputModal = ({
 }) => {
   const [isShowingInput, setIsShowingInput] = useState(false);
   const [inputModal, setInputModal] = useState(false);
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
 
   const changeSwitch = state => {
     handleSwitch(state, name);
@@ -38,7 +41,7 @@ export const InputModal = ({
           backgroundColor={global.colors.lightGreyColor}
           circleColor={global.colors.purpleColor}
         />
-        <S.Text>{inputTitle}</S.Text>
+        <S.Text screenHeight={screenHeight}>{inputTitle}</S.Text>
         {stateSwitch?.state && (
           <TouchableOpacity
             onPress={() => {
@@ -47,7 +50,7 @@ export const InputModal = ({
             }}>
             <Icon
               name={'eye'}
-              size={24}
+              size={screenHeight / 28}
               color={`${global.colors.purpleColor}`}
               style={{marginLeft: 10}}
             />
@@ -64,11 +67,16 @@ export const InputModal = ({
           isVisible={inputModal}
           onBackdropPress={() => handleInputModal(false)}
           onRequestClose={() => handleInputModal(false)}>
-          <S.InputsContainer>
+          <S.InputsContainer
+            isSmallerScreen={isSmallerScreen}
+            screenHeight={screenHeight}
+            screenWidth={screenWidth}>
             <S.TextContent>
-              <S.Text>{inputTitle}</S.Text>
+              <S.Text screenHeight={screenHeight}>{inputTitle}</S.Text>
             </S.TextContent>
-            <S.CloseButtonContent onPress={() => setIsShowingInput(false)}>
+            <S.CloseButtonContent
+              screenWidth={screenWidth}
+              onPress={() => setIsShowingInput(false)}>
               <S.CloseButton>
                 <Icon name={'times'} size={18} color={'white'} />
               </S.CloseButton>

@@ -56,7 +56,7 @@ export const TelText = styled.Text`
 export const ScheduleNameText = styled.Text`
   font-size: 16px;
   font-family: ${global.fonts.mainFont};
-  opacity: ${props => (props.nextHour ? 1 : 0.4)};
+  opacity: ${props => (props.nextHour || !props.passedHour ? 1 : 0.4)};
   color: ${props =>
     props.nextHour ? `${global.colors.purpleColor}` : 'black'};
 `;
@@ -64,7 +64,7 @@ export const ScheduleNameText = styled.Text`
 export const ScheduleDateText = styled.Text`
   font-size: 13px;
   font-family: ${global.fonts.mainFont};
-  opacity: ${props => (props.nextHour ? 1 : 0.4)};
+  opacity: ${props => (props.nextHour || !props.passedHour ? 1 : 0.4)};
   color: ${props =>
     props.nextHour ? `${global.colors.purpleColor}` : 'black'};
 `;

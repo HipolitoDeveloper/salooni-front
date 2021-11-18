@@ -9,10 +9,13 @@ import Input from '../../../components/small/Input';
 import errorMessages from '../../../../common/errorMessages';
 import ErrorMessage from '../../../components/small/ErrorMessage';
 import global from '../../../../common/global';
-import {ActivityIndicator} from 'react-native';
+import {ActivityIndicator, Dimensions} from 'react-native';
 import Loading from '../../../components/small/Loading';
 
 const SignInOwner = () => {
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
   const {doLogin, verifyOwner, owner} = useContext(UserContext);
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -68,7 +71,7 @@ const SignInOwner = () => {
           width={'70%'}
           keyboard={'email-address'}
           isSecureTextEntry={false}
-          fontSize={18}
+          fontSize={40}
           disabled={false}
           mask="email"
           validateInput={true}
@@ -86,7 +89,7 @@ const SignInOwner = () => {
           width={'70%'}
           keyboard={'default'}
           isSecureTextEntry={true}
-          fontSize={18}
+          fontSize={40}
           disabled={false}
           mask="password"
           validateInput={false}
@@ -97,16 +100,18 @@ const SignInOwner = () => {
         />
 
         <S.PasswordResetButton>
-          <S.PasswordResetText>Esqueceu a senha?</S.PasswordResetText>
+          <S.PasswordResetText screenHeight={screenHeight}>
+            Esqueceu a senha?
+          </S.PasswordResetText>
         </S.PasswordResetButton>
 
         <Loading isLoading={isLoading} color={`${global.colors.purpleColor}`} />
         <SubmitButton
           text={'Entrar'}
           onPress={() => onLogin()}
-          width={'60%'}
-          height={'50px'}
-          fontSize={'18px'}
+          width={1.6}
+          height={15}
+          fontSize={30}
           buttonColor={`${global.colors.purpleColor}`}
         />
         {errorMessage !== '' && (
@@ -118,7 +123,9 @@ const SignInOwner = () => {
         )}
 
         <S.RegisterContent>
-          <S.RegisterText>Não possui cadastro?</S.RegisterText>
+          <S.RegisterText screenHeight={screenHeight}>
+            Não possui cadastro?
+          </S.RegisterText>
           <S.RegisterButton onPress={() => navigate.navigate('SignupStack')}>
             <S.RegisterButtonText>{''} Registre-se</S.RegisterButtonText>
           </S.RegisterButton>

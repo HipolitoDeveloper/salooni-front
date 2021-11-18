@@ -24,6 +24,7 @@ import {
 } from '../../../components/small/Input/verifier';
 import ErrorMessage from '../../../components/small/ErrorMessage';
 import Loading from '../../../components/small/Loading';
+import {Dimensions} from 'react-native';
 
 const Profile = () => {
   const {currentUser, updateProfile} = useContext(UserContext);
@@ -34,6 +35,10 @@ const Profile = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const navigate = useNavigation();
+
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
 
   navigate.addListener('focus', () => {
     setProfile(currentUser);
@@ -104,7 +109,7 @@ const Profile = () => {
           />
         )}
         <Loading isLoading={isLoading} color={`${global.colors.purpleColor}`} />
-        <S.ProcedureContent>
+        <S.ProcedureContent isSmallerScreen={isSmallerScreen}>
           <Button
             disabled={false}
             marginBottom={'20px'}
@@ -138,7 +143,7 @@ const Profile = () => {
           width={'80%'}
           keyboard={'default'}
           isSecureTextEntry={false}
-          fontSize={14}
+          fontSize={40}
           disabled={false}
           color={global.colors.purpleColor}
           label={'Nome do Usuário'}
@@ -154,7 +159,7 @@ const Profile = () => {
           width={'80%'}
           keyboard={'default'}
           isSecureTextEntry={false}
-          fontSize={14}
+          fontSize={40}
           disabled={false}
           color={global.colors.purpleColor}
           label={'Nome do Salão'}
@@ -170,7 +175,7 @@ const Profile = () => {
           width={'80%'}
           keyboard={'numeric'}
           isSecureTextEntry={false}
-          fontSize={14}
+          fontSize={40}
           disabled={false}
           mask={'cnpj'}
           color={global.colors.purpleColor}
@@ -187,7 +192,7 @@ const Profile = () => {
           width={'80%'}
           keyboard={'email-address'}
           isSecureTextEntry={false}
-          fontSize={14}
+          fontSize={40}
           disabled={true}
           editable={false}
           mask={'email'}
@@ -203,7 +208,7 @@ const Profile = () => {
         {/*  width={'80%'}*/}
         {/*  keyboard={'default'}*/}
         {/*  isSecureTextEntry={true}*/}
-        {/*  fontSize={14}*/}
+        {/*  fontSize={40}*/}
         {/*  disabled={true}*/}
         {/*  editable={false}*/}
         {/*  mask={'password'}*/}

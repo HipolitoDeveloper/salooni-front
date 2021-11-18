@@ -57,15 +57,25 @@ const PartnerProvider = ({children}) => {
     dispatch({type: 'EDIT_PARTNER', payload});
   };
 
-  const savePartner = payload => {
-    return new Promise((resolve, reject) => {
+  const savePartner = partner => {
+    return new Promise(async (resolve, reject) => {
+      let errorMessage = '';
       try {
-        state.registeredPartners.forEach(async partner => {
-          saveEmployee(partner, false).then(newPartner => {
+        await saveEmployee(partner, false).then(
+          newPartner => {
             dispatch({type: 'SAVE_PARTNERS', newPartner});
-          });
-        });
-        resolve('Deu bom');
+          },
+          error => {
+            errorMessage = error;
+            console.log('error', error);
+          },
+        );
+
+        if (typeof errorMessage !== 'string') {
+          reject(errorMessage.code);
+        } else {
+          resolve('Deu bom');
+        }
       } catch (e) {
         reject(`Deu ruim ao salvar parceiros ${e}`);
       }
@@ -77,11 +87,14 @@ const PartnerProvider = ({children}) => {
       try {
         const partner = payload;
 
-        updateEmployeeCRUD(partner, false).then(updatedPartner => {
-          dispatch({type: 'UPDATE_PARTNER', updatedPartner});
-        });
-
-        resolve('Deu bom');
+        await updateEmployeeCRUD(partner, false).then(
+          updatedPartner => {
+            resolve(dispatch({type: 'UPDATE_PARTNER', updatedPartner}));
+          },
+          error => {
+            reject(error);
+          },
+        );
       } catch (e) {
         reject(`Deu ruim ao editar clientes ${e}`);
       }
@@ -137,7 +150,12 @@ const PartnerProvider = ({children}) => {
     });
   };
 
+  const handlePartnerRegisterError = payload => {
+    dispatch({type: 'HANDLE_ERROR', payload});
+  };
+
   const contextValues = {
+    handlePartnerRegisterError,
     loadAllPartners,
     addPartner,
     cleanPartnersInformation,

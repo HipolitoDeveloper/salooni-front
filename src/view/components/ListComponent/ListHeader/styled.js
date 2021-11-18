@@ -41,7 +41,7 @@ export const SubHeader = styled.View`
 
 export const TitleName = styled.Text`
   font-family: ${global.fonts.mainFont};
-  font-size: 24px;
+  font-size: ${props => props.screenHeight / 25}px;
   color: ${props => props.headerColor};
   letter-spacing: 2px;
   margin: 0 auto;
@@ -106,10 +106,9 @@ export const CancelInput = styled.TouchableOpacity``;
 export const SearchInput = styled.TextInput`
   color: black;
   width: 70%;
-  font-size: 16px;
+  font-size: ${props => props.screenHeight / 45}px;
   opacity: 0.6;
   font-family: ${global.fonts.mainFont};
-  height: 40px;
 `;
 
 export const SwitchContent = styled.View``;
@@ -130,7 +129,7 @@ export const CalendarIcon = styled.TouchableOpacity`
   width: 28px;
   border-radius: 5px;
   position: absolute;
-  right: 100px;
+  right: ${props => props.screenWidth / 4}px;
 `;
 
 export const ProfileIcon = styled.TouchableOpacity`

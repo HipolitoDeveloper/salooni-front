@@ -15,10 +15,15 @@ const RegisteredItemsModal = ({
   deletePreRegisteredItem,
   handleSelect,
 }) => {
+  console.log('items', items);
+
   return (
     <S.Wrapper>
       {!isOpened && (
         <S.CloseButtonContent onPress={handleOpening}>
+          {items.some(item => item.errorProperties?.length > 0) && (
+            <Text>AaQWEW</Text>
+          )}
           <S.CloseButton color={color}>
             <Icon
               name={'arrow-up'}
@@ -28,6 +33,7 @@ const RegisteredItemsModal = ({
           </S.CloseButton>
         </S.CloseButtonContent>
       )}
+
       <Modal
         scrollHorizontal={true}
         style={{
@@ -54,6 +60,7 @@ const RegisteredItemsModal = ({
             {items.map((item, index) => (
               <S.ItemContent key={item.name}>
                 <S.RightItemContent onPress={() => handleSelect(item, index)}>
+                  {item.errorProperties?.length > 0 && <Text>AaQWEW</Text>}
                   <S.ItemName isEditing={item.isInView}>
                     {leftInformation
                       ? item[`${leftInformation}`].name

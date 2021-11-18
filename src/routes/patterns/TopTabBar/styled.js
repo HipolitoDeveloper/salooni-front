@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import global from '../../../common/global';
-import {StyleSheet, Platform} from 'react-native';
+import {StyleSheet, Platform, Dimensions} from 'react-native';
 
 export const Container = styled.View`
   background-color: ${global.colors.lightGreyColor};
@@ -8,17 +8,16 @@ export const Container = styled.View`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  height: 16%;
+  height: ${props => (props.isSmallerScreen ? '20%' : '16%')};
 `;
 
 export const Content = styled.View`
   background-color: ${global.colors.lightGreyColor};
-
+  flex: 2;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
-
   width: 100%;
   margin-bottom: ${Platform.OS === 'ios' ? '10px' : '20px'};
   margin-top: ${Platform.OS === 'ios' ? '40px' : '5px'};
@@ -48,7 +47,8 @@ export const ConfirmButton = styled.TouchableOpacity`
 `;
 
 export const HeaderTitleContainer = styled.View`
-  width: 80%;
+  width: 100%;
+  flex: 1;
 
   display: flex;
   flex-direction: row;
@@ -56,11 +56,13 @@ export const HeaderTitleContainer = styled.View`
   align-items: flex-start;
 `;
 
-export const HeaderTitleContent = styled.TouchableOpacity``;
+export const HeaderTitleContent = styled.TouchableOpacity`
+  padding: 0 10px 0 10px;
+`;
 
 export const HeaderTitle = styled.Text`
   font-family: ${global.fonts.mainFont};
-  font-size: 16px;
+  font-size: ${props => props.screenHeight / 45}px;
   color: ${props => props.headerColor};
 `;
 

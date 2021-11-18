@@ -19,7 +19,7 @@ const ListContent = ({
   checked,
   formattedDateHour,
   nextHour,
-
+  passedHour,
   itemType,
   selected,
   selectItem,
@@ -32,10 +32,10 @@ const ListContent = ({
     if (itemType === 'schedule') {
       return (
         <>
-          <S.ScheduleNameText nextHour={nextHour}>
+          <S.ScheduleNameText nextHour={nextHour} passedHour={passedHour}>
             {client.name}
           </S.ScheduleNameText>
-          <S.ScheduleDateText nextHour={nextHour}>
+          <S.ScheduleDateText nextHour={nextHour} passedHour={passedHour}>
             {formattedDateHour}
           </S.ScheduleDateText>
           <S.EmployeeNameText>Responsável: {employee.name}</S.EmployeeNameText>
@@ -87,8 +87,8 @@ const ListContent = ({
           </S.InformationContent>
         </S.LeftContent>
         <S.RightContent>
-          {itemType === 'schedule' && !isDeleting && (
-            <S.CheckContent selected={false}>
+          {itemType === 'schedule' && !isDeleting && passedHour && (
+            <S.CheckContent selected={selected}>
               <S.ConfirmQuestionText>
                 Procedimentos realizados?
               </S.ConfirmQuestionText>

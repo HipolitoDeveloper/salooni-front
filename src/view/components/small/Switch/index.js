@@ -6,6 +6,7 @@ import {
   TouchableWithoutFeedback,
   LayoutAnimation,
   Animated,
+  Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
@@ -29,8 +30,12 @@ export const Switch = ({
     ? circleColor
     : `${global.colors.lightGreyColor}`;
 
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
+
   Animated.timing(switchCircle, {
-    toValue: switchState.state ? 35 : 3,
+    toValue: switchState.state ? (isSmallerScreen ? 40 : 35) : 3,
     duration: 500,
     useNativeDriver: false,
   }).start();
@@ -38,7 +43,7 @@ export const Switch = ({
   const handleState = stateToChange => {
     handleSwitch(stateToChange);
     Animated.timing(switchCircle, {
-      toValue: switchState.state ? 35 : 3,
+      toValue: switchState.state ? (isSmallerScreen ? 50 : 10) : 3,
       duration: 500,
       useNativeDriver: false,
     }).start();
@@ -57,6 +62,7 @@ export const Switch = ({
           style={[
             styles.input,
             {
+              height: screenHeight / 25,
               backgroundColor: switchState.state
                 ? backgroundSwitchColor
                 : 'transparent',
@@ -68,6 +74,8 @@ export const Switch = ({
             style={[
               styles.circle,
               {
+                height: screenHeight / 30,
+                width: screenWidth / 15,
                 backgroundColor: switchState.state
                   ? circleSwitchColor
                   : 'black',
@@ -96,7 +104,7 @@ export const Switch = ({
 const styles = StyleSheet.create({
   input: {
     width: '80%',
-    height: 30,
+
     borderRadius: 40,
     display: 'flex',
     justifyContent: 'center',
@@ -105,8 +113,6 @@ const styles = StyleSheet.create({
   },
   circle: {
     position: 'absolute',
-    width: 25,
-    height: 25,
     borderRadius: 100,
     top: 2,
     elevation: 5,

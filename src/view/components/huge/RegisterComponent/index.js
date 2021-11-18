@@ -5,7 +5,7 @@ import * as S from './styled';
 import ActionButton from 'react-native-circular-action-menu';
 import global from '../../../../common/global';
 import FloatButton from '../../small/FloatButton';
-import {Platform, ScrollView, TouchableOpacity} from 'react-native';
+import {Dimensions, Platform, ScrollView, TouchableOpacity} from 'react-native';
 import {Text} from '../../small/InputModal/styled';
 import Times from '../../../../assets/svg/timesSVG.svg';
 import {AddMessage, ButtonsContent} from './styled';
@@ -32,6 +32,10 @@ const RegisterComponent = ({
   const [isRegisteredItemsBoxOpened, setIsRegisteredItemsBoxOpened] =
     useState(false);
   const [modalState, setModalState] = useState(false);
+
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
 
   const cancelRegister = () => {
     if (preRegisteredItems.length > 0) {
@@ -60,7 +64,10 @@ const RegisterComponent = ({
         {children}
 
         {isPreRegisteredEditing && (
-          <S.CancelButton color={color} onPress={cancelEditing}>
+          <S.CancelButton
+            bottom={`${screenHeight / (isSmallerScreen ? 5 : 6)}px`}
+            color={color}
+            onPress={cancelEditing}>
             <Times
               fill={'#fff'}
               borderFill={`${global.colors.lightGreyColor}`}
@@ -72,12 +79,9 @@ const RegisterComponent = ({
 
         {!isEditing && (
           <>
-            <S.AddMessage>
-              Não esqueça de adicionar as informações.
-            </S.AddMessage>
             <FloatButton
               disabled={!validForm()}
-              bottom={'150px'}
+              bottom={`${screenHeight / (isSmallerScreen ? 5 : 7)}px`}
               right={'40px'}
               onPress={() => {
                 onAdd();
@@ -86,6 +90,9 @@ const RegisterComponent = ({
               buttonColor={color}
               icon={isPreRegisteredEditing ? 'pen' : 'plus'}
             />
+            <S.AddMessage screenHeight={screenHeight}>
+              Não esqueça de adicionar as informações.
+            </S.AddMessage>
           </>
         )}
       </S.Content>
