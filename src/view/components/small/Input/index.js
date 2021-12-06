@@ -27,6 +27,7 @@ import {
 } from './verifier';
 import {InputContent, InputTitle, ShowPasswordButton} from './styled';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import Warning from '../Warning';
 const Input = ({
   invalidValue,
   handleChange,
@@ -168,12 +169,18 @@ const Input = ({
       )}
 
       <S.InputContent>
-        {invalidValue && <Text>Ooewqe</Text>}
+        {invalidValue && (
+          <Warning
+            right={`${screenWidth / 1.35}px`}
+            bottom={'20px'}
+            color={color}
+            size={15}
+          />
+        )}
         <S.InputTitle screenHeight={screenHeight} color={color}>
           {label}
         </S.InputTitle>
         <S.Input
-          ref={ref}
           style={[
             {
               paddingLeft: leftPlaceholder && value.length ? 30 : 0,
@@ -201,7 +208,7 @@ const Input = ({
           onKeyPress={onKeyPress}
         />
 
-        {mask === 'password' && (
+        {(mask === 'password' || mask === 'confirmPassword') && (
           <S.ShowPasswordButton onPress={showPassword}>
             <Icon
               name={'eye'}

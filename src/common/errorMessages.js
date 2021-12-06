@@ -23,18 +23,21 @@ export default {
   clientMessage:
     'Nem todas as informações relacionadas ao cliente foram preenchidas',
   noClientMessage: 'Nenhum cliente foi pré-registrado',
+  noScheduleMessage: 'Nenhum agendamento foi pré-registrado',
   passwordsNotMatch: 'Senhas não são idênticas',
   notOwner:
     'Esse e-mail não pertence à um proprietário. Tente o acesso na aba de parceiros',
   deleteMessage: 'Deseja mesmo realizar essa exclusão?',
   scheduleMessage:
-    'Nem todas as informações relacionas ao agendamento foram preenchidas',
+    'Nem todas as informações relacionadas ao agendamento foram preenchidas',
   invalidCNPJ: 'CNPJ inválido',
   invalidCPF: 'CPF inválido',
   invalidEmail: 'E-mail inválido',
   invalidTel: 'Telefone inválido',
   partnerSignupMessage: 'Preencha todas as informações!',
   duplicateInformation: 'CNPJ ou E-mail informados já estão sendo utilizados!',
+  profileErrorMessage:
+    'Não foi possível atualizar o perfil, pois as informações já estão sendo utilizadas por outro usuário no sistema!',
   duplicateEmailPreRegisteredItems:
     'Um dos itens pré-registrados não pode ser salvo, pois possui um e-mail já registrado em nosso sistema.',
   genericErrorMessage:

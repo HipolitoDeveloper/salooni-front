@@ -31,8 +31,8 @@ const PartnerProvider = ({children}) => {
     return new Promise(async (resolve, reject) => {
       try {
         await getAllPartnersBySalonId(payload, false).then(partners => {
-          resolve(dispatch({type: 'LOAD_PARTNERS', partners}));
-
+          dispatch({type: 'LOAD_PARTNERS', partners});
+          resolve(state.partners);
           // console.log((state.clients = clients));
         });
       } catch (e) {

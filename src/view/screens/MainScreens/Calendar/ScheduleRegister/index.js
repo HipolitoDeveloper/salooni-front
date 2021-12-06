@@ -174,26 +174,28 @@ const ScheduleRegister = ({route}) => {
 
   const updateSchedules = () => {
     setIsLoading(true);
-    updateSchedule(schedule).then(
-      () => {
-        sortScheduleList();
-        setIsLoading(false);
-        navigate.replace('TabStack', {
-          screen: 'Schedules',
-          params: {
-            isToShowAgenda: false,
-          },
-        });
-        setIsLoading(false);
-        setErrorMessage('');
-        clearSchedule();
-      },
+    if (verifyInformation(true)) {
+      updateSchedule(schedule).then(
+        () => {
+          sortScheduleList();
+          setIsLoading(false);
+          navigate.replace('TabStack', {
+            screen: 'Schedules',
+            params: {
+              isToShowAgenda: false,
+            },
+          });
+          setIsLoading(false);
+          setErrorMessage('');
+          clearSchedule();
+        },
 
-      error => {
-        setIsLoading(false);
-        console.error(error);
-      },
-    );
+        error => {
+          setIsLoading(false);
+          console.error(error);
+        },
+      );
+    }
   };
 
   const deleteSchedules = () => {
@@ -249,7 +251,7 @@ const ScheduleRegister = ({route}) => {
       return ableToGo;
     } else if (registeredSchedules.length === 0) {
       ableToGo = false;
-      setErrorMessage(errorMessages.noClientMessage);
+      setErrorMessage(errorMessages.noScheduleMessage);
       setIsLoading(false);
     }
     return ableToGo;

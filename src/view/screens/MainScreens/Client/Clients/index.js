@@ -45,16 +45,19 @@ const Clients = () => {
   };
 
   const onRefresh = () => {
-    setIsLoading(true);
-    loadAllClients(currentUser.idSalon).then(
-      () => {
-        setIsLoading(false);
-      },
-      error => {
-        console.log(error);
-        setIsLoading(false);
-      },
-    );
+    return new Promise(resolve => {
+      setIsLoading(true);
+      loadAllClients(currentUser.idSalon).then(
+        newClients => {
+          setIsLoading(false);
+          resolve(newClients);
+        },
+        error => {
+          console.log(error);
+          setIsLoading(false);
+        },
+      );
+    });
   };
 
   return (

@@ -106,7 +106,7 @@ export const CancelInput = styled.TouchableOpacity``;
 export const SearchInput = styled.TextInput`
   color: black;
   width: 70%;
-  font-size: ${props => props.screenHeight / 45}px;
+  font-size: ${props => props.screenHeight / 55}px;
   opacity: 0.6;
   font-family: ${global.fonts.mainFont};
 `;

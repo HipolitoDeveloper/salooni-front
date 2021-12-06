@@ -40,8 +40,8 @@ export const DayContainer = styled.TouchableOpacity`
   justify-content: center;
   padding: 10px;
   background-color: ${props => props.color};
-  border-radius: 40px;
-  margin: 30px 5px 5px 5px;
+  border-radius: 10px;
+  margin: 30px 1px 5px 5px;
 `;
 
 export const ScheduleAddButton = styled.View``;

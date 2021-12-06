@@ -198,6 +198,9 @@ const SignInPartner = () => {
         )}
 
         <Input
+          invalidValue={userData?.errorProperties?.some(
+            property => property === 'email',
+          )}
           handleChange={handleChange}
           placeholderTextColor={'grey'}
           placeholder={'E-mail'}
@@ -211,14 +214,41 @@ const SignInPartner = () => {
           isToValidate={true}
           noEmpty={true}
           onFocus={resetVerifier}
+          fontSize={44}
         />
+
+        {isPartner && (
+          <Input
+            invalidValue={userData?.errorProperties?.some(
+              property => property === 'password',
+            )}
+            handleChange={handleChange}
+            name={'password'}
+            placeholder={'Senhea'}
+            value={userData.password}
+            editable={isPartner}
+            selectTextOnFocus={isPartner}
+            isSecureTextEntry={true}
+            width={'70%'}
+            mask={'password'}
+            color={global.colors.purpleColor}
+            label={'Senha'}
+            isToValidate={isPartner}
+            noEmpty={true}
+            fontSize={44}
+          />
+        )}
+
 
         <Loading isLoading={isLoading} color={`${global.colors.purpleColor}`} />
 
-        {isPartnerFirstAccess ? (
+        {isPartnerFirstAccess && (
           isAbleToSignup ? (
             <>
               <Input
+                invalidValue={userData?.errorProperties?.some(
+                  property => property === 'password',
+                )}
                 handleChange={handleChange}
                 name={'password'}
                 placeholder={'Senha'}
@@ -231,9 +261,13 @@ const SignInPartner = () => {
                 label={'Senha'}
                 isToValidate={isPartnerFirstAccess}
                 noEmpty={true}
+                fontSize={44}
               />
 
               <Input
+                invalidValue={userData?.errorProperties?.some(
+                  property => property === 'confirmPassword',
+                )}
                 handleChange={handleChange}
                 name={'confirmPassword'}
                 placeholder={'Confirme sua senha'}
@@ -247,10 +281,14 @@ const SignInPartner = () => {
                 label={'Confirmação da Senha'}
                 isToValidate={isPartnerFirstAccess}
                 noEmpty={true}
+                fontSize={44}
               />
             </>
           ) : (
             <Input
+              invalidValue={userData?.errorProperties?.some(
+                property => property === 'cnpj',
+              )}
               handleChange={handleChange}
               name={'cnpj'}
               placeholder={'CNPJ'}
@@ -263,42 +301,27 @@ const SignInPartner = () => {
               label={'CNPJ'}
               isToValidate={isPartnerFirstAccess}
               noEmpty={true}
+              fontSize={44}
             />
           )
-        ) : (
-          <Input
-            handleChange={handleChange}
-            name={'password'}
-            placeholder={'Senha'}
-            value={userData.password}
-            editable={isPartner}
-            selectTextOnFocus={isPartner}
-            isSecureTextEntry={true}
-            width={'70%'}
-            mask={'password'}
-            color={global.colors.purpleColor}
-            label={'Senha'}
-            isToValidate={isPartner}
-            noEmpty={true}
-          />
         )}
 
         {isPartnerFirstAccess ? (
           <SubmitButton
             text={isAbleToSignup ? 'Cadastrar' : 'Verificar'}
             onPress={() => (isAbleToSignup ? doPartnerSignup() : verifyCNPJ())}
-            width={'60%'}
-            height={'50px'}
-            fontSize={'18px'}
+            width={1.6}
+            height={15}
+            fontSize={40}
             buttonColor={`${global.colors.purpleColor}`}
           />
         ) : (
           <SubmitButton
             text={isPartner ? 'Entrar' : 'Verificar'}
             onPress={() => (isPartner ? doPartnerLogin() : verifyEmail())}
-            width={'60%'}
-            height={'50px'}
-            fontSize={'18px'}
+            width={1.6}
+            height={15}
+            fontSize={40}
             buttonColor={`${global.colors.purpleColor}`}
           />
         )}
