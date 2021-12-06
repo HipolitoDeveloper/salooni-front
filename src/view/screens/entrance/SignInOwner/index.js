@@ -21,8 +21,8 @@ const SignInOwner = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [userData, setUserData] = useState({
-    email: 'gabriel@gmail.com',
-    password: '123Abc@',
+    email: '',
+    password: '',
   });
   const navigate = useNavigation();
 
@@ -111,7 +111,7 @@ const SignInOwner = () => {
           onPress={() => onLogin()}
           width={1.6}
           height={15}
-          fontSize={30}
+          fontSize={40}
           buttonColor={`${global.colors.purpleColor}`}
         />
         {errorMessage !== '' && (

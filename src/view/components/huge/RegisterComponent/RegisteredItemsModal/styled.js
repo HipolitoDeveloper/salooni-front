@@ -1,6 +1,5 @@
 import styled from 'styled-components/native';
 import global from '../../../../../common/global';
-
 export const Wrapper = styled.View`
   width: 100%;
   position: absolute;
@@ -66,6 +65,7 @@ export const ItemName = styled.Text`
     props.isEditing ? `black` : `${global.colors.lightGreyColor}`};
   font-weight: ${props => (props.isEditing ? `bold` : `100`)};
   font-size: 16px;
+  margin-left: 15px;
 `;
 
 export const ItemDeleteButton = styled.TouchableOpacity`

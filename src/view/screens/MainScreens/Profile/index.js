@@ -54,6 +54,8 @@ const Profile = () => {
 
   const cancelEditting = () => {
     setIsEditting(false);
+    setProfile(currentUser);
+    setErrorMessage('');
   };
 
   const updateInformation = () => {
@@ -64,7 +66,10 @@ const Profile = () => {
         setIsLoading(false);
       },
       error => {
-        console.error(error);
+        if (error.code === 137) {
+          // handleProfileRegisterError({item: profile, property: 'email'});
+          setErrorMessage(errorMessages.profileErrorMessage);
+        }
         setIsLoading(false);
       },
     );
@@ -101,13 +106,6 @@ const Profile = () => {
   return (
     <S.Container>
       <S.BodyContent>
-        {errorMessage !== '' && (
-          <ErrorMessage
-            text={errorMessage}
-            width={'70%'}
-            textColor={global.colors.purpleColor}
-          />
-        )}
         <Loading isLoading={isLoading} color={`${global.colors.purpleColor}`} />
         <S.ProcedureContent isSmallerScreen={isSmallerScreen}>
           <Button
@@ -252,6 +250,13 @@ const Profile = () => {
           </S.FooterContent>
         )}
       </S.FooterContainer>
+      {errorMessage !== '' && (
+        <ErrorMessage
+          text={errorMessage}
+          width={'70%'}
+          textColor={global.colors.purpleColor}
+        />
+      )}
     </S.Container>
   );
 };

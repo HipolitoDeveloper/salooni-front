@@ -96,20 +96,23 @@ const Schedules = ({route}) => {
   };
 
   const onRefresh = () => {
-    setIsLoading(true);
-    loadAllSchedules({
-      salonId: currentUser.idSalon,
-      employeeId: currentUser.idFunc,
-      employeeType: currentUser.employeeType,
-    }).then(
-      () => {
-        setIsLoading(false);
-      },
-      error => {
-        console.log(error);
-        setIsLoading(false);
-      },
-    );
+    return new Promise(resolve => {
+      setIsLoading(true);
+      loadAllSchedules({
+        salonId: currentUser.idSalon,
+        employeeId: currentUser.idFunc,
+        employeeType: currentUser.employeeType,
+      }).then(
+        newSchedules => {
+          setIsLoading(false);
+          resolve(newSchedules);
+        },
+        error => {
+          console.log(error);
+          setIsLoading(false);
+        },
+      );
+    });
   };
 
   return (
@@ -125,7 +128,7 @@ const Schedules = ({route}) => {
         showAddButton={true}
         onRefresh={onRefresh}
         refreshing={isLoading}
-        searchPlaceHolder={'Procure pela sua agenda '}
+        searchPlaceHolder={'Procure pelo cliente agendado '}
         isOwner={true}
         showHeader={true}
         handleAgenda={handleAgenda}

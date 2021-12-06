@@ -87,7 +87,6 @@ export const saveEmployee = (employeeObj, returnParseObject, isSigningUp) => {
     try {
       const {cnpj, tel, tel2, employeeType, name, salonId, email, procedures} =
         employeeObj;
-
       const newEmployee = new EmployeeObject();
       newEmployee.set('name', name.trim());
       newEmployee.set('cnpj', cnpj);

@@ -56,7 +56,7 @@ export const updateUser = userObj => {
       resolve(await user.save());
     } catch (e) {
       console.error(`User ${e}`);
-      reject(`User ${JSON.stringify(e)}`);
+      reject(e);
     }
   });
 };

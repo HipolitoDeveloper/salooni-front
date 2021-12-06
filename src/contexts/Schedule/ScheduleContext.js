@@ -49,7 +49,7 @@ const ScheduleProvider = ({children}) => {
           schedules => {
             dispatch({type: 'LOAD_SCHEDULES', schedules});
             sortScheduleList();
-            resolve(schedules);
+            resolve(state.schedules);
 
             // console.log((state.clients = clients));
           },

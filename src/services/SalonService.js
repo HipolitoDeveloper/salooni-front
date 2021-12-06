@@ -53,12 +53,12 @@ export const updateSalon = (salonObj, returnParseObject) => {
         },
         error => {
           console.error(`Salão   ${error}`);
-          reject(`Salão ${JSON.stringify(error)}`);
+          reject(error);
         },
       );
     } catch (e) {
       console.error(`Salão   ${e}`);
-      reject(`Salão ${JSON.stringify(e)}`);
+      reject(e);
     }
   });
 };

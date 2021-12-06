@@ -284,6 +284,13 @@ const List = ({
     });
   };
 
+  const doRefresh = async () => {
+    await onRefresh().then(items => {
+      console.log('items', items);
+      setItems(items);
+    });
+  };
+
   return (
     <S.Container>
       <ListMenu
@@ -347,7 +354,7 @@ const List = ({
           data={items}
           refreshControl={
             <RefreshControl
-              onRefresh={onRefresh}
+              onRefresh={doRefresh}
               refreshing={refreshing}
               progressViewOffset={180}
             />

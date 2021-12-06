@@ -319,8 +319,8 @@ const UserProvider = ({children}) => {
         await updateSalon(salon);
         resolve(dispatch({type: 'UPDATE_USER', payload}));
       } catch (e) {
-        console.log(e);
-        reject(`Deu ruim ao atualizar as informações do Usuário ${e}`);
+        console.log(`Deu ruim ao atualizar as informações do Usuário ${e}`);
+        reject(e);
       }
     });
   };

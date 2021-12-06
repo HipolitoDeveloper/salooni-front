@@ -24,7 +24,8 @@ const ClientProvider = ({children}) => {
     return new Promise(async (resolve, reject) => {
       try {
         await getAllClientsBySalonId(payload, false).then(clients => {
-          resolve(dispatch({type: 'LOAD_CLIENTS', clients}));
+          dispatch({type: 'LOAD_CLIENTS', clients});
+          resolve(state.clients);
 
           // console.log((state.clients = clients));
         });

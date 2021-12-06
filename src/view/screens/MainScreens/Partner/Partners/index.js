@@ -80,16 +80,21 @@ const Partners = () => {
   };
 
   const onRefresh = () => {
-    setIsLoading(true);
-    loadAllPartners(currentUser.idSalon).then(
-      () => {
-        setIsLoading(false);
-      },
-      error => {
-        console.log(error);
-        setIsLoading(false);
-      },
-    );
+    return new Promise(resolve => {
+      setIsLoading(true);
+      loadAllPartners(currentUser.idSalon).then(
+        newPartnerList => {
+          setIsLoading(false);
+          resolve(
+            newPartnerList.filter(partner => partner.employeeType === 'PRC'),
+          );
+        },
+        error => {
+          console.log(error);
+          setIsLoading(false);
+        },
+      );
+    });
   };
   const handleAgenda = item => {
     setStateAgenda({isShowing: !stateAgenda.isShowing, item: item});

@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import * as S from './styled';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {FlatList, View, Text} from 'react-native';
+import {FlatList, View, Text, Dimensions} from 'react-native';
 import global from '../../../../../common/global';
 import Modal from 'react-native-modal';
+import Warning from '../../../small/Warning';
 
 const RegisteredItemsModal = ({
   color,
@@ -15,14 +16,20 @@ const RegisteredItemsModal = ({
   deletePreRegisteredItem,
   handleSelect,
 }) => {
-  console.log('items', items);
+  const screenHeight = Dimensions.get('screen').height;
+  const screenWidth = Dimensions.get('screen').width;
+  const isSmallerScreen = screenHeight < 650;
 
   return (
     <S.Wrapper>
       {!isOpened && (
         <S.CloseButtonContent onPress={handleOpening}>
           {items.some(item => item.errorProperties?.length > 0) && (
-            <Text>AaQWEW</Text>
+            <Warning
+              right={`${screenWidth / 2.6}px`}
+              bottom={0}
+              color={color}
+            />
           )}
           <S.CloseButton color={color}>
             <Icon
@@ -60,7 +67,13 @@ const RegisteredItemsModal = ({
             {items.map((item, index) => (
               <S.ItemContent key={item.name}>
                 <S.RightItemContent onPress={() => handleSelect(item, index)}>
-                  {item.errorProperties?.length > 0 && <Text>AaQWEW</Text>}
+                  {item.errorProperties?.length > 0 && (
+                    <Warning
+                      right={`${screenWidth / 4}px`}
+                      color={color}
+                      size={15}
+                    />
+                  )}
                   <S.ItemName isEditing={item.isInView}>
                     {leftInformation
                       ? item[`${leftInformation}`].name
