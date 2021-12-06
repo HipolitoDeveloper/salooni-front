@@ -1,20 +1,26 @@
-import React, {useContext, useState} from 'react';
-import SubmitButton from '../../../components/SubmitButton';
+import React, {useContext, useEffect, useState} from 'react';
+import SubmitButton from '../../../components/small/SubmitButton';
 import * as S from './styled';
 import SalooniLogo from '../../../../assets/icone11-nobackground.png';
 import {UserContext} from '../../../../contexts/User/UserContext';
 import errorMessages from '../../../../common/errorMessages';
 
 import {useNavigation} from '@react-navigation/native';
-import AlertModal from '../../../components/AlertModal';
+import AlertModal from '../../../components/small/AlertModal';
 import {ActivityIndicator, StyleSheet} from 'react-native';
 import global from '../../../../common/global';
 import {MaskedTextInput} from 'react-native-mask-text';
-import ErrorMessage from '../../../components/ErrorMessage';
-import Input from '../../../components/Input';
+import ErrorMessage from '../../../components/small/ErrorMessage';
+import Input from '../../../components/small/Input';
+import Loading from '../../../components/small/Loading';
+import {
+  CNPJVerifier,
+  EMAILVerifier,
+  TELVerifier,
+} from '../../../components/small/Input/verifier';
 
 const SignInPartner = () => {
-  const {doLogin, verifyPartner, doSignup} = useContext(UserContext);
+  const {doLogin, verifyPartner, doSignup, owner} = useContext(UserContext);
   const navigate = useNavigation();
 
   const [verifiedPartner, setVerifiedPartner] = useState({});
@@ -41,7 +47,7 @@ const SignInPartner = () => {
   const doPartnerLogin = () => {
     doLogin(userData).then(
       () => {
-        navigate.navigate('ApplicationStack');
+        navigate.navigate('TabStack');
       },
 
       error => {
@@ -52,7 +58,7 @@ const SignInPartner = () => {
 
   const doPartnerSignup = () => {
     setIsLoading(true);
-    if (verifyPassword()) {
+    if (verifyInformation(true)) {
       doSignup(verifiedPartner, userData).then(
         () => {
           setShowAlertModal({
@@ -75,18 +81,6 @@ const SignInPartner = () => {
     }
   };
 
-  const verifyPassword = () => {
-    let isAbleToSignup = false;
-
-    if (userData.password === userData.confirmPassword) {
-      isAbleToSignup = true;
-      setErrorMessage('');
-    } else {
-      setErrorMessage(errorMessages.passwordsNotMatch);
-    }
-
-    return isAbleToSignup;
-  };
   const verifyEmail = () => {
     setIsLoading(true);
     verifyPartner(userData, '').then(
@@ -145,6 +139,45 @@ const SignInPartner = () => {
     );
   };
 
+  const resetVerifier = () => {
+    setIsPartner(false);
+    setIsPartnerFirstAccess(false);
+  };
+
+  const verifyInformation = showErrorMessages => {
+    let ableToGo = true;
+    let errorMessage = '';
+
+    if (
+      userData === {} ||
+      userData.email === undefined ||
+      userData.email === '' ||
+      userData.password === undefined ||
+      userData.password === '' ||
+      userData.confirmPassword === undefined ||
+      userData.confirmPassword === ''
+    ) {
+      ableToGo = false;
+      errorMessage = errorMessages.partnerSignupMessage;
+      if (showErrorMessages) setIsLoading(false);
+    } else {
+      if (!EMAILVerifier(userData.email).state) {
+        ableToGo = false;
+        errorMessage = errorMessages.invalidEmail;
+        if (showErrorMessages) setIsLoading(false);
+      }
+
+      if (userData.password !== userData.confirmPassword) {
+        ableToGo = false;
+        setErrorMessage(errorMessages.passwordsNotMatch);
+        if (showErrorMessages) setIsLoading(false);
+      }
+    }
+
+    if (showErrorMessages) setErrorMessage(errorMessage);
+    return ableToGo;
+  };
+
   return (
     <S.Container>
       <S.Content>
@@ -170,12 +203,17 @@ const SignInPartner = () => {
           placeholder={'E-mail'}
           name={'email'}
           value={userData.email}
+          keyboard={'email-address'}
           width={'70%'}
+          mask={'email'}
+          color={global.colors.purpleColor}
+          label={'E-mail'}
+          isToValidate={true}
+          noEmpty={true}
+          onFocus={resetVerifier}
         />
 
-        {isLoading && (
-          <ActivityIndicator size="large" color={global.colors.purpleColor} />
-        )}
+        <Loading isLoading={isLoading} color={`${global.colors.purpleColor}`} />
 
         {isPartnerFirstAccess ? (
           isAbleToSignup ? (
@@ -186,8 +224,13 @@ const SignInPartner = () => {
                 placeholder={'Senha'}
                 value={userData.password}
                 isSecureTextEntry={true}
-                keyboard={'numeric'}
+                keyboard={'default'}
                 width={'70%'}
+                mask={'password'}
+                color={global.colors.purpleColor}
+                label={'Senha'}
+                isToValidate={isPartnerFirstAccess}
+                noEmpty={true}
               />
 
               <Input
@@ -196,8 +239,14 @@ const SignInPartner = () => {
                 placeholder={'Confirme sua senha'}
                 value={userData.confirmPassword}
                 isSecureTextEntry={true}
-                keyboard={'numeric'}
+                keyboard={'default'}
                 width={'70%'}
+                mask={'confirmPassword'}
+                originalPassword={userData.password}
+                color={global.colors.purpleColor}
+                label={'Confirmação da Senha'}
+                isToValidate={isPartnerFirstAccess}
+                noEmpty={true}
               />
             </>
           ) : (
@@ -210,6 +259,10 @@ const SignInPartner = () => {
               mask={'cnpj'}
               keyboard={'numeric'}
               width={'70%'}
+              color={global.colors.purpleColor}
+              label={'CNPJ'}
+              isToValidate={isPartnerFirstAccess}
+              noEmpty={true}
             />
           )
         ) : (
@@ -222,6 +275,11 @@ const SignInPartner = () => {
             selectTextOnFocus={isPartner}
             isSecureTextEntry={true}
             width={'70%'}
+            mask={'password'}
+            color={global.colors.purpleColor}
+            label={'Senha'}
+            isToValidate={isPartner}
+            noEmpty={true}
           />
         )}
 
@@ -262,7 +320,7 @@ export default SignInPartner;
 
 export const styles = StyleSheet.create({
   input: {
-    fontFamily: `${global.fonts.s}`,
+    fontFamily: `${global.fonts.mainFont}`,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: `${global.colors.purpleColor}`,
     color: 'black',

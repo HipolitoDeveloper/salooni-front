@@ -3,19 +3,25 @@ import {PartnerReducer} from './PartnerReducer';
 
 import {
   deleteEmployeeCRUD,
+  deleteEmployeesCRUD,
   getAllPartnersBySalonId,
   saveEmployee,
   updateEmployeeCRUD,
 } from '../../services/EmployeeService';
 import {getProcedureByName} from '../../services/ProcedureService';
-import {saveProcedureEmployee} from '../../services/ProcedureEmployeeService';
+import {
+  deleteProcedureEmployee,
+  deleteProcedureEmployeeByEmployeeId,
+  saveProcedureEmployee,
+} from '../../services/ProcedureEmployeeService';
+import {deleteClientsCRUD} from '../../services/ClientService';
 
 export const PartnerContext = createContext();
 
 const initialState = {
   partners: [],
   registeredPartners: [],
-  dropdownPartners: [],
+  isPartnersLoading: true,
 };
 
 const PartnerProvider = ({children}) => {
@@ -51,15 +57,25 @@ const PartnerProvider = ({children}) => {
     dispatch({type: 'EDIT_PARTNER', payload});
   };
 
-  const savePartner = payload => {
-    return new Promise((resolve, reject) => {
+  const savePartner = partner => {
+    return new Promise(async (resolve, reject) => {
+      let errorMessage = '';
       try {
-        state.registeredPartners.forEach(async partner => {
-          saveEmployee(partner, false).then(newPartner => {
+        await saveEmployee(partner, false).then(
+          newPartner => {
             dispatch({type: 'SAVE_PARTNERS', newPartner});
-          });
-        });
-        resolve('Deu bom');
+          },
+          error => {
+            errorMessage = error;
+            console.log('error', error);
+          },
+        );
+
+        if (typeof errorMessage !== 'string') {
+          reject(errorMessage.code);
+        } else {
+          resolve('Deu bom');
+        }
       } catch (e) {
         reject(`Deu ruim ao salvar parceiros ${e}`);
       }
@@ -71,22 +87,25 @@ const PartnerProvider = ({children}) => {
       try {
         const partner = payload;
 
-        updateEmployeeCRUD(partner, false).then(updatedPartner => {
-          dispatch({type: 'UPDATE_PARTNER', updatedPartner});
-        });
-
-        resolve('Deu bom');
+        await updateEmployeeCRUD(partner, false).then(
+          updatedPartner => {
+            resolve(dispatch({type: 'UPDATE_PARTNER', updatedPartner}));
+          },
+          error => {
+            reject(error);
+          },
+        );
       } catch (e) {
         reject(`Deu ruim ao editar clientes ${e}`);
       }
     });
   };
 
-  const deletePartner = payload => {
+  const deleteUniquePartner = payload => {
     return new Promise(async (resolve, reject) => {
       try {
         const {id} = payload;
-        dispatch({type: 'DELETE_PARTNER', payload});
+        dispatch({type: 'DELETE_PARTNER', id});
 
         resolve(await deleteEmployeeCRUD(id));
       } catch (e) {
@@ -95,23 +114,56 @@ const PartnerProvider = ({children}) => {
     });
   };
 
+  const deletePartnerList = payload => {
+    return new Promise(async (resolve, reject) => {
+      const partners = payload;
+      try {
+        await deleteEmployeesCRUD(partners);
+        resolve(dispatch({type: 'DELETE_PARTNERS', partners}));
+      } catch (e) {
+        reject(`Deu ruim ao excluir clientes ${e}`);
+      }
+    });
+  };
+
   const deletePartnerInView = payload => {
     dispatch({type: 'DELETE_PARTNER_INVIEW', payload});
   };
 
-  const cleanRegisteredPartners = payload => {
-    dispatch({type: 'CLEAN_REGISTERED_PARTNERS', payload});
+  const deletePartnerProcedure = payload => {
+    return new Promise(async (resolve, reject) => {
+      const {procedureEmployeeId} = payload;
+      try {
+        deleteProcedureEmployee(procedureEmployeeId, false).then(
+          deletedProcedureEmployee => {
+            resolve(
+              dispatch({
+                type: 'DELETE_PARTNER_PROCEDURE',
+                deletedProcedureEmployee,
+              }),
+            );
+          },
+        );
+      } catch (e) {
+        reject(`Deu ruim ao excluir procedimento ${e}`);
+      }
+    });
+  };
+
+  const handlePartnerRegisterError = payload => {
+    dispatch({type: 'HANDLE_ERROR', payload});
   };
 
   const contextValues = {
+    handlePartnerRegisterError,
     loadAllPartners,
     addPartner,
     cleanPartnersInformation,
-
+    deletePartnerProcedure,
     savePartner,
-    cleanRegisteredPartners,
     updatePartner,
-    deletePartner,
+    deleteUniquePartner,
+    deletePartnerList,
     deletePartnerInView,
     updatePartnerInView,
     editPartner,

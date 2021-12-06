@@ -3,16 +3,10 @@ export const PartnerReducer = (state, action) => {
     case 'LOAD_PARTNERS':
       state.partners = action.partners;
 
-      state.dropdownPartners = action.partners.map(partner => {
-        return {
-          id: partner.id,
-          item: partner.name,
-        };
-      });
-
+      state.isPartnersLoading = false;
       return {
         partners: state.partners,
-        dropdownPartners: state.dropdownPartners,
+        isPartnersLoading: state.isPartnersLoading,
         ...state,
       };
     case 'ADD_PARTNER':
@@ -25,16 +19,18 @@ export const PartnerReducer = (state, action) => {
       };
 
     case 'CLEAN_PARTNERS':
-      state.partners = [];
+      state.registeredPartners = [];
       return {
-        partners: state.partners,
+        registeredPartners: state.registeredPartners,
         ...state,
       };
 
     case 'UPDATE_PARTNERS_INVIEW':
       const partnerInViewIndex = action.payload;
       state.registeredPartners.map((partner, index) => {
-        if (partner.isInView === true && index !== partnerInViewIndex) {
+        if (partnerInViewIndex === -1) {
+          partner.isInView = false;
+        } else if (partner.isInView === true && index !== partnerInViewIndex) {
           partner.isInView = false;
         }
 
@@ -60,8 +56,14 @@ export const PartnerReducer = (state, action) => {
       };
     case 'SAVE_PARTNERS':
       state.partners.push(action.newPartner);
+      state.registeredPartners.forEach((registeredPartner, index) => {
+        if (registeredPartner.email === action.newPartner.email) {
+          state.registeredPartners.splice(index, 1);
+        }
+      });
       return {
         partners: state.partners,
+        registeredPartners: state.registeredPartners,
         ...state,
       };
     case 'UPDATE_PARTNER':
@@ -80,9 +82,9 @@ export const PartnerReducer = (state, action) => {
         ...state,
       };
     case 'DELETE_PARTNER':
-      const {objectId} = action.payload;
+      const deletedPartnerId = action.id;
       state.partners.forEach((partner, index) => {
-        if (partner.objectId === objectId) {
+        if (partner.id === deletedPartnerId) {
           state.partners.splice(index, 1);
         }
       });
@@ -102,12 +104,34 @@ export const PartnerReducer = (state, action) => {
         registeredPartners: state.registeredPartners,
         ...state,
       };
+    case 'DELETE_PARTNER_PROCEDURE':
+      const {employeeId, id} = action.deletedProcedureEmployee;
+      state.partners.forEach(partner => {
+        if (partner.id === employeeId) {
+          partner.procedures.forEach((procedure, index) => {
+            if (procedure.id === id) {
+              partner.procedures.splice(index, 1);
+            }
+          });
+        }
+      });
 
-    case 'CLEAN_REGISTERED_PARTNERS':
-      state.registeredPartners = [];
       return {
-        registeredPartners: state.registeredPartners,
+        partners: state.partners,
         ...state,
+      };
+    case 'HANDLE_ERROR':
+      const {item, property} = action.payload;
+
+      state.registeredPartners.forEach(partner => {
+        if (item.name === partner.name) {
+          partner.errorProperties.push(property);
+        }
+      });
+
+      return {
+        ...state,
+        registeredPartners: state.registeredPartners,
       };
 
     default:

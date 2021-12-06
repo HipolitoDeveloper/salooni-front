@@ -2,7 +2,10 @@ import Parse from 'parse/react-native';
 import {convertToObj} from '../pipe/conversor';
 import {EmployeeObject} from './EmployeeService';
 import {ProcedureObject} from './ProcedureService';
-import {buildProcedureEmployee} from '../factory/Employee';
+import {
+  buildProcedureEmployee,
+  buildProcedureEmployeeList,
+} from '../factory/Employee';
 
 const ProcedureEmployeeObject = Parse.Object.extend('employee_procedure');
 
@@ -17,15 +20,18 @@ export const getProcedureEmployeeByEmployeeId = (
       const ProcedureEmployeeQuery = new Parse.Query(ProcedureEmployeeObject);
       ProcedureEmployeeQuery.equalTo('employee_id', employee);
       ProcedureEmployeeQuery.include('procedure_id');
+      ProcedureEmployeeQuery.include('employee_id');
 
       if (returnParseObject) {
         resolve(await ProcedureEmployeeQuery.find());
       } else {
-        resolve(
-          buildProcedureEmployee(
-            convertToObj(await ProcedureEmployeeQuery.find()),
-          ),
-        );
+        const employeeProcedures = await ProcedureEmployeeQuery.find();
+
+        if (employeeProcedures.length === 0) {
+          resolve([]);
+        } else {
+          resolve(buildProcedureEmployeeList(convertToObj(employeeProcedures)));
+        }
       }
     } catch (e) {
       console.error(`Procedimento do empregado ${e}`);
@@ -131,7 +137,9 @@ export const deleteProcedureEmployee = (
         if (returnParseObject) {
           resolve(deletedProcedureEmployee);
         } else {
-          resolve(convertToObj(deletedProcedureEmployee));
+          resolve(
+            buildProcedureEmployee(convertToObj(deletedProcedureEmployee)),
+          );
         }
       });
     } catch (e) {

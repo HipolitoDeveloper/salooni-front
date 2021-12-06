@@ -1,39 +1,77 @@
 import React, {createContext, useReducer} from 'react';
 import {ScheduleReducer} from './ScheduleReducer';
 import {
+  confirmSchedulesList,
   deleteScheduleCRUD,
+  deleteSchedulesCRUD,
   getAllSchedules,
   insertScheduleCRUD,
   updateScheduleCRUD,
 } from '../../services/ScheduleService';
+import {deleteClientCRUD} from '../../services/ClientService';
+import {deleteProcedureEmployee} from '../../services/ProcedureEmployeeService';
+import {deleteScheduleProcedureById} from '../../services/ScheduleProcedureService';
+import {buildCalendar} from '../../factory/Schedule';
 
 export const ScheduleContext = createContext();
 
 const initialState = {
+  isSchedulesLoading: true,
   schedules: [],
   calendarSchedule: [],
   registeredSchedules: [],
   scheduleInView: {},
-  dropdownClients: [],
 };
 
 const ScheduleProvider = ({children}) => {
   const [state, dispatch] = useReducer(ScheduleReducer, initialState);
 
-  const loadAllSchedules = (payload, refreshSchedules) => {
+  const loadAllSchedulesByPartner = payload => {
     const {employeeId, salonId, employeeType} = payload;
     return new Promise(async (resolve, reject) => {
       try {
         await getAllSchedules(employeeId, salonId, employeeType, false).then(
           schedules => {
-            resolve(dispatch({type: 'LOAD_SCHEDULES', schedules}));
+            resolve(buildCalendar(schedules));
+          },
+        );
+      } catch (e) {
+        reject(`Deu ruim ao listar agendamentos ${e}`);
+      }
+    });
+  };
+
+  const loadAllSchedules = payload => {
+    const {employeeId, salonId, employeeType} = payload;
+    return new Promise(async (resolve, reject) => {
+      try {
+        await getAllSchedules(employeeId, salonId, employeeType, false).then(
+          schedules => {
+            dispatch({type: 'LOAD_SCHEDULES', schedules});
+            sortScheduleList();
+            resolve(schedules);
 
             // console.log((state.clients = clients));
           },
         );
       } catch (e) {
-        reject(`Deu ruim ao listar clientes ${e}`);
+        reject(`Deu ruim ao listar agendamentos ${e}`);
       }
+    });
+  };
+
+  const checkSchedule = payload => {
+    const id = payload;
+    dispatch({type: 'CHECK_SCHEDULE', id});
+  };
+
+  const confirmSchedules = payload => {
+    const toConfirmSchedules = payload;
+
+    toConfirmSchedules.forEach(({id, procedures, checked}) => {
+      confirmSchedulesList(id, procedures, checked).then(confirmedSchedule => {
+        dispatch({type: 'CONFIRM_SCHEDULE', confirmedSchedule});
+      });
     });
   };
 
@@ -46,10 +84,9 @@ const ScheduleProvider = ({children}) => {
       try {
         state.registeredSchedules.forEach(schedule => {
           insertScheduleCRUD(schedule, false).then(newSchedule => {
-            dispatch({type: 'SAVE_SCHEDULE', newSchedule});
+            resolve(dispatch({type: 'SAVE_SCHEDULE', newSchedule}));
           });
         });
-        resolve('Deu bom');
       } catch (e) {
         reject(`Deu ruim ao salvar agendamentos ${e}`);
       }
@@ -68,15 +105,47 @@ const ScheduleProvider = ({children}) => {
     });
   };
 
-  const deleteSchedule = payload => {
+  const deleteUniqueSchedule = payload => {
     return new Promise(async (resolve, reject) => {
+      const schedule = payload;
       try {
-        const schedule = payload;
-
-        dispatch({type: 'DELETE_SCHEDULE', payload});
-        resolve(await deleteScheduleCRUD(schedule));
+        dispatch({type: 'DELETE_SCHEDULE', deletedScheduleId: schedule.id});
+        await deleteScheduleCRUD(schedule);
+        resolve(sortScheduleList);
       } catch (e) {
         reject(`Deu ruim ao excluir agendamentos ${e}`);
+      }
+    });
+  };
+
+  const deleteScheduleList = payload => {
+    return new Promise(async (resolve, reject) => {
+      const schedules = payload;
+      try {
+        dispatch({type: 'DELETE_SCHEDULES', schedules});
+        await deleteSchedulesCRUD(schedules);
+        resolve(sortScheduleList);
+      } catch (e) {
+        reject(`Deu ruim ao excluir agendamentos ${e}`);
+      }
+    });
+  };
+
+  const deleteScheduleProcedure = payload => {
+    return new Promise(async (resolve, reject) => {
+      const {scheduleProcedureId} = payload;
+      try {
+        deleteScheduleProcedureById(scheduleProcedureId, false).then(
+          deletedScheduleProcedure => {
+            dispatch({
+              type: 'DELETE_SCHEDULE_PROCEDURE',
+              deletedScheduleProcedure,
+            });
+            resolve(sortScheduleList);
+          },
+        );
+      } catch (e) {
+        reject(`Deu ruim ao excluir procedimento ${e}`);
       }
     });
   };
@@ -93,6 +162,10 @@ const ScheduleProvider = ({children}) => {
     dispatch({type: 'EDIT_SCHEDULE', payload});
   };
 
+  const sortScheduleList = payload => {
+    dispatch({type: 'SORT_SCHEDULES', payload});
+  };
+
   const cleanRegisteredSchedules = payload => {
     dispatch({type: 'CLEAN_REGISTERED_SCHEDULES', payload});
   };
@@ -104,16 +177,20 @@ const ScheduleProvider = ({children}) => {
   const contextValues = {
     loadAllSchedules,
     addSchedule,
-
+    deleteScheduleProcedure,
     saveSchedule,
+    sortScheduleList,
     cleanRegisteredSchedules,
     cleanSchedules,
-
+    deleteUniqueSchedule,
+    deleteScheduleList,
     updateSchedule,
-    deleteSchedule,
+    checkSchedule,
     deleteScheduleInView,
     updateScheduleInView,
     editSchedule,
+    confirmSchedules,
+    loadAllSchedulesByPartner,
     ...state,
   };
 

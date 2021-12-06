@@ -19,7 +19,7 @@ export const Content = styled.View`
 `;
 
 export const Input = styled.TextInput`
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   width: 70%;
   border-bottom-width: 1px;
   border-bottom-color: ${global.colors.purpleColor};
@@ -41,8 +41,8 @@ export const PasswordResetButton = styled.TouchableOpacity`
 `;
 
 export const PasswordResetText = styled.Text`
-  font-family: ${global.fonts.s};
-  font-size: 16px;
+  font-family: ${global.fonts.auxiliarFont};
+  font-size: ${props => props.screenHeight / 40}px;
   color: ${global.colors.purpleColor};
 `;
 
@@ -53,14 +53,14 @@ export const RegisterContent = styled.View`
   justify-content: center;
 `;
 export const RegisterText = styled.Text`
-  font-family: ${global.fonts.s};
-  font-size: 16px;
+  font-family: ${global.fonts.auxiliarFont};
+  font-size: ${props => props.screenHeight / 40}px;
 `;
 
 export const RegisterButton = styled.TouchableOpacity``;
 
 export const RegisterButtonText = styled.Text`
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   font-size: 16px;
   color: ${global.colors.purpleColor};
 `;

@@ -5,6 +5,8 @@ import {deleteProcedureEmployeeByProcedureId} from './ProcedureEmployeeService';
 import {buildProcedure, buildProcedureList} from '../factory/Procedure';
 import {deleteScheduleProcedureByProcedureId} from './ScheduleProcedureService';
 import {EmployeeObject} from './EmployeeService';
+import {deleteScheduleByClientId} from './ScheduleService';
+import {ClientObject} from './ClientService';
 
 export const ProcedureObject = Parse.Object.extend('procedure');
 
@@ -60,32 +62,46 @@ export const saveProcedure = (procedureObj, returnParseObject) => {
         commissionPercentage,
         employeeId,
         salonId,
+        hasMaintenance,
+        hasCommission,
+        isPercentage,
+        isFixedValue,
       } = procedureObj;
 
       const newProcedure = new ProcedureObject();
-
-      if (maintenanceValue !== undefined && maintenanceDays !== undefined) {
-        newProcedure.set(
-          'maintenance_value',
-          parseFloat(maintenanceValue.replace('.', '').replace(',', '.')),
-        );
-        newProcedure.set('maintenance_days', parseInt(maintenanceDays));
-      }
+      //
+      newProcedure.set(
+        'maintenance_value',
+        hasMaintenance.state
+          ? parseFloat(maintenanceValue.replace('.', '').replace(',', '.'))
+          : 0,
+      );
+      newProcedure.set(
+        'maintenance_days',
+        hasMaintenance.state ? parseInt(maintenanceDays) : 0,
+      );
+      //
+      newProcedure.set(
+        'commission_value',
+        parseFloat(
+          hasCommission.state && isFixedValue
+            ? commissionValue.replace('.', '').replace(',', '.')
+            : 0,
+        ),
+      );
+      newProcedure.set(
+        'commission_percentage',
+        hasCommission.state && isPercentage
+          ? parseInt(commissionPercentage)
+          : 0,
+      );
       newProcedure.set('name', name);
       newProcedure.set('time', parseInt(time));
       newProcedure.set(
         'value',
         parseFloat(value.replace('.', '').replace(',', '.')),
       );
-      newProcedure.set(
-        'commission_value',
-        parseFloat(
-          commissionValue !== 0
-            ? commissionValue.replace('.', '').replace(',', '.')
-            : 0,
-        ),
-      );
-      newProcedure.set('commission_percentage', parseInt(commissionPercentage));
+
       newProcedure.set(
         'employee_id',
         new EmployeeObject({objectId: employeeId}),
@@ -121,7 +137,7 @@ export const getProcedureByName = (procedureName, returnParseObject) => {
       if (returnParseObject) {
         resolve(await ProcedureQuery.first());
       } else {
-        resolve(buildProcedure(convertToObj(await ProcedureQuery.first())));
+        resolve(convertToObj(await ProcedureQuery.first()));
       }
     } catch (e) {
       console.error(`Procedimento   ${e}`);
@@ -151,6 +167,19 @@ export const deleteProcedureCRUD = (procedureId, returnParseObject) => {
   });
 };
 
+export const deleteProceduresCRUD = async procedures => {
+  try {
+    for (const procedure of procedures) {
+      const procedureToDelete = new ProcedureObject({objectId: procedure.id});
+      await procedureToDelete.destroy();
+      await deleteProcedureEmployeeByProcedureId(procedure.id);
+      await deleteScheduleProcedureByProcedureId(procedure.id, false);
+    }
+  } catch (e) {
+    console.error(`Procedimento ${e}`);
+  }
+};
+
 export const updateProcedureCRUD = (procedureObj, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -163,32 +192,48 @@ export const updateProcedureCRUD = (procedureObj, returnParseObject) => {
         maintenanceValue,
         maintenanceDays,
         id,
+        isFixedValue,
+        hasMaintenance,
+        hasCommission,
+        isPercentage,
       } = procedureObj;
 
       const procedure = new ProcedureObject({objectId: id});
 
-      if (maintenanceValue !== undefined && maintenanceDays !== undefined) {
-        procedure.set(
-          'maintenance_value',
-          parseFloat(maintenanceValue.replace(',', '')),
-        );
-        procedure.set('maintenance_days', parseInt(maintenanceDays));
-      }
+      procedure.set(
+        'maintenance_value',
+        hasMaintenance.state
+          ? parseFloat(maintenanceValue.replace('.', '').replace(',', '.'))
+          : 0,
+      );
+      procedure.set(
+        'maintenance_days',
+        hasMaintenance.state ? parseInt(maintenanceDays) : 0,
+      );
+
+      procedure.set(
+        'commission_value',
+        parseFloat(
+          hasCommission.state && isFixedValue
+            ? commissionValue.replace('.', '').replace(',', '.')
+            : 0,
+        ),
+      );
+      console.log('teste', hasCommission.state && isPercentage);
+
+      procedure.set(
+        'commission_percentage',
+        hasCommission.state && isPercentage
+          ? parseInt(commissionPercentage)
+          : 0,
+      );
+
       procedure.set('name', name);
       procedure.set('time', parseInt(time));
       procedure.set(
         'value',
         parseFloat(value.replace('.', '').replace(',', '.')),
       );
-      procedure.set(
-        'commission_value',
-        parseFloat(
-          commissionValue !== 0
-            ? commissionValue.replace('.', '').replace(',', '.')
-            : 0,
-        ),
-      );
-      procedure.set('commission_percentage', parseInt(commissionPercentage));
 
       if (returnParseObject) {
         resolve(await procedure.save());

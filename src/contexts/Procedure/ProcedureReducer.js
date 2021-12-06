@@ -2,10 +2,12 @@ export const ProcedureReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_PROCEDURES':
       state.procedures = action.procedures;
+      state.isProceduresLoading = false;
 
       return {
         procedures: state.procedures,
         dropdownProcedures: state.dropdownProcedures,
+        isProceduresLoading: state.isProceduresLoading,
         ...state,
       };
     case 'ADD_PROCEDURE':
@@ -23,7 +25,12 @@ export const ProcedureReducer = (state, action) => {
       const procedureInViewIndex = action.payload;
       state.registeredProcedures = state.registeredProcedures.map(
         (procedure, index) => {
-          if (procedure.isInView === true && index !== procedureInViewIndex) {
+          if (procedureInViewIndex === -1) {
+            procedure.isInView = false;
+          } else if (
+            procedure.isInView === true &&
+            index !== procedureInViewIndex
+          ) {
             procedure.isInView = false;
           }
 
@@ -75,12 +82,24 @@ export const ProcedureReducer = (state, action) => {
           state.procedures.splice(index, 1);
         }
       });
+      return {
+        procedures: state.procedures,
+        ...state,
+      };
+    case 'DELETE_PROCEDURES':
+      const procedures = action.procedures;
+      procedures.forEach(deletedProcedure => {
+        state.procedures.forEach((procedure, index) => {
+          if (procedure.id === deletedProcedure.id) {
+            state.procedures.splice(index, 1);
+          }
+        });
+      });
 
       return {
         procedures: state.procedures,
         ...state,
       };
-
     case 'DELETE_PROCEDURE_INVIEW':
       const procedureToDelete = action.payload;
 
@@ -93,18 +112,10 @@ export const ProcedureReducer = (state, action) => {
         ...state,
       };
 
-    case 'CLEAN_REGISTERED_PROCEDURES':
+    case 'CLEAN_PROCEDURES':
       state.registeredProcedures = [];
       return {
         registeredProcedures: state.registeredProcedures,
-        ...state,
-      };
-
-    case 'CLEAN_PROCEDURES':
-      state.procedures = [];
-
-      return {
-        procedures: state.procedures,
         ...state,
       };
 

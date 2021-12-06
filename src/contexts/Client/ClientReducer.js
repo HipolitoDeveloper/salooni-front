@@ -1,12 +1,12 @@
-import {ClientParseObjectToClientObject} from '../../pipe/conversor';
-
 export const ClientReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_CLIENTS':
       state.clients = action.clients;
+      state.isClientsLoading = false;
       return {
         clients: state.clients,
         dropdownClients: state.dropdownClients,
+        isClientsLoading: state.isClientsLoading,
         ...state,
       };
     case 'ADD_CLIENT':
@@ -20,8 +20,14 @@ export const ClientReducer = (state, action) => {
 
     case 'SAVE_CLIENTS':
       state.clients.push(action.newClient);
+      state.registeredClients.forEach((registeredClient, index) => {
+        if (registeredClient.email === action.newClient.email) {
+          state.registeredClients.splice(index, 1);
+        }
+      });
       return {
         clients: state.clients,
+        registeredClients: state.registeredClients,
         ...state,
       };
 
@@ -53,6 +59,21 @@ export const ClientReducer = (state, action) => {
         ...state,
       };
 
+    case 'DELETE_CLIENTS':
+      const clients = action.clients;
+      clients.forEach(deletedClient => {
+        state.clients.forEach((client, index) => {
+          if (client.id === deletedClient.id) {
+            state.clients.splice(index, 1);
+          }
+        });
+      });
+
+      return {
+        clients: state.clients,
+        ...state,
+      };
+
     case 'DELETE_CLIENT_INVIEW':
       const clientToDelete = action.payload;
 
@@ -67,7 +88,9 @@ export const ClientReducer = (state, action) => {
     case 'UPDATE_CLIENTS_INVIEW':
       const clientInViewIndex = action.payload;
       state.registeredClients.map((client, index) => {
-        if (client.isInView === true && index !== clientInViewIndex) {
+        if (clientInViewIndex === -1) {
+          client.isInView = false;
+        } else if (client.isInView === true && index !== clientInViewIndex) {
           client.isInView = false;
         }
 
@@ -99,9 +122,23 @@ export const ClientReducer = (state, action) => {
         ...state,
       };
     case 'CLEAN_CLIENTS':
+      state.clients = [];
       return {
-        clients: [],
+        clients: state.clients,
         ...state,
+      };
+    case 'HANDLE_ERROR':
+      const {item, property} = action.payload;
+
+      state.registeredClients.forEach(client => {
+        if (item.name === client.name) {
+          client.errorProperties.push(property);
+        }
+      });
+
+      return {
+        ...state,
+        registeredClients: state.registeredClients,
       };
 
     default:

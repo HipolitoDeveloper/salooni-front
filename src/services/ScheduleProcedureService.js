@@ -1,7 +1,10 @@
 import Parse from 'parse/react-native';
 import {convertToObj} from '../pipe/conversor';
-import {getScheduleByProcedureId, ScheduleObject} from './ScheduleService';
-import {buildScheduleProcedure} from '../factory/Schedule';
+import {ScheduleObject} from './ScheduleService';
+import {
+  buildScheduleProcedure,
+  buildScheduleProcedureList,
+} from '../factory/Schedule';
 import {ProcedureObject} from './ProcedureService';
 
 const ScheduleProcedureObject = Parse.Object.extend('schedule_procedure');
@@ -23,7 +26,7 @@ export const getScheduleProcedureByScheduleId = (
         resolve(await ScheduleProcedureQuery.find());
       } else {
         resolve(
-          buildScheduleProcedure(
+          buildScheduleProcedureList(
             convertToObj(await ScheduleProcedureQuery.find()),
           ),
         );
@@ -51,54 +54,10 @@ export const getScheduleProcedureByProcedureId = (
         resolve(await ScheduleProcedureQuery.find());
       } else {
         resolve(
-          buildScheduleProcedure(
+          buildScheduleProcedureList(
             convertToObj(await ScheduleProcedureQuery.find()),
           ),
         );
-      }
-    } catch (e) {
-      console.error(`Procedimentos do agendamento ${e}`);
-      reject(`Procedimentos do agendamento ${JSON.stringify(e)}`);
-    }
-  });
-};
-
-// export const getProcedureEmployeeByProcedureId = (
-//   procedureId,
-//   returnParseObject,
-// ) => {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const procedure = await getProcedureById(procedureId, true);
-//
-//       const ProcedureEmployeeQuery = new Parse.Query(ProcedureEmployeeObject);
-//       ProcedureEmployeeQuery.equalTo('procedure_id', procedure);
-//       ProcedureEmployeeQuery.include('IdFuncFK');
-//
-//       if (returnParseObject) {
-//         resolve(await ProcedureEmployeeQuery.find());
-//       } else {
-//         resolve(convertToObj(await ProcedureEmployeeQuery.find()));
-//       }
-//     } catch (e) {
-//       reject(`Procedimento ${JSON.stringify(e)}`);
-//     }
-//   });
-// };
-
-export const getScheduleProcedureById = (
-  scheduleProcedureId,
-  returnParseObject,
-) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const ScheduleProcedureQuery = new Parse.Query(ScheduleProcedureObject);
-      ScheduleProcedureQuery.equalTo('objectId', scheduleProcedureId);
-
-      if (returnParseObject) {
-        resolve(await ScheduleProcedureQuery.first());
-      } else {
-        resolve(convertToObj(await ScheduleProcedureQuery.first()));
       }
     } catch (e) {
       console.error(`Procedimentos do agendamento ${e}`);
@@ -154,7 +113,11 @@ export const deleteScheduleProcedureById = (
         if (returnParseObject) {
           resolve(deletedScheduleProcedure);
         } else {
-          resolve(convertToObj(deletedScheduleProcedure));
+          resolve(
+            deletedScheduleProcedure !== undefined
+              ? buildScheduleProcedure(convertToObj(deletedScheduleProcedure))
+              : [],
+          );
         }
       });
     } catch (e) {
@@ -190,6 +153,22 @@ export const deleteScheduleProcedureByProcedureId = async procedureId => {
     scheduleProcedures.map(async sp => {
       await sp.destroy();
     });
+  } catch (e) {
+    console.error(`Procedimentos do agendamento ${e}`);
+  }
+};
+
+export const confirmScheduleProcedure = async (procedures, checked) => {
+  try {
+    for (const scheduleProcedures of procedures) {
+      const {scheduleProcedureId} = scheduleProcedures;
+      const scheduleProcedure = new ScheduleProcedureObject({
+        objectId: scheduleProcedureId,
+      });
+      scheduleProcedure.set('accomplished_schedule', checked);
+
+      await scheduleProcedure.save();
+    }
   } catch (e) {
     console.error(`Procedimentos do agendamento ${e}`);
   }

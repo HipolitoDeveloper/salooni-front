@@ -12,10 +12,9 @@ target 'salooni' do
     :hermes_enabled => false
   )
 
-  target 'salooniTests' do
-    inherit! :complete
-    # Pods for testing
-  end
+  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+
+
 
   # Enables Flipper.
   #

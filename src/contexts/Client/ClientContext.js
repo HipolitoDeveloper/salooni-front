@@ -2,16 +2,19 @@ import React, {createContext, useReducer} from 'react';
 import {ClientReducer} from './ClientReducer';
 import {
   deleteClientCRUD,
+  deleteClientsCRUD,
   getAllClientsBySalonId,
   insertClientCRUD,
   updateClientCRUD,
 } from '../../services/ClientService';
+import {saveEmployee} from '../../services/EmployeeService';
 
 export const ClientContext = createContext();
 
 const initialState = {
   clients: [],
   registeredClients: [],
+  isClientsLoading: true,
 };
 
 const ClientProvider = ({children}) => {
@@ -43,15 +46,25 @@ const ClientProvider = ({children}) => {
     dispatch({type: 'EDIT_CLIENT', payload});
   };
 
-  const saveClient = payload => {
-    return new Promise((resolve, reject) => {
+  const saveClient = client => {
+    return new Promise(async (resolve, reject) => {
+      let errorMessage = '';
       try {
-        state.registeredClients.forEach(client => {
-          insertClientCRUD(client, false).then(newClient => {
+        await insertClientCRUD(client, false).then(
+          newClient => {
             dispatch({type: 'SAVE_CLIENTS', newClient});
-          });
-        });
-        resolve('OK');
+          },
+          error => {
+            errorMessage = error;
+            console.log('error', error);
+          },
+        );
+
+        if (typeof errorMessage !== 'string') {
+          reject(errorMessage.code);
+        } else {
+          resolve('Deu bom');
+        }
       } catch (e) {
         reject(`Deu ruim ao salvar clientes ${e}`);
       }
@@ -61,24 +74,40 @@ const ClientProvider = ({children}) => {
   const updateClient = payload => {
     return new Promise(async (resolve, reject) => {
       try {
-        updateClientCRUD(payload, false).then(updatedClient => {
-          dispatch({type: 'UPDATE_CLIENT', updatedClient});
-        });
-
-        resolve('Deu bom');
+        await updateClientCRUD(payload, false).then(
+          updatedClient => {
+            resolve(dispatch({type: 'UPDATE_CLIENT', updatedClient}));
+          },
+          error => {
+            reject(error);
+          },
+        );
       } catch (e) {
-        reject(`Deu ruim ao editar clientes ${e}`);
+        console.log(`Deu ruim ao editar clientes ${e}`);
+        reject(e);
       }
     });
   };
 
-  const deleteClient = payload => {
+  const deleteUniqueClient = payload => {
     return new Promise(async (resolve, reject) => {
       const {id} = payload;
       try {
         deleteClientCRUD(id).then(deletedClient => {
           resolve(dispatch({type: 'DELETE_CLIENT', deletedClient}));
         });
+      } catch (e) {
+        reject(`Deu ruim ao excluir cliente ${e}`);
+      }
+    });
+  };
+
+  const deleteClientList = payload => {
+    return new Promise(async (resolve, reject) => {
+      const clients = payload;
+      try {
+        await deleteClientsCRUD(clients);
+        resolve(dispatch({type: 'DELETE_CLIENTS', clients}));
       } catch (e) {
         reject(`Deu ruim ao excluir clientes ${e}`);
       }
@@ -97,16 +126,20 @@ const ClientProvider = ({children}) => {
     dispatch({type: 'CLEAN_CLIENTS', payload});
   };
 
+  const handleClientRegisterError = payload => {
+    dispatch({type: 'HANDLE_ERROR', payload});
+  };
+
   const contextValues = {
+    handleClientRegisterError,
     loadAllClients,
     addClient,
-
     saveClient,
     cleanRegisteredClients,
     cleanClients,
-
     updateClient,
-    deleteClient,
+    deleteUniqueClient,
+    deleteClientList,
     deleteClientInView,
     updateClientInView,
     editClient,

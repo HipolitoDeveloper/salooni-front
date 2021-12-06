@@ -17,16 +17,25 @@ export const insertClientCRUD = (clientObj, returnParseObject) => {
       client.set('cpf', cpf);
       client.set('tel', tel);
       client.set('tel2', tel2);
-      client.set('birthdate', bornDate);
+      client.set('birthdate', bornDate.toString());
       client.set('salon_id', new SalonObject({objectId: salonId}));
-      if (returnParseObject) {
-        resolve(await client.save());
-      } else {
-        resolve(buildClientObject(convertToObj(await client.save())));
-      }
+
+      client.save().then(
+        savedClient => {
+          if (returnParseObject) {
+            resolve(savedClient);
+          } else {
+            resolve(buildClientObject(convertToObj(savedClient)));
+          }
+        },
+        error => {
+          console.error(`Cliente ${JSON.stringify(error)}`);
+          reject(error);
+        },
+      );
     } catch (e) {
       console.error(`Cliente ${JSON.stringify(e)}`);
-      reject(`Cliente ${JSON.stringify(e)}`);
+      reject(e);
     }
   });
 };
@@ -52,7 +61,7 @@ export const updateClientCRUD = (clientObj, returnParseObject) => {
       }
     } catch (e) {
       console.error(`Cliente ${e}`);
-      reject(`Cliente ${JSON.stringify(e)}`);
+      reject(e);
     }
   });
 };
@@ -93,4 +102,15 @@ export const deleteClientCRUD = (clientId, returnParseObject) => {
       reject(`Cliente ${JSON.stringify(e)}`);
     }
   });
+};
+export const deleteClientsCRUD = async clients => {
+  try {
+    for (const client of clients) {
+      const clientToDelete = new ClientObject({objectId: client.id});
+      await clientToDelete.destroy();
+      await deleteScheduleByClientId(client.id, false);
+    }
+  } catch (e) {
+    console.error(`Cliente ${e}`);
+  }
 };

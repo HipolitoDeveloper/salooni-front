@@ -1,18 +1,23 @@
 import React, {useContext, useEffect, useState} from 'react';
 import * as S from './styled';
-import Input from '../../../../components/Input';
-import SubmitButton from '../../../../components/SubmitButton';
+import Input from '../../../../components/small/Input';
 import global from '../../../../../common/global';
-import ErrorMessage from '../../../../components/ErrorMessage';
+import ErrorMessage from '../../../../components/small/ErrorMessage';
 import {useNavigation} from '@react-navigation/native';
 import {ClientContext} from '../../../../../contexts/Client/ClientContext';
 import errorMessages from '../../../../../common/errorMessages';
-import AlertModal from '../../../../components/AlertModal';
-import {ActivityIndicator} from 'react-native';
-import BackButton from '../../../../components/BackButton';
+import AlertModal from '../../../../components/small/AlertModal';
 import {UserContext} from '../../../../../contexts/User/UserContext';
-import {SalonObject} from '../../../../../services/SalonService';
-import Icon from 'react-native-vector-icons/Ionicons';
+import RegisterComponent from '../../../../components/huge/RegisterComponent';
+import Loading from '../../../../components/small/Loading';
+import {
+  CPFVerifier,
+  TELVerifier,
+} from '../../../../components/small/Input/verifier';
+import RNDateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
+import {InputTitle} from '../../../../components/small/Input/styled';
+import {Dimensions} from 'react-native';
 
 const ClientRegister = ({route}) => {
   const {
@@ -20,12 +25,12 @@ const ClientRegister = ({route}) => {
     editClient,
     registeredClients,
     saveClient,
-
     cleanRegisteredClients,
     updateClientInView,
     updateClient,
     deleteClient,
     deleteClientInView,
+    handleClientRegisterError,
   } = useContext(ClientContext);
 
   const {currentUser} = useContext(UserContext);
@@ -37,9 +42,15 @@ const ClientRegister = ({route}) => {
     isShowing: false,
     text: '',
   });
-  const [client, setClient] = useState({});
-  const navigate = useNavigation();
+  const [client, setClient] = useState({
+    bornDate: new Date(),
+    errorProperties: [],
+  });
+  const [invalidForm, setInvalidForm] = useState(false);
+  const [showDate, setShowDate] = useState(false);
 
+  const navigate = useNavigation();
+  const screenHeight = Dimensions.get('screen').height;
   useEffect(() => {
     navigate.addListener('focus', () => {
       if (Object.keys(route.params?.client).length !== 0) {
@@ -55,7 +66,20 @@ const ClientRegister = ({route}) => {
     registeredClients.forEach(client => (client.isInView = false));
   }, []);
 
+  const cleanClient = () => {
+    setClient({
+      bornDate: new Date(),
+      errorProperties: [],
+    });
+  };
+
   const handleChange = (text, name) => {
+    client.errorProperties?.forEach((property, index) => {
+      if (property === name) {
+        client.errorProperties?.splice(index, 1);
+      }
+    });
+
     setClient({
       ...client,
       [name]: text,
@@ -66,21 +90,27 @@ const ClientRegister = ({route}) => {
     setShowAlertModal({isShowing: isShowing, text: text});
   };
 
+  const onChangeDate = (event, selectedDate) => {
+    selectedDate = selectedDate || client.bornDate;
+    handleChange(selectedDate, 'bornDate');
+    setShowDate(false);
+  };
+
   const chooseAddClientMethod = async () => {
     const {isInView, indexInView} = {...client};
 
-    if (verifyInformation() && isInView) {
+    if (verifyInformation(true) && isInView) {
       client.isInView = false;
       editClient({client: client, index: indexInView});
       setErrorMessage('');
-      setClient({});
+      cleanClient();
     }
 
-    if (verifyInformation() && !isInView) {
+    if (verifyInformation(true) && !isInView) {
       client.salonId = currentUser.idSalon;
       addClient(client);
       setErrorMessage('');
-      setClient({});
+      cleanClient();
     }
   };
 
@@ -91,52 +121,73 @@ const ClientRegister = ({route}) => {
 
     setClient(client);
 
-    if (!verifyIfIsEditing()) {
-      setClient({});
+    if (!verifyIfIsPreRegisteredEditing()) {
+      cleanClient();
     }
   };
 
-  const verifyIfIsEditing = () => {
+  const verifyIfIsPreRegisteredEditing = () => {
     return registeredClients.some(client => client.isInView === true);
   };
 
-  const saveClients = () => {
+  const saveClients = async () => {
+    let isSaving = false;
     setIsLoading(true);
     if (verifyInformationToGo()) {
-      saveClient().then(
-        () => {
-          setTimeout(() => {
+      for (const client of registeredClients) {
+        await saveClient(client).then(
+          () => {
+            setErrorMessage('');
+            isSaving = true;
+          },
+          error => {
             setIsLoading(false);
-            navigate.navigate('Clients');
-            setClient({});
-          }, 3000);
-          cleanRegisteredClients();
-          setErrorMessage('');
-        },
-        error => {
+            if (error === 137)
+              handleClientRegisterError({item: client, property: 'email'});
+            setErrorMessage(errorMessages.duplicateEmailPreRegisteredItems);
+          },
+        );
+      }
+
+      if (isSaving) {
+        setTimeout(() => {
           setIsLoading(false);
-          console.log(error);
-        },
-      );
+          navigate.push('TabStack', {screen: 'Clients'});
+          cleanClient();
+          cleanRegisteredClients();
+        }, 3000);
+      }
     }
   };
 
-  const updateClients = () => {
+  const updateClients = async () => {
     setIsLoading(true);
-    updateClient(client).then(
-      async () => {
+    await updateClient(client).then(
+      () => {
         setTimeout(() => {
           setIsLoading(false);
-          navigate.navigate('Clients');
-          setClient({});
+          navigate.push('TabStack', {screen: 'Clients'});
+          cleanClient();
         }, 500);
         setErrorMessage('');
       },
       error => {
         setIsLoading(false);
-        console.log(error);
+        if (error.code === 137)
+          handleClientRegisterError({item: client, property: 'email'});
+        setErrorMessage(errorMessages.duplicateEmailPreRegisteredItems);
       },
     );
+  };
+
+  const deletePreRegisteredItem = client => {
+    deleteClientInView(client);
+    cleanClient();
+  };
+
+  const cancelEditing = () => {
+    updateClientInView(-1);
+    cleanClient();
   };
 
   const deleteClients = () => {
@@ -146,7 +197,7 @@ const ClientRegister = ({route}) => {
         setIsLoading(false);
         navigate.navigate('Clients');
         setErrorMessage('');
-        setClient({});
+        cleanClient();
       },
       error => {
         setIsLoading(false);
@@ -157,11 +208,14 @@ const ClientRegister = ({route}) => {
 
   const verifyInformationToGo = () => {
     let ableToGo = true;
-
-    if (Object.keys(client).length === 5) {
-      addClient(client);
-      return ableToGo;
-    } else if (registeredClients.length === 0) {
+    // if (Object.keys(client).length < 4) {
+    // addClient(client);
+    // return ableToGo;
+    // ableToGo = false;
+    // setErrorMessage(errorMessages.noClientMessage);
+    // setIsLoading(false);
+    // } else
+    if (registeredClients.length === 0) {
       ableToGo = false;
       setErrorMessage(errorMessages.noClientMessage);
       setIsLoading(false);
@@ -169,7 +223,7 @@ const ClientRegister = ({route}) => {
     return ableToGo;
   };
 
-  const verifyInformation = () => {
+  const verifyInformation = showErrorMessages => {
     let ableToGo = true;
     let errorMessage = '';
 
@@ -179,8 +233,6 @@ const ClientRegister = ({route}) => {
       client.name === '' ||
       client.email === undefined ||
       client.email === '' ||
-      client.cpf === undefined ||
-      client.cpf === '' ||
       client.tel === undefined ||
       client.tel === '' ||
       client.bornDate === undefined ||
@@ -188,189 +240,204 @@ const ClientRegister = ({route}) => {
     ) {
       ableToGo = false;
       errorMessage = errorMessages.clientMessage;
-      setIsLoading(false);
+      if (showErrorMessages) setIsLoading(false);
+    } else {
+      if (!TELVerifier(client.tel).state) {
+        ableToGo = false;
+        errorMessage = errorMessages.invalidTel;
+        if (showErrorMessages) setIsLoading(false);
+      }
     }
 
-    setErrorMessage(errorMessage);
+    if (
+      client.tel2 !== '' &&
+      client.tel2 !== undefined &&
+      !TELVerifier(client.tel2).state
+    ) {
+      ableToGo = false;
+      errorMessage = errorMessages.invalidTel;
+      if (showErrorMessages) setIsLoading(false);
+    }
+
+    if (
+      client.cpf !== '' &&
+      client.cpf !== undefined &&
+      !CPFVerifier(client.cpf).state
+    ) {
+      ableToGo = false;
+      errorMessage = errorMessages.invalidCPF;
+      if (showErrorMessages) setIsLoading(false);
+    }
+
+    if (
+      registeredClients.some(
+        registeredClient =>
+          registeredClient.name !== client.name &&
+          registeredClient.email === client.email,
+      )
+    ) {
+      ableToGo = false;
+      errorMessage = errorMessages.duplicateInformation;
+      setErrorMessage(errorMessages.duplicateInformation);
+      if (showErrorMessages) setIsLoading(false);
+    }
+
+    if (showErrorMessages) setErrorMessage(errorMessage);
+    if (errorMessage === '') setErrorMessage('');
     return ableToGo;
   };
 
-  const loadBoxInformation = () =>
-    registeredClients.map((client, index) => (
-      <S.BoxContent onPress={() => handleClient(client, index)} key={index}>
-        <S.BoxText isInView={client.isInView}>{client.name}</S.BoxText>
-      </S.BoxContent>
-    ));
-
   return (
-    <S.Container>
-      <S.Content>
-        <S.HeaderContent>
-          <BackButton
-            positionTop={'20px'}
-            positionLeft={'-8px'}
-            buttonColor={`${global.colors.blueColor}`}
-            onPress={() => {
-              navigate.goBack();
-            }}
-          />
-          <S.HeaderTitle>Registro de Clientes</S.HeaderTitle>
-        </S.HeaderContent>
-        <S.BodyContent>
-          <Input
-            handleChange={handleChange}
-            name={'name'}
-            placeholder={'Nome*'}
-            value={client.name}
-            width={'80%'}
-            keyboard={'default'}
-            isSecureTextEntry={false}
-            fontSize={18}
-            disabled={false}
-            mask="none"
-          />
+    <RegisterComponent
+      onCancel={() => {
+        navigate.goBack();
+        cleanRegisteredClients();
+      }}
+      color={`${global.colors.blueColor}`}
+      preRegisteredItems={registeredClients}
+      handleSelect={handleClient}
+      deletePreRegisteredItem={deletePreRegisteredItem}
+      onConfirm={isEditing ? updateClients : saveClients}
+      isPreRegisteredEditing={verifyIfIsPreRegisteredEditing()}
+      cancelEditing={cancelEditing}
+      isEditing={isEditing}
+      onAdd={chooseAddClientMethod}
+      registeredItemRightInformation={'tel'}
+      headerTitle={'Clientes'}
+      validForm={() => verifyInformation(false)}>
+      {errorMessage !== '' && (
+        <ErrorMessage
+          text={errorMessage}
+          width={'70%'}
+          textColor={global.colors.blueColor}
+        />
+      )}
+      <Loading isLoading={isLoading} color={global.colors.blueColor} />
+      <S.BodyContent>
+        <Input
+          invalidValue={client?.errorProperties?.some(
+            property => property === 'name',
+          )}
+          handleChange={handleChange}
+          name={'name'}
+          placeholder={'Nome do Cliente'}
+          value={client.name}
+          width={'80%'}
+          keyboard={'default'}
+          isSecureTextEntry={false}
+          fontSize={50}
+          disabled={false}
+          color={global.colors.blueColor}
+          label={'Nome*'}
+          isToValidate={true}
+          noEmpty={true}
+        />
 
-          <Input
-            handleChange={handleChange}
-            name={'email'}
-            placeholder={'E-mail*'}
-            value={client.email}
-            width={'80%'}
-            keyboard={'email-address'}
-            isSecureTextEntry={false}
-            fontSize={18}
-            disabled={false}
-            mask="none"
-          />
+        <Input
+          invalidValue={client?.errorProperties?.some(
+            property => property === 'email',
+          )}
+          handleChange={handleChange}
+          name={'email'}
+          placeholder={'E-mail do Cliente'}
+          value={client.email}
+          width={'80%'}
+          keyboard={'email-address'}
+          isSecureTextEntry={false}
+          fontSize={50}
+          disabled={false}
+          mask="email"
+          color={global.colors.blueColor}
+          label={'E-mail*'}
+          isToValidate={true}
+          noEmpty={true}
+        />
 
-          <Input
-            handleChange={handleChange}
-            name={'cpf'}
-            placeholder={'CPF*'}
-            value={client.cpf}
-            width={'80%'}
-            keyboard={'numeric'}
-            isSecureTextEntry={false}
-            fontSize={18}
-            disabled={false}
-            mask={'cpf'}
-          />
+        <Input
+          invalidValue={client?.errorProperties?.some(
+            property => property === 'cpf',
+          )}
+          handleChange={handleChange}
+          name={'cpf'}
+          placeholder={'CPF'}
+          value={client.cpf}
+          width={'80%'}
+          keyboard={'numeric'}
+          isSecureTextEntry={false}
+          fontSize={50}
+          disabled={false}
+          mask={'cpf'}
+          color={global.colors.blueColor}
+          label={'CPF'}
+          isToValidate={true}
+          noEmpty={false}
+        />
 
-          <Input
-            handleChange={handleChange}
-            name={'bornDate'}
-            placeholder={'Data de Nascimento*'}
+        <S.DateTextContent
+          borderBottomColor={global.colors.blueColor}
+          onPress={() => setShowDate(true)}>
+          <InputTitle
+            color={global.colors.blueColor}
+            screenHeight={screenHeight}>
+            Data de Nascimento*
+          </InputTitle>
+          <S.DateText>
+            {moment(client.bornDate).format('DD/MM/YYYY')}
+          </S.DateText>
+        </S.DateTextContent>
+        {showDate && (
+          <RNDateTimePicker
             value={client.bornDate}
-            width={'80%'}
-            keyboard={'numeric'}
-            isSecureTextEntry={false}
-            fontSize={18}
-            disabled={false}
-            mask={'date'}
+            mode={'date'}
+            is24Hour={true}
+            display="default"
+            minimumDate={new Date(1950, 0, 1)}
+            maximumDate={new Date()}
+            onChange={onChangeDate}
+            locale="pt-BR"
           />
+        )}
 
-          <S.ClientInformationContent>
-            <S.InformationContent isEditing={isEditing}>
-              <Input
-                handleChange={handleChange}
-                name={'tel'}
-                placeholder={'Celular*'}
-                value={client.tel}
-                width={'85%'}
-                keyboard={'numeric'}
-                isSecureTextEntry={false}
-                fontSize={18}
-                disabled={false}
-                mask={'phone'}
-              />
+        <Input
+          invalidValue={client?.errorProperties?.some(
+            property => property === 'tel',
+          )}
+          handleChange={handleChange}
+          name={'tel'}
+          placeholder={'Celular'}
+          value={client.tel}
+          width={'80%'}
+          keyboard={'numeric'}
+          isSecureTextEntry={false}
+          fontSize={50}
+          disabled={false}
+          mask={'phone'}
+          color={global.colors.blueColor}
+          label={'Celular*'}
+          isToValidate={true}
+          noEmpty={true}
+        />
 
-              <Input
-                handleChange={handleChange}
-                name={'tel2'}
-                placeholder={'Telefone'}
-                value={client.tel2}
-                width={'85%'}
-                keyboard={'numeric'}
-                isSecureTextEntry={false}
-                fontSize={18}
-                disabled={false}
-                mask={'phone'}
-              />
-            </S.InformationContent>
-
-            {!isEditing && (
-              <S.RegisteredProceduresContent>
-                <S.RegisteredProceduresBoxTitle>
-                  Já Cadastrados
-                </S.RegisteredProceduresBoxTitle>
-                <S.RegisteredProceduresBox>
-                  {loadBoxInformation()}
-                </S.RegisteredProceduresBox>
-              </S.RegisteredProceduresContent>
-            )}
-          </S.ClientInformationContent>
-        </S.BodyContent>
-        <S.FooterContent>
-          <S.AddButtonContent>
-            {errorMessage !== '' && (
-              <ErrorMessage
-                text={errorMessage}
-                width={'70%'}
-                textColor={`${global.colors.blueColor}`}
-              />
-            )}
-
-            {isLoading && (
-              <S.LoadingContent>
-                <ActivityIndicator
-                  size="large"
-                  color={global.colors.blueColor}
-                />
-              </S.LoadingContent>
-            )}
-
-            <S.ButtonsContent>
-              {!isEditing && (
-                <SubmitButton
-                  text={client.isInView ? 'Editar' : 'Adicionar'}
-                  onPress={() => chooseAddClientMethod()}
-                  width={'40%'}
-                  height={'30px'}
-                  fontSize={'18px'}
-                  buttonColor={`${global.colors.blueColor}`}
-                />
-              )}
-
-              {client.isInView && (
-                <S.DeleteButton
-                  onPress={() => {
-                    deleteClientInView(client);
-                    setClient({});
-                  }}>
-                  <Icon name="trash" size={17} />
-                </S.DeleteButton>
-              )}
-            </S.ButtonsContent>
-          </S.AddButtonContent>
-          <S.SubmitButtonContent>
-            <SubmitButton
-              disabled={verifyIfIsEditing()}
-              text={'Salvar'}
-              onPress={() => (!isEditing ? saveClients() : updateClients())}
-              width={'40%'}
-              height={'50px'}
-              fontSize={'18px'}
-              buttonColor={`${global.colors.blueColor}`}
-            />
-            {isEditing && (
-              <S.DeleteButton
-                onPress={() => handleModal(true, errorMessages.deleteMessage)}>
-                <Icon name="trash" size={17} />
-              </S.DeleteButton>
-            )}
-          </S.SubmitButtonContent>
-        </S.FooterContent>
-      </S.Content>
+        <Input
+          invalidValue={client?.errorProperties?.some(
+            property => property === 'tel2',
+          )}
+          handleChange={handleChange}
+          name={'tel2'}
+          placeholder={'Telefone'}
+          value={client.tel2}
+          width={'80%'}
+          keyboard={'numeric'}
+          isSecureTextEntry={false}
+          fontSize={50}
+          disabled={false}
+          mask={'phone'}
+          color={global.colors.blueColor}
+          label={'Telefone Residencial'}
+          isToValidate={true}
+          noEmpty={false}
+        />
+      </S.BodyContent>
 
       <AlertModal
         text={showAlertModal.text}
@@ -383,7 +450,7 @@ const ClientRegister = ({route}) => {
         }}
         title={'Atenção.'}
       />
-    </S.Container>
+    </RegisterComponent>
   );
 };
 

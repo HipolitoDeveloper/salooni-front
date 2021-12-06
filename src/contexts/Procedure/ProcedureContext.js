@@ -2,16 +2,23 @@ import React, {createContext, useReducer} from 'react';
 import {ProcedureReducer} from './ProcedureReducer';
 import {
   deleteProcedureCRUD,
+  deleteProceduresCRUD,
   getAllProceduresBySalonId,
   saveProcedure,
   updateProcedureCRUD,
 } from '../../services/ProcedureService';
+import {deleteProcedureEmployeeByEmployeeId} from '../../services/ProcedureEmployeeService';
+import {
+  deleteClientCRUD,
+  deleteClientsCRUD,
+} from '../../services/ClientService';
 
 export const ProcedureContext = createContext();
 
 const initialState = {
   procedures: [],
   registeredProcedures: [],
+  isProceduresLoading: true,
 };
 
 const ProcedureProvider = ({children}) => {
@@ -73,11 +80,24 @@ const ProcedureProvider = ({children}) => {
     });
   };
 
-  const deleteProcedure = payload => {
+  // const deleteProcedure = payload => {
+  //   return new Promise(async (resolve, reject) => {
+  //     const {id} = payload;
+  //     try {
+  //       deleteProcedureCRUD(id, false).then(deletedProcedures => {
+  //         resolve(dispatch({type: 'DELETE_PROCEDURE', deletedProcedures}));
+  //       });
+  //     } catch (e) {
+  //       reject(`Deu ruim ao excluir procedimento ${e}`);
+  //     }
+  //   });
+  // };
+
+  const deleteUniqueProcedure = payload => {
     return new Promise(async (resolve, reject) => {
       const {id} = payload;
       try {
-        deleteProcedureCRUD(id, false).then(deletedProcedures => {
+        deleteProcedureCRUD(id).then(deletedProcedures => {
           resolve(dispatch({type: 'DELETE_PROCEDURE', deletedProcedures}));
         });
       } catch (e) {
@@ -86,23 +106,30 @@ const ProcedureProvider = ({children}) => {
     });
   };
 
-  const deleteProcedureInView = payload => {
-    dispatch({type: 'DELETE_PROCEDURE_INVIEW', payload});
+  const deleteProcedureList = payload => {
+    return new Promise(async (resolve, reject) => {
+      const procedures = payload;
+      try {
+        await deleteProceduresCRUD(procedures);
+        resolve(dispatch({type: 'DELETE_PROCEDURES', procedures}));
+      } catch (e) {
+        reject(`Deu ruim ao excluir procedimentos ${e}`);
+      }
+    });
   };
 
-  const cleanRegisteredProcedures = payload => {
-    dispatch({type: 'CLEAN_REGISTERED_PROCEDURES', payload});
+  const deleteProcedureInView = payload => {
+    dispatch({type: 'DELETE_PROCEDURE_INVIEW', payload});
   };
 
   const contextValues = {
     loadAllProcedures,
     addProcedure,
     cleanProceduresInformation,
-
     saveProcedures,
-    cleanRegisteredProcedures,
     updateProcedure,
-    deleteProcedure,
+    deleteProcedureList,
+    deleteUniqueProcedure,
     deleteProcedureInView,
     updateProcedureInView,
     editProcedure,

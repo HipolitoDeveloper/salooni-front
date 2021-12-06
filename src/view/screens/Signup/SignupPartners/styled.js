@@ -34,14 +34,14 @@ export const HeaderContent = styled.View`
 
 export const HeaderTitle = styled.Text`
   margin: 60px 0 30px 0;
-  font-family: ${global.fonts.g};
+  font-family: ${global.fonts.mainFont};
   font-size: 24px;
   color: ${global.colors.purpleColor};
 `;
 
 export const HeaderText = styled.Text`
   font-size: 16px;
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   text-align: center;
 `;
 export const BodyContent = styled.View`

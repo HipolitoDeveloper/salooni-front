@@ -1,133 +1,143 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {
-  ActivityIndicator,
-  RefreshControl,
-  Pressable,
-  TouchableOpacity,
-  TouchableNativeFeedback,
-  TouchableHighlight,
-} from 'react-native';
+import React, {useContext, useState} from 'react';
 import global from '../../../../../common/global';
-import Header from '../../../../components/Header';
 import * as S from './styled';
-import ActionButton from 'react-native-circular-action-menu';
 import {UserContext} from '../../../../../contexts/User/UserContext';
 import {useNavigation} from '@react-navigation/native';
 import {PartnerContext} from '../../../../../contexts/Partner/PartnerContext';
-import {Swipeable} from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import {ScheduleContext} from '../../../../../contexts/Schedule/ScheduleContext';
+import List from '../../../../components/ListComponent';
+import Calendar from '../../../../components/huge/CalendarComponent';
+import Notification from '../../../../components/small/Notification';
+
 const Partners = () => {
-  const {partners, loadAllPartners} = useContext(PartnerContext);
-  const {loadAllSchedules} = useContext(ScheduleContext);
-  const {currentUser} = useContext(UserContext);
+  const {
+    partners,
+    deleteUniquePartner,
+    deletePartnerList,
+    deletePartnerProcedure,
+    loadAllPartners,
+  } = useContext(PartnerContext);
+  const {loadAllSchedulesByPartner} = useContext(ScheduleContext);
+  const {currentUser, isOwner} = useContext(UserContext);
 
-  const [loading, setLoading] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
+  const items = partners.filter(partner => partner.employeeType === 'PRC');
+  const [isLoading, setIsLoading] = useState(false);
+  const [stateAgenda, setStateAgenda] = useState({isShowing: false, item: {}});
   const navigate = useNavigation();
 
-  const loadSchedule = idFunc => {
-    setLoading(true);
-    loadAllSchedules({
+  const navigateToEmployeeCalendar = employee => {
+    setIsLoading(true);
+    loadAllSchedulesByPartner({
       salonId: currentUser.idSalon,
-      employeeId: idFunc,
-      employeeType: currentUser.employeeType,
+      employeeId: employee.id,
+      employeeType: employee.employeeType,
+      showCurrentUserSchedules: false,
     }).then(
-      () => {
-        setLoading(false);
-        navigate.push('ApplicationStack', {
-          screen: 'SchedulingCalendar',
-          params: {
-            typeView: 'AGN',
-          },
-        });
+      calendarSchedule => {
+        setIsLoading(false);
+        console.log('calendarSchedule', calendarSchedule);
+        handleAgenda(calendarSchedule);
+        // navigate.push('ApplicationStack', {
+        //   screen: 'Schedules',
+        //   params: {
+        //     calendarViewState: true,
+        //     employeeView: true,
+        //     employee: employee,
+        //   },
+        // });
       },
       error => {
         console.log(error);
-        setLoading(false);
+        setIsLoading(false);
       },
     );
-    setLoading(false);
   };
 
-  const getLeftContent = () => (
-    <S.LeftContent>
-      <Icon name="calendar" size={20} color="#FFF" style={{marginLeft: 20}} />
-    </S.LeftContent>
-  );
+  const deletePartner = partnerToDelete => {
+    setIsLoading(true);
+    deleteUniquePartner(partnerToDelete).then(
+      () => {
+        setIsLoading(false);
+      },
+      error => {
+        setIsLoading(false);
+        console.log(error);
+      },
+    );
+  };
 
-  const loadPartners = partners.map(
-    (partner, index) =>
-      partner.employeeType === 'PRC' && (
-        <Swipeable
-          key={index}
-          renderLeftActions={getLeftContent}
-          onSwipeableLeftOpen={() => loadSchedule(partner.objectId)}>
-          <S.BoxContainer>
-            <S.BoxContent>
-              <S.BoxLabel>Nome</S.BoxLabel>
-              <S.BoxText>{partner.name}</S.BoxText>
-            </S.BoxContent>
-            <S.BoxContent>
-              <S.BoxLabel>Telefone</S.BoxLabel>
-              <S.BoxText>{partner.tel}</S.BoxText>
-            </S.BoxContent>
-            <S.DetailsContent>
-              <S.DetailsButton
-                onPress={() => {
-                  navigate.push('ApplicationStack', {
-                    screen: 'PartnerRegister',
-                    params: {partner: partner},
-                  });
-                }}>
-                <S.DetailsButtonText>Detalhes</S.DetailsButtonText>
-              </S.DetailsButton>
-            </S.DetailsContent>
-          </S.BoxContainer>
-        </Swipeable>
-      ),
-  );
+  const deletePartners = partnersToDelete => {
+    setIsLoading(true);
+    deletePartnerList(partnersToDelete).then(
+      () => {
+        setIsLoading(false);
+      },
+      error => {
+        setIsLoading(false);
+        console.log(error);
+      },
+    );
+  };
+
+  const onRefresh = () => {
+    setIsLoading(true);
+    loadAllPartners(currentUser.idSalon).then(
+      () => {
+        setIsLoading(false);
+      },
+      error => {
+        console.log(error);
+        setIsLoading(false);
+      },
+    );
+  };
+  const handleAgenda = item => {
+    setStateAgenda({isShowing: !stateAgenda.isShowing, item: item});
+  };
 
   return (
     <S.Container>
-      <S.Content>
-        <Header
-          headerColor={global.colors.lightBlueColor}
-          headerTitle={'Parceiros'}
-        />
+      <Notification />
 
-        {loading && (
-          <S.LoadingContent>
-            <ActivityIndicator size="large" color={global.colors.blueColor} />
-          </S.LoadingContent>
-        )}
-        <S.BodyContent
-          refreshControl={
-            <RefreshControl
-              tintColor="transparent"
-              colors={['transparent']}
-              style={{backgroundColor: 'transparent'}}
-              refreshing={isRefreshing}
-              onRefresh={() => loadAllPartners(currentUser.idSalon)}
-            />
-          }>
-          {loadPartners}
-        </S.BodyContent>
-        <S.FooterContent>
-          <S.ActionButtonContainer>
-            <ActionButton
-              buttonColor={`${global.colors.lightBlueColor}`}
-              onPress={() => {
-                navigate.push('ApplicationStack', {
-                  screen: 'PartnerRegister',
-                  params: {partner: []},
-                });
-              }}
-            />
-          </S.ActionButtonContainer>
-        </S.FooterContent>
-      </S.Content>
+      {stateAgenda.isShowing && (
+        <Calendar
+          isVisible={stateAgenda.isShowing}
+          calendarSchedule={stateAgenda.item}
+          color={global.colors.purpleColor}
+          handleModal={handleAgenda}
+        />
+      )}
+
+      <List
+        showAddButton={true}
+        onRefresh={onRefresh}
+        refreshing={isLoading}
+        searchPlaceHolder={'Procure pelos seus parceiros'}
+        navigateToCalendar={navigateToEmployeeCalendar}
+        isOwner={isOwner}
+        showCalendarButton={true}
+        showHeader={true}
+        headerText={'Parceiros'}
+        color={`${global.colors.greenColor}`}
+        itemList={items}
+        menuItems={['name', 'tel', 'email', 'procedures']}
+        deleteItemList={deletePartners}
+        deleteUniqueItem={deletePartner}
+        deleteProcedure={deletePartnerProcedure}
+        isLoading={isLoading}
+        onAddNavigateTo={() =>
+          navigate.push('ApplicationStack', {
+            screen: 'PartnerRegister',
+            params: {partner: []},
+          })
+        }
+        onEditNavigateTo={partner =>
+          navigate.push('ApplicationStack', {
+            screen: 'PartnerRegister',
+            params: {partner: partner},
+          })
+        }
+      />
     </S.Container>
   );
 };

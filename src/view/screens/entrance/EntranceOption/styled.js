@@ -35,7 +35,7 @@ export const SalooniLogo = styled.Image`
 
 export const HeaderText = styled.Text`
   margin-top: 10px;
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   font-size: 20px;
   text-align: center;
   color: white;
@@ -52,9 +52,9 @@ export const OwnerImage = styled.Image`
   width: 150px;
 `;
 
-export const OwnerText = styled.Text`
-  font-family: ${global.fonts.s};
-  color: black;
+export const Text = styled.Text`
+  font-family: ${global.fonts.mainFont};
+  color: ${global.colors.lightGreyColor};
   font-size: 20px;
 `;
 
@@ -62,15 +62,4 @@ export const PartnerContent = styled.TouchableOpacity`
   flex: 3;
   align-items: center;
   justify-content: center;
-`;
-
-export const PartnerImage = styled.Image`
-  height: 140px;
-  width: 140px;
-`;
-
-export const PartnerText = styled.Text`
-  font-family: ${global.fonts.s};
-  color: black;
-  font-size: 20px;
 `;

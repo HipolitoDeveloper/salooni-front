@@ -1,0 +1,7 @@
+{
+  "replaceAttrValues": {
+    "#A177AF": "{props.fill}",
+    "white": "{props.borderFill}"
+
+  }
+}

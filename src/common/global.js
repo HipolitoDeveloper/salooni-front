@@ -1,13 +1,17 @@
 export default {
   colors: {
     purpleColor: '#A177AF',
-    lightGreyColor: '#ededed',
+    lightGreyColor: '#F5F5F5',
+    darkGreyColor: '#878686',
     backgroundColor: '#f8f8f8',
-    blueColor: '#6ebedb',
+    headerColor: '#f8f8f8',
+    blueColor: '#6EBEDB',
+    greenColor: '#89CC9E',
     lightBlueColor: '#88d1ce',
+    darkBlueColor: '#575BA8',
   },
   fonts: {
-    s: 'Sani Trixie Sans Regular',
-    g: 'Sani Trixie Sans Generic',
+    auxiliarFont: 'SaniTrixieSans',
+    mainFont: 'SaniTrixieSans',
   },
 };

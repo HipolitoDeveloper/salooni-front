@@ -1,29 +1,42 @@
 export default {
   signinMessage: 'Usuário ou senha estão errados',
   partnerMessage: 'Nem todas as informações do parceiro foram preenchidas',
-  noPartnerMessage:
-    'Nenhum parceiro foi adicionado, tem certeza que deseja continuar?',
+  profileMessage: 'Nem todas as informações do perfil foram preenchidas',
+  noPartnerSignupMessage:
+    'Tem certeza que deseja realizar o cadastro sem parceiros pré-registrado?',
+  noPartnerMessage: 'Nenhum parceiro foi pré-registrado.',
   salonMessage: 'Nome do Salão ou CNPJ não foram preenchidos',
   ownerMessage: 'Preencha todas as informações do proprietário',
   procedureMessage: 'As informações estão incompletas, não é possível avançar',
   noProcedureMessage:
-    'Nenhum procedimento foi adicionado, tem certeza que deseja continuar?',
+    'Tem certeza que deseja realizar o cadastro sem procedimentos pré-registrados?',
   saveErrorProcedureMessage:
-    'Não é possível salvar sem procedimentos adicionados.',
-  salonWarningMessage:
-    'Algo deu errado ao salvar as informações do seu salão, estamos trabalhando nisso!',
+    'Não é possível salvar sem procedimentos pré-registrados.',
+  signupErrorMessage:
+    'As informações do seu cadastro estão inconsistentes!! Verifique os dados informados.',
   userWarningMessage:
     'Algo deu errado ao realizar o seu cadastro, estamos trabalhando nisso!',
   commissionMessage: 'Adicione um tipo de comissão ao procedimento',
+  maintenanceMessage: 'A manutenção foi selecionada, preencha as informações.',
   commissionMismatchMessage:
     'Valor da comissão deve ser inferior ao valor do procedimento',
   clientMessage:
-    'Nem todas as informações relacionas ao cliente foram preenchidas',
-  noClientMessage: 'Nenhum cliente foi adicionado',
+    'Nem todas as informações relacionadas ao cliente foram preenchidas',
+  noClientMessage: 'Nenhum cliente foi pré-registrado',
   passwordsNotMatch: 'Senhas não são idênticas',
   notOwner:
     'Esse e-mail não pertence à um proprietário. Tente o acesso na aba de parceiros',
   deleteMessage: 'Deseja mesmo realizar essa exclusão?',
   scheduleMessage:
     'Nem todas as informações relacionas ao agendamento foram preenchidas',
+  invalidCNPJ: 'CNPJ inválido',
+  invalidCPF: 'CPF inválido',
+  invalidEmail: 'E-mail inválido',
+  invalidTel: 'Telefone inválido',
+  partnerSignupMessage: 'Preencha todas as informações!',
+  duplicateInformation: 'CNPJ ou E-mail informados já estão sendo utilizados!',
+  duplicateEmailPreRegisteredItems:
+    'Um dos itens pré-registrados não pode ser salvo, pois possui um e-mail já registrado em nosso sistema.',
+  genericErrorMessage:
+    'Algo de errado aconteceu. Estamos trabalhando em melhorias!',
 };

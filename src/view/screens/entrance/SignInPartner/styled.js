@@ -22,14 +22,14 @@ export const Content = styled.View`
 export const EmailMessage = styled.Text`
   width: 70%;
   margin-top: 10px;
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   font-size: 14px;
   text-align: center;
   color: ${global.colors.purpleColor};
 `;
 
 export const Input = styled.TextInput`
-  font-family: ${global.fonts.s};
+  font-family: ${global.fonts.auxiliarFont};
   width: 70%;
   border-bottom-width: ${StyleSheet.hairlineWidth}px;
   border-bottom-color: ${global.colors.purpleColor};
