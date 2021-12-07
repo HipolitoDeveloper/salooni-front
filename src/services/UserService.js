@@ -26,13 +26,13 @@ export const getUsersByEmail = (userEmail, returnParseObject) => {
 export const signUp = userObj => {
   return new Promise(async (resolve, reject) => {
     try {
-      const {email, password, employeeId} = userObj;
+      const {email, password, employee} = userObj;
 
       const user = new Parse.User();
       user.set('username', email.trim());
       user.set('email', email.trim());
       user.set('password', password.trim());
-      user.set('employee_id', new EmployeeObject({objectId: employeeId}));
+      user.set('employee_id', new EmployeeObject({objectId: employee.id}));
 
       resolve(await user.signUp());
     } catch (e) {

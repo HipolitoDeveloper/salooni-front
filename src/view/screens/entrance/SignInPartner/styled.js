@@ -43,3 +43,22 @@ export const SalooniLogo = styled.Image`
   border-color: ${global.colors.purpleColor};
   border-radius: 100px;
 `;
+
+
+export const CloseButton = styled.TouchableOpacity`
+  border: ${StyleSheet.hairlineWidth}px solid black;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100px;
+`;
+
+export const FooterButtons = styled.View`
+display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+`

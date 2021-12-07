@@ -158,10 +158,10 @@ const SignupTabBar = ({children, state, navigation}) => {
               handleModal(
                 'O cadastro foi concluído.',
                 true,
-                `Realize a entrada como proprietário com o usuário ${user.email}`,
+                `Clique aqui para entrar com o usuário ${user.email}`,
                 null,
                 () =>
-                  navigate.navigate('EntranceStack', {screen: 'SignInOwner'}),
+                  navigate.navigate('TabStack'),
                 'IR',
               );
             },
