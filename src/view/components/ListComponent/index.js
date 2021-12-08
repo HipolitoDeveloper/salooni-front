@@ -366,7 +366,7 @@ const List = ({
               isDeleting={isDeleting}
               itemType={itemType}
               color={color}
-              changeListState={changeListState}
+              changeListState={isOwner? changeListState: () => {}}
               selectItem={selectItem}
               checkItem={checkItem}
               onPressItem={() => {
@@ -376,7 +376,7 @@ const List = ({
           )}
         />
       </S.Body>
-      {!showFooter && showAddButton && (
+      {!showFooter && showAddButton && isOwner && (
         <FloatButton
           bottom={'40px'}
           right={'30px'}
