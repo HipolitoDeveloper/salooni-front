@@ -53,8 +53,7 @@ export const saveProcedure = (procedureObj, returnParseObject) => {
   return new Promise(async (resolve, reject) => {
     try {
       const {
-        maintenanceValue,
-        maintenanceDays,
+    
         name,
         time,
         value,
@@ -62,25 +61,13 @@ export const saveProcedure = (procedureObj, returnParseObject) => {
         commissionPercentage,
         employeeId,
         salonId,
-        hasMaintenance,
         hasCommission,
         isPercentage,
         isFixedValue,
       } = procedureObj;
 
       const newProcedure = new ProcedureObject();
-      //
-      newProcedure.set(
-        'maintenance_value',
-        hasMaintenance.state
-          ? parseFloat(maintenanceValue.replace('.', '').replace(',', '.'))
-          : 0,
-      );
-      newProcedure.set(
-        'maintenance_days',
-        hasMaintenance.state ? parseInt(maintenanceDays) : 0,
-      );
-      //
+
       newProcedure.set(
         'commission_value',
         parseFloat(
@@ -189,27 +176,15 @@ export const updateProcedureCRUD = (procedureObj, returnParseObject) => {
         value,
         commissionValue,
         commissionPercentage,
-        maintenanceValue,
-        maintenanceDays,
+    
         id,
         isFixedValue,
-        hasMaintenance,
         hasCommission,
         isPercentage,
       } = procedureObj;
 
       const procedure = new ProcedureObject({objectId: id});
 
-      procedure.set(
-        'maintenance_value',
-        hasMaintenance.state
-          ? parseFloat(maintenanceValue.replace('.', '').replace(',', '.'))
-          : 0,
-      );
-      procedure.set(
-        'maintenance_days',
-        hasMaintenance.state ? parseInt(maintenanceDays) : 0,
-      );
 
       procedure.set(
         'commission_value',

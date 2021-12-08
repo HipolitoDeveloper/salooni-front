@@ -1,15 +1,15 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import * as S from './styled';
 import Input from '../../small/Input';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import global from '../../../../common/global';
 import ErrorMessage from '../../small/ErrorMessage';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import errorMessages from '../../../../common/errorMessages';
 import AlertModal from '../../small/AlertModal';
-import {UserContext} from '../../../../contexts/User/UserContext';
-import {ProcedureContext} from '../../../../contexts/Procedure/ProcedureContext';
-import {InputModal} from '../../small/InputModal';
+import { UserContext } from '../../../../contexts/User/UserContext';
+import { ProcedureContext } from '../../../../contexts/Procedure/ProcedureContext';
+import { InputModal } from '../../small/InputModal';
 import RegisterComponent from '../RegisterComponent';
 import Loading from '../../small/Loading';
 
@@ -31,7 +31,7 @@ const ProcedureForm = ({
     deleteProcedureInView,
   } = useContext(ProcedureContext);
 
-  const {currentUser} = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -45,12 +45,10 @@ const ProcedureForm = ({
     name: '',
     time: '',
     value: '',
-    maintenanceValue: '',
-    maintenanceDays: '',
+
     commissionPercentage: '',
     commissionValue: '',
-    hasCommission: {state: false, text: 'times'},
-    hasMaintenance: {state: false, text: 'times'},
+    hasCommission: { state: false, text: 'times' },
   });
 
   const navigate = useNavigation();
@@ -78,12 +76,10 @@ const ProcedureForm = ({
       name: '',
       time: '',
       value: '',
-      maintenanceValue: '',
-      maintenanceDays: '',
+
       commissionPercentage: '',
       commissionValue: '',
-      hasCommission: {state: false, text: 'times'},
-      hasMaintenance: {state: false, text: 'times'},
+      hasCommission: { state: false, text: 'times' },
     });
   };
 
@@ -113,7 +109,7 @@ const ProcedureForm = ({
   };
 
   const handleModal = (isShowing, text, isNavigating) => {
-    setShowAlertModal({isShowing: isShowing, text: text});
+    setShowAlertModal({ isShowing: isShowing, text: text });
 
     if (isNavigating) {
       navigate.navigate('SignupPartners');
@@ -121,10 +117,10 @@ const ProcedureForm = ({
   };
 
   const chooseAddProcedureMethod = () => {
-    const {isInView, indexInView} = {...procedure};
+    const { isInView, indexInView } = { ...procedure };
     if (verifyInformation(true) && isInView) {
       procedure.isInView = false;
-      editProcedure({procedure: procedure, index: indexInView});
+      editProcedure({ procedure: procedure, index: indexInView });
       setErrorMessage('');
       clearProcedure();
     }
@@ -173,7 +169,7 @@ const ProcedureForm = ({
 
   const saveProcedure = () => {
     setIsLoading(true);
-
+    console.log("registered", registeredProcedures)
     if (verifyInformationToGo()) {
       saveProcedures().then(
         () => {
@@ -182,7 +178,8 @@ const ProcedureForm = ({
             goBack();
             clearProcedure();
             cleanProceduresInformation();
-          }, 3000);
+          }, 1000);
+
           setErrorMessage('');
         },
         error => {
@@ -232,7 +229,7 @@ const ProcedureForm = ({
   const verifyInformationToGo = () => {
     let ableToGo = true;
     if (Object.keys(procedure).length === 6) {
-      addProcedure(procedure);
+      // addProcedure(procedure);
       return ableToGo;
     } else if (registeredProcedures.length === 0) {
       ableToGo = false;
@@ -261,21 +258,6 @@ const ProcedureForm = ({
       if (showErrorMessages) setIsLoading(false);
     }
 
-    if (!procedure.hasMaintenance.state) {
-      procedure.maintenanceValue = '';
-      procedure.maintenanceDays = '';
-    } else if (
-      procedure.hasMaintenance.state &&
-      (procedure.maintenanceValue === '' ||
-        procedure.maintenanceDays === '' ||
-        procedure.maintenanceValue === undefined ||
-        procedure.maintenanceDays === undefined)
-    ) {
-      ableToGo = false;
-      errorMessage = errorMessages.maintenanceMessage;
-      setErrorMessage(errorMessage);
-      if (showErrorMessages) setIsLoading(false);
-    }
 
     if (!procedure.hasCommission.state) {
       procedure.commissionValue = '';
@@ -396,46 +378,6 @@ const ProcedureForm = ({
         />
 
         <InputModal
-          name={'hasMaintenance'}
-          inputTitle={'Manutenção'}
-          handleSwitch={handleChange}
-          stateSwitch={procedure.hasMaintenance}>
-          <Input
-            handleChange={handleChange}
-            name={'maintenanceValue'}
-            placeholder={'Valor de Manutenção'}
-            value={procedure.maintenanceValue}
-            width={'80%'}
-            keyboard={'numeric'}
-            isSecureTextEntry={false}
-            fontSize={40}
-            disabled={false}
-            mask="brl"
-            leftPlaceholder={'R$'}
-            color={global.colors.purpleColor}
-            label={'Valor*'}
-            isToValidate={isFocused}
-            noEmpty={true}
-          />
-          <Input
-            handleChange={handleChange}
-            name={'maintenanceDays'}
-            placeholder={'Dias para Manutenção'}
-            value={procedure.maintenanceDays}
-            width={'80%'}
-            keyboard={'numeric'}
-            isSecureTextEntry={false}
-            fontSize={40}
-            disabled={false}
-            mask="none"
-            color={global.colors.purpleColor}
-            label={'Dias*'}
-            isToValidate={isFocused}
-            noEmpty={true}
-          />
-        </InputModal>
-
-        <InputModal
           name={'hasCommission'}
           inputTitle={'Comissão'}
           handleSwitch={handleChange}
@@ -475,7 +417,7 @@ const ProcedureForm = ({
             </S.CheckboxContent>
             <S.CheckboxContent>
               <BouncyCheckbox
-                style={{borderColor: global.colors.purpleColor}}
+                style={{ borderColor: global.colors.purpleColor }}
                 isChecked={procedure.isFixedValue}
                 onPress={isChecked =>
                   handleChange(!procedure.isFixedValue, 'commissionValue', true)

@@ -163,48 +163,7 @@ export const LoadingContent = styled.View`
   justify-content: center;
 `;
 
-export const MaintenanceContainer = styled.View`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
-export const MaintenanceSelect = styled.View`
-  width: 80%;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-`;
-
-export const MaintenanceTextContent = styled.View`
-  width: 100%;
-  height: 60px;
-  padding-left: 10px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-`;
-
-export const MaintenanceText = styled.Text`
-  font-size: 18px;
-`;
-
-export const MaintenanceContent = styled.View`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 40px;
-  border-top-right-radius: 40px;
-  position: absolute;
-  background-color: white;
-  top: 0;
-  width: 80%;
-  height: 180px;
-  z-index: 5;
-  elevation: 5;
-`;
 
 export const CloseButtonContent = styled.View``;
 

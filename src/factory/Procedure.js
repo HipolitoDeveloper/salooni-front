@@ -18,14 +18,7 @@ export const buildProcedureList = procedures => {
       isFixedValue: procedure.commission_value !== 0,
       value: convertToBRL(procedure.value),
       time: procedure.time.toString(),
-      maintenanceValue:
-        procedure.maintenance_value !== 0
-          ? convertToBRL(procedure.maintenance_value)
-          : '',
-      maintenanceDays:
-        procedure.maintenance_days !== 0
-          ? procedure.maintenance_days.toString()
-          : '',
+    
       hasCommission: {
         state:
           procedure.commission_percentage !== 0 ||
@@ -36,10 +29,7 @@ export const buildProcedureList = procedures => {
             ? 'check'
             : 'times',
       },
-      hasMaintenance: {
-        state: procedure.maintenance_value !== 0,
-        text: procedure.maintenance_value !== 0 ? 'check' : 'times',
-      },
+ 
     };
   });
 };
@@ -60,8 +50,7 @@ export const buildProcedure = procedure => {
     isFixedValue: procedure.commission_value !== 0,
     value: convertToBRL(procedure.value),
     time: procedure.time.toString(),
-    maintenanceValue: convertToBRL(procedure.maintenance_value),
-    maintenanceDays: procedure.maintenance_days.toString(),
+
     hasCommission: {
       state:
         procedure.commission_percentage !== 0 ||
@@ -72,9 +61,6 @@ export const buildProcedure = procedure => {
           ? 'check'
           : 'times',
     },
-    hasMaintenance: {
-      state: procedure.maintenance_value !== 0,
-      text: procedure.maintenance_value !== 0 ? 'check' : 'times',
-    },
+
   };
 };

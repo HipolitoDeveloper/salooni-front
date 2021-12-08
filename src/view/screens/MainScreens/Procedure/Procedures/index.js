@@ -51,16 +51,21 @@ const Procedures = () => {
   };
 
   const onRefresh = () => {
-    setIsLoading(true);
-    loadAllProcedures(currentUser.idSalon).then(
-      () => {
-        setIsLoading(false);
-      },
-      error => {
-        console.log(error);
-        setIsLoading(false);
-      },
-    );
+    return new Promise(resolve => {
+      setIsLoading(true);
+      loadAllProcedures(currentUser.idSalon).then(
+        (newProcedureList) => {
+          resolve(
+            newProcedureList,
+          );
+          setIsLoading(false);
+        },
+        error => {
+          console.log(error);
+          setIsLoading(false);
+        },
+      );
+    })   
   };
 
   return (

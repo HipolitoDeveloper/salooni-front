@@ -17,7 +17,6 @@ export default {
   userWarningMessage:
     'Algo deu errado ao realizar o seu cadastro, estamos trabalhando nisso!',
   commissionMessage: 'Adicione um tipo de comissão ao procedimento',
-  maintenanceMessage: 'A manutenção foi selecionada, preencha as informações.',
   commissionMismatchMessage:
     'Valor da comissão deve ser inferior ao valor do procedimento',
   clientMessage:

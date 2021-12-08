@@ -165,7 +165,7 @@ const List = ({
       );
     } else {
       const regex = new RegExp(`${text.trim()}`, 'i');
-      setItems(itemList.filter(i => i.name.search(regex) >= 0 || i.selected));
+      setItems(itemList.filter(i => i.name.search(regex) >= 0 || i.selected || i.tel.replace(/\s*\(?\)|\(|-\s*/g, '').search(regex) >= 0));
     }
   };
 
