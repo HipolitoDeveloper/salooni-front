@@ -11,7 +11,7 @@ import {
 import {deleteClientCRUD} from '../../services/ClientService';
 import {deleteProcedureEmployee} from '../../services/ProcedureEmployeeService';
 import {deleteScheduleProcedureById} from '../../services/ScheduleProcedureService';
-import {buildCalendar} from '../../factory/Schedule';
+import {buildAgenda} from '../../factory/Schedule';
 
 export const ScheduleContext = createContext();
 
@@ -32,7 +32,7 @@ const ScheduleProvider = ({children}) => {
       try {
         await getAllSchedules(employeeId, salonId, employeeType, false).then(
           schedules => {
-            resolve(buildCalendar(schedules));
+            resolve(buildAgenda(schedules));
           },
         );
       } catch (e) {

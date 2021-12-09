@@ -4,7 +4,8 @@ import moment from 'moment';
 import {getScheduleProcedureByScheduleId} from '../services/ScheduleProcedureService';
 import {buildProcedure} from './Procedure';
 
-export const buildCalendar = schedules => {
+export const buildAgenda = schedules => {
+
   const scheduledDates = buildDateList(schedules);
   let scheduleList = {};
 
@@ -111,12 +112,15 @@ export const buildScheduleList = schedules => {
       schedule.needsToBeNotified = schedule.passedHour && !schedule.checked;
     }
 
-    const organizedSchedules = sortSchedules(setNextHour(newSchedules));
-    resolve(organizedSchedules);
+    const organizedSchedules = sortSchedules(newSchedules);
+
+
+    resolve( organizedSchedules);
   });
 };
 
 const buildDateList = schedules => {
+  console.log("schedules", schedules)
   let scheduledDates = [];
   schedules.forEach(schedule => {
     if (scheduledDates.length === 0)

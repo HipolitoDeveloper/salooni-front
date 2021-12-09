@@ -12,7 +12,7 @@ const Clients = () => {
   const {clients, deleteUniqueClient, deleteClientList, loadAllClients} =
     useContext(ClientContext);
 
-  const {currentUser} = useContext(UserContext);
+  const {currentUser, isOwner} = useContext(UserContext);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -67,11 +67,13 @@ const Clients = () => {
         showAddButton={true}
         onRefresh={onRefresh}
         refreshing={isLoading}
-        isOwner={true}
+        isOwner={isOwner}
+        blockDeleteFunction={isOwner}
         showHeader={true}
         headerText={'Clientes'}
         color={`${global.colors.blueColor}`}
         itemList={clients}
+        itemType={'client'}
         searchPlaceHolder={'Procure pelos seus clientes'}
         menuItems={['name', 'tel', 'email']}
         deleteUniqueItem={deleteClient}

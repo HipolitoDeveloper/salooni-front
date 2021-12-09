@@ -1,13 +1,13 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import * as S from './styled';
 import Button from '../../small/Button';
 import global from '../../../../common/global';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {Dimensions, FlatList, ScrollView, View} from 'react-native';
+import { Dimensions, FlatList, ScrollView, View } from 'react-native';
 import RoundedTimes from '../../../../assets/svg/roundedTimesSVG.svg';
-import {Switch} from '../../small/Switch';
+import { Switch } from '../../small/Switch';
 import Modal from 'react-native-modal';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 const ListMenu = ({
   navigateToCalendar,
@@ -124,7 +124,7 @@ const ListMenu = ({
                       <FlatList
                         keyExtractor={item => item.id}
                         data={menuState.itemToShow[`${item}`]}
-                        renderItem={({item}) => (
+                        renderItem={({ item }) => (
                           <S.ProcedureContent
                             screenHeight={screenHeight}
                             disabled={!isOwner && itemType !== 'schedule'}
@@ -159,84 +159,57 @@ const ListMenu = ({
                 </View>
               ))}
             </S.ItemInformation>
-            {isOwner && (
-              <S.FooterButtons isSmallerScreen={isSmallerScreen}>
-                {isConfirming ? (
-                  <>
-                    <Button
-                      disabled={false}
-                      marginBottom={'20px'}
-                      onPress={onConfirm}
-                      color={color}
-                      text={'Confirmar'}
-                      width={'120px'}
-                      height={'35px'}
-                      fontSize={'17px'}
-                      textColor={color}
-                      backgroundColor={global.colors.backgroundColor}
-                      leftContent={{
-                        show: true,
-                        height: '20px',
-                        width: '20px',
-                        icon: 'check',
-                        iconColor: 'black',
-                        backgroundColor: `${color}`,
-                        borderRadius: '20px',
-                        iconSize: 13,
-                      }}
-                    />
-                    <Button
-                      disabled={false}
-                      marginBottom={'20px'}
-                      onPress={() => checkItem(-1)}
-                      color={color}
-                      text={'Cancelar confirmação'}
-                      width={'120px'}
-                      height={'35px'}
-                      fontSize={'17px'}
-                      textColor={global.colors.lightGreyColor}
-                      backgroundColor={color}
-                    />
-                  </>
-                ) : (
-                  <>
-                    {showCalendarButton && (
-                      <Button
-                        disabled={false}
-                        marginBottom={'20px'}
-                        onPress={() => {
-                          navigateToCalendar(menuState.itemToShow);
-                          handleMenu(menuState.itemToShow);
-                        }}
-                        color={color}
-                        text={'Agenda'}
-                        width={'120px'}
-                        height={'35px'}
-                        fontSize={'17px'}
-                        textColor={color}
-                        backgroundColor={global.colors.backgroundColor}
-                        leftContent={{
-                          show: true,
-                          height: '20px',
-                          width: '20px',
-                          icon: 'calendar-alt',
-                          iconColor: 'black',
-                          backgroundColor: `${color}`,
-                          borderRadius: '20px',
-                          iconSize: 13,
-                        }}
-                      />
-                    )}
 
+            <S.FooterButtons isSmallerScreen={isSmallerScreen}>
+              {isConfirming ? (
+                <>
+                  <Button
+                    disabled={false}
+                    marginBottom={'20px'}
+                    onPress={onConfirm}
+                    color={color}
+                    text={'Confirmar'}
+                    width={'120px'}
+                    height={'35px'}
+                    fontSize={'17px'}
+                    textColor={color}
+                    backgroundColor={global.colors.backgroundColor}
+                    leftContent={{
+                      show: true,
+                      height: '20px',
+                      width: '20px',
+                      icon: 'check',
+                      iconColor: 'black',
+                      backgroundColor: `${color}`,
+                      borderRadius: '20px',
+                      iconSize: 13,
+                    }}
+                  />
+                  <Button
+                    disabled={false}
+                    marginBottom={'20px'}
+                    onPress={() => checkItem(-1)}
+                    color={color}
+                    text={'Cancelar confirmação'}
+                    width={'120px'}
+                    height={'35px'}
+                    fontSize={'17px'}
+                    textColor={global.colors.lightGreyColor}
+                    backgroundColor={color}
+                  />
+                </>
+              ) : (
+                <>
+                  {showCalendarButton && (
                     <Button
                       disabled={false}
                       marginBottom={'20px'}
                       onPress={() => {
-                        onEditNavigateTo(menuState.itemToShow);
-                        handleMenu(menuState?.itemToShow);
+                        navigateToCalendar(menuState.itemToShow);
+                        handleMenu(menuState.itemToShow);
                       }}
                       color={color}
-                      text={'Editar'}
+                      text={'Agenda'}
                       width={'120px'}
                       height={'35px'}
                       fontSize={'17px'}
@@ -246,13 +219,41 @@ const ListMenu = ({
                         show: true,
                         height: '20px',
                         width: '20px',
-                        icon: 'pen',
+                        icon: 'calendar-alt',
                         iconColor: 'black',
                         backgroundColor: `${color}`,
                         borderRadius: '20px',
                         iconSize: 13,
                       }}
                     />
+                  )}
+
+                  <Button
+                    disabled={false}
+                    marginBottom={'20px'}
+                    onPress={() => {
+                      onEditNavigateTo(menuState.itemToShow);
+                      handleMenu(menuState?.itemToShow);
+                    }}
+                    color={color}
+                    text={'Editar'}
+                    width={'120px'}
+                    height={'35px'}
+                    fontSize={'17px'}
+                    textColor={color}
+                    backgroundColor={global.colors.backgroundColor}
+                    leftContent={{
+                      show: true,
+                      height: '20px',
+                      width: '20px',
+                      icon: 'pen',
+                      iconColor: 'black',
+                      backgroundColor: `${color}`,
+                      borderRadius: '20px',
+                      iconSize: 13,
+                    }}
+                  />
+                  {isOwner && (
                     <Button
                       disabled={false}
                       marginBottom={'20px'}
@@ -276,12 +277,12 @@ const ListMenu = ({
                         backgroundColor: `${color}`,
                         borderRadius: '20px',
                         iconSize: 13,
-                      }}
-                    />
-                  </>
-                )}
-              </S.FooterButtons>
-            )}
+                      }} />
+                  )}
+                </>
+              )}
+
+            </S.FooterButtons>
           </S.Content>
         </S.Container>
       </Modal>

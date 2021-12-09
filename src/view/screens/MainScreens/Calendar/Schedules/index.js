@@ -1,17 +1,16 @@
-import React, {useContext, useEffect, useState} from 'react';
-import * as S from './styled';
-import global from '../../../../../common/global';
-import {ScheduleContext} from '../../../../../contexts/Schedule/ScheduleContext';
-import Calendar from '../../../../components/huge/CalendarComponent';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
-import {UserContext} from '../../../../../contexts/User/UserContext';
-import CalendarHeader from '../../../../components/huge/CalendarComponent/CalendarHeader';
+import React, { useContext, useEffect, useState } from 'react';
+import global from '../../../../../common/global';
+import notificationsMessages from '../../../../../common/notificationsMessages';
+import { ScheduleContext } from '../../../../../contexts/Schedule/ScheduleContext';
+import { UserContext } from '../../../../../contexts/User/UserContext';
+import Calendar from '../../../../components/huge/CalendarComponent';
 import List from '../../../../components/ListComponent';
 import AlertModal from '../../../../components/small/AlertModal';
-import Notification from '../../../../components/small/Notification';
-import notificationsMessages from '../../../../../common/notificationsMessages';
 import Loading from '../../../../components/small/Loading';
+import Notification from '../../../../components/small/Notification';
+import * as S from './styled';
 
 const Schedules = ({route}) => {
   const {currentUser, verifyNotification} = useContext(UserContext);
@@ -105,7 +104,7 @@ const Schedules = ({route}) => {
       }).then(
         newSchedules => {
           setIsLoading(false);
-          resolve(newSchedules);
+          resolve(newSchedules.filter(schedule => schedule.formattedDate === moment(new Date()).format('YYYY-MM-DD')));
         },
         error => {
           console.log(error);
@@ -135,7 +134,8 @@ const Schedules = ({route}) => {
         showProfileIcon={true}
         headerText={'Calendário'}
         color={global.colors.purpleColor}
-        itemList={schedules}
+        itemList={schedules.filter(schedule => schedule.formattedDate === moment(new Date()).format('YYYY-MM-DD'))
+      }
         menuItems={['name', 'tel', 'email', 'procedures']}
         objectMenuItems={['client', 'client', 'client']}
         itemType={'schedule'}

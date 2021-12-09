@@ -21,6 +21,7 @@ import AlertModal from '../small/AlertModal';
 const {diffClamp} = Animated;
 
 const List = ({
+  blockDeleteFunction,
   backButtonHeader,
   showBackButton,
   showCalendarButton,
@@ -366,7 +367,7 @@ const List = ({
               isDeleting={isDeleting}
               itemType={itemType}
               color={color}
-              changeListState={isOwner? changeListState: () => {}}
+              changeListState={isOwner ? changeListState: () => {}}
               selectItem={selectItem}
               checkItem={checkItem}
               onPressItem={() => {
@@ -376,7 +377,7 @@ const List = ({
           )}
         />
       </S.Body>
-      {!showFooter && showAddButton && isOwner && (
+      {!showFooter && showAddButton && (isOwner || itemType === 'client') && (
         <FloatButton
           bottom={'40px'}
           right={'30px'}
