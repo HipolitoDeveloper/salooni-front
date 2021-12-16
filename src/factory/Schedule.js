@@ -4,7 +4,7 @@ import moment from 'moment';
 import {getScheduleProcedureByScheduleId} from '../services/ScheduleProcedureService';
 import {buildProcedure} from './Procedure';
 
-export const buildCalendar = schedules => {
+export const buildAgenda = schedules => {
   const scheduledDates = buildDateList(schedules);
   let scheduleList = {};
 

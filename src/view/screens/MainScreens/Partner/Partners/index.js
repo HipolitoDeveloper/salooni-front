@@ -6,7 +6,7 @@ import {useNavigation} from '@react-navigation/native';
 import {PartnerContext} from '../../../../../contexts/Partner/PartnerContext';
 import {ScheduleContext} from '../../../../../contexts/Schedule/ScheduleContext';
 import List from '../../../../components/ListComponent';
-import Calendar from '../../../../components/huge/CalendarComponent';
+import Calendar from '../../../../components/huge/AgendaComponent';
 import Notification from '../../../../components/small/Notification';
 
 const Partners = () => {
