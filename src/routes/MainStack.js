@@ -11,7 +11,7 @@ import Agenda from '../view/components/huge/AgendaComponent';
 const Stack = createStackNavigator();
 
 export const MainStack = () => {
-  const {loginStatus} = useContext(UserContext);
+  // const {loginStatus} = useContext(UserContext);
 
   return (
     <Stack.Navigator

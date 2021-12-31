@@ -28,6 +28,7 @@
     "parse": "^3.3.0",
     "prop-types": "^15.7.2",
     "react": "17.0.1",
+    "react-calendar": "^3.5.0",
     "react-native": "0.64.2",
     "react-native-autocomplete-dropdown": "^1.1.4",
     "react-native-autocomplete-input": "github:mrlaessig/react-native-autocomplete-input",

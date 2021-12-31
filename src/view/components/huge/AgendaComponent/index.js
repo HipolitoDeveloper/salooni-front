@@ -8,15 +8,19 @@ import Carousel from 'react-native-snap-carousel';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import global from '../../../../common/global';
 import * as S from './styled';
+import { Calendar, CalendarList } from 'react-native-calendars';
+
 const Agenda = ({ calendarSchedule, isVisible, handleModal }) => {
+  const INITIAL_DATE = moment(new Date()).format('YYYY-MM-DD')
+
   const navigate = useNavigation();
+  const [selected, setSelected] = useState(INITIAL_DATE);
 
   const [months, setMonths] = useState([])
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    buildMonths()
-    setItems(calendarSchedule);
+
   }, []);
 
 
@@ -79,224 +83,54 @@ const Agenda = ({ calendarSchedule, isVisible, handleModal }) => {
     'S',
   ]
 
-
-
-
-  const loadItems = day => {
-    setTimeout(() => {
-      for (let i = -15; i < 85; i++) {
-        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-        const strTime = timeToString(time);
-        if (!items[strTime]) {
-          items[strTime] = [];
-          const numItems = Math.floor(Math.random() * 3 + 1);
-          for (let j = 0; j < numItems; j++) {
-            // items[strTime].push({
-            //   name: 'Item for ' + strTime + ' #' + j,
-            //   height: Math.max(50, Math.floor(Math.random() * 150)),
-            // });
-          }
-        }
-      }
-      const newItems = {};
-      Object.keys(items).forEach(key => {
-        newItems[key] = items[key];
-      });
-      setItems(newItems);
-    }, 1000);
+  const onDayPress = day => {
+    setSelected(day.dateString);
   };
-
-  const timeToString = time => {
-    const date = new Date(time);
-    return date.toISOString().split('T')[0];
-  };
-
-  const renderItems = (item, firstItemInDay) => (
-    <>
-      <TouchableOpacity
-        style={[
-          styles.item,
-          {
-            backgroundColor: item.nextHour
-              ? `${global.colors.purpleColor}`
-              : 'white',
-          },
-        ]}>
-        <View style={[styles.itemContent]}>
-          <View>
-            <Text
-              style={{
-                color: item.nextHour ? 'white' : `${global.colors.purpleColor}`,
-                opacity: item.passedHour ? 0.6 : 1,
-              }}>
-              {item.formattedHour}
-            </Text>
-            <Text
-              style={{
-                opacity: item.passedHour ? 0.6 : 1,
-              }}>
-              {item.clientName}
-            </Text>
-          </View>
-          <View style={{ color: global.colors.lightGreyColor }}>
-            <Text
-              style={{
-                opacity: item.passedHour ? 0.6 : 1,
-              }}>
-              {item.clientTel}
-            </Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    </>
-  );
-
-  const renderEmptyDate = () => (
-    <View style={styles.emptyDate}>
-      <Text>Este dia não possui agendamentos.</Text>
-    </View>
-  );
-
-  const renderKnob = () => (
-    <View>
-      <Text>Abrir</Text>
-    </View>
-  );
-
-  const renderDay = (day, item) => {
-    if (day !== undefined) {
-      const dayDate = moment(day?.dateString).format('DD');
-      const dayName =
-        LocaleConfig.locales['br'].dayNamesShort[
-        new Date(day?.dateString).getDay()
-        ];
-      const isCurrentDate =
-        moment(day?.dateString).format('yyyy/MM/DD') ===
-        moment(new Date()).format('yyyy/MM/DD');
-      const dayColor = isCurrentDate
-        ? global.colors.purpleColor
-        : global.colors.darkGreyColor;
-
-      return (
-        <S.DayContainer
-          color={dayColor}
-          onPress={date =>
-            navigate.push('ApplicationStack', {
-              screen: 'ScheduleRegister',
-              params: {
-                schedule: [],
-                date: moment(day.dateString),
-              },
-            })
-          }>
-          <Icon name={'plus'} size={12} color={global.colors.lightGreyColor} />
-          <S.Day>{dayDate}</S.Day>
-          <S.DayName>{dayName}</S.DayName>
-        </S.DayContainer>
-      );
-    } else {
-      return <></>;
-    }
-  };
-
-  const daysInMonth = (month, year) => {
-    return 32 - new Date(year, month, 32).getDate();
-  }
-
-  const buildMonths = (selectedYear) => {
-    const today = new Date();
-
-    const year = selectedYear ? selectedYear : today.getFullYear()
-    const days = [];
-
-    monthNames.map((_, index) => {
-      const numberDays = daysInMonth(index, year)
-
-      for (let day = 1; day <= numberDays; day++) {
-        days.push(day)
-      }
-
-      // return {
-      //   [index]: days
-      // }
-    })
-
-    // const rowsNumber = days.length / 7
-    const teste = []
-    days.map((day, index) => {
-      const week = [];
-
-      for (let i = 1; i <= 7 * i; i++) {
-        const weekNumber = 7 * i
-        week.push(days.filter((day, index) => index < weekNumber))
-
-        console.log("week", days.filter((day, index) => index < weekNumber))
-      }
-      
-      // teste.push({
-      //   [index]: week
-      // })
-    })
-
-    console.log("days", teste)
-
-  }
-
-  const renderMonths = ({ item: month, index }) => {
-    const monthNumber = Object.keys(month)
-    return (
-      <>
-        <FlatList
-          contentContainerStyle={styles.days}
-          columnWrapperStyle={styles.daysRow}
-          scrollEnabled={false}
-          numColumns={7}
-          keyExtractor={Math.random}
-          data={month[monthNumber]}
-          renderItem={({ item }) => (
-            <S.DayContainer>
-              {item}
-            </S.DayContainer>
-          )} />
-      </>
-    )
-  }
 
   return (
     <>
-      <S.MonthContainer>
-        <S.MonthHeader>
-          <FlatList
-            scrollEnabled={false}
-            contentContainerStyle={styles.dayNames}
-            keyExtractor={Math.random}
-            data={dayNames}
-            horizontal={true}
-            renderItem={({ item }) => (
-              <S.MonthHeaderItem>
-                {item}
-              </S.MonthHeaderItem>
-            )}
-          />
-        </S.MonthHeader>
-        <Carousel
-          containerCustomStyle={{
 
-          }}
-          layout={"default"}
-          data={months}
-          renderItem={renderMonths}
-          sliderWidth={300}
-          itemWidth={300}
-          onSnapToItem={index => console.log("rte", index)}
-        />
-
-      </S.MonthContainer>
-      {/* <SafeAreaView style={{ flex: 1, backgroundColor: 'rebeccapurple', paddingTop: 50, }}>
-        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', }}>
-        
-        </View>
-      </SafeAreaView> */}
+      <Calendar
+        onDayPress={onDayPress}
+        current={INITIAL_DATE}
+        minDate={INITIAL_DATE}
+        enableSwipeMonths
+        markedDates={{
+          [selected]: {
+            selected: true,
+            disableTouchEvent: true,
+            selectedColor: 'orange',
+            selectedTextColor: 'red'
+          },
+          '2021-12-30': { marked: true, dotColor: '#50cebb' },
+          '2022-05-16': { marked: true, dotColor: '#50cebb' },
+          '2022-05-21': { startingDay: true, color: '#50cebb', textColor: 'white' },
+          '2022-05-22': {
+            color: '#70d7c7',
+            customTextStyle: {
+              color: '#FFFAAA',
+              fontWeight: '700'
+            }
+          },
+          '2022-05-23': { color: '#70d7c7', textColor: 'white', marked: true, dotColor: 'white' },
+          '2022-05-24': { color: '#70d7c7', textColor: 'white' },
+          '2022-05-25': {
+            endingDay: true,
+            color: '#50cebb',
+            textColor: 'white',
+            customContainerStyle: {
+              borderTopRightRadius: 5,
+              borderBottomRightRadius: 5
+            }
+          },
+          '2022-05-30': { disabled: true, disableTouchEvent: true }
+        }}
+          
+        theme={{
+          textSectionTitleDisabledColor: 'grey',
+          textSectionTitleColor: '#00BBF2'
+        }}
+      />
 
       <S.EventsContainer>
 
