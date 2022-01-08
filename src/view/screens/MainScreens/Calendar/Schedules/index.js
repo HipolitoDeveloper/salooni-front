@@ -1,19 +1,20 @@
-import { useNavigation } from '@react-navigation/native';
-import moment from 'moment';
-import React, { useContext, useEffect, useState } from 'react';
-import global from '../../../../../common/global';
-import notificationsMessages from '../../../../../common/notificationsMessages';
-import { ScheduleContext } from '../../../../../contexts/Schedule/ScheduleContext';
-import { UserContext } from '../../../../../contexts/User/UserContext';
-import Calendar from '../../../../components/huge/AgendaComponent';
-import List from '../../../../components/ListComponent';
-import AlertModal from '../../../../components/small/AlertModal';
-import Loading from '../../../../components/small/Loading';
-import Notification from '../../../../components/small/Notification';
-import * as S from './styled';
+import { useNavigation } from "@react-navigation/native";
+import moment from "moment";
+import React, { useContext, useEffect, useState } from "react";
+import global from "../../../../../common/global";
+import notificationsMessages from "../../../../../common/notificationsMessages";
+import { ScheduleContext } from "../../../../../contexts/Schedule/ScheduleContext";
+import { UserContext } from "../../../../../contexts/User/UserContext";
+import Calendar from "../../../../components/huge/AgendaComponent";
+import List from "../../../../components/ListComponent";
+import AlertModal from "../../../../components/small/AlertModal";
+import Loading from "../../../../components/small/Loading";
+import Notification from "../../../../components/small/Notification";
+import * as S from "./styled";
+import Agenda from "../../../../components/huge/AgendaComponent";
 
-const Schedules = ({route}) => {
-  const {currentUser, verifyNotification} = useContext(UserContext);
+const Schedules = ({ route }) => {
+  const { currentUser, verifyNotification } = useContext(UserContext);
   const {
     calendarSchedule,
     schedules,
@@ -29,19 +30,21 @@ const Schedules = ({route}) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState({
-    text: '',
+    text: "",
     isVisible: false,
-    onOk: () => {},
-    title: '',
-    onClose: () => {},
-    cancelTitle: '',
-    okTitle: '',
+    onOk: () => {
+    },
+    title: "",
+    onClose: () => {
+    },
+    cancelTitle: "",
+    okTitle: "",
   });
 
   const navigate = useNavigation();
 
   useEffect(() => {
-    navigate.addListener('focus', () => {
+    navigate.addListener("focus", () => {
       setIsShowingAgenda(route.params?.isToShowAgenda);
     });
   }, [navigate]);
@@ -58,8 +61,8 @@ const Schedules = ({route}) => {
         schedule => !schedule.checked && schedule.passedHour,
       ),
       method: () =>
-        navigate.push('ApplicationStack', {
-          screen: 'UnconfirmedSchedules',
+        navigate.push("ApplicationStack", {
+          screen: "UnconfirmedSchedules",
         }),
     });
   };
@@ -117,9 +120,8 @@ const Schedules = ({route}) => {
   return (
     <S.Container>
       <Notification />
-      <Calendar
+      <Agenda
         isVisible={isShowingAgenda}
-        calendarSchedule={calendarSchedule}
         color={global.colors.purpleColor}
         handleModal={handleAgenda}
       />
@@ -127,18 +129,18 @@ const Schedules = ({route}) => {
         showAddButton={true}
         onRefresh={onRefresh}
         refreshing={isLoading}
-        searchPlaceHolder={'Procure pelo cliente agendado '}
+        searchPlaceHolder={"Procure pelo cliente agendado "}
         isOwner={true}
         showHeader={true}
         handleAgenda={handleAgenda}
         showProfileIcon={true}
-        headerText={'Calendário'}
+        headerText={"Calendário"}
         color={global.colors.purpleColor}
         itemList={schedules}
-        menuItems={['name', 'tel', 'email', 'procedures']}
-        objectMenuItems={['client', 'client', 'client']}
-        itemType={'schedule'}
-        listProperty={['name', 'scheduleHour']}
+        menuItems={["name", "tel", "email", "procedures"]}
+        objectMenuItems={["client", "client", "client"]}
+        itemType={"schedule"}
+        listProperty={["name", "scheduleHour"]}
         checkItems={checkSchedules}
         confirmItems={confirmSchedule}
         deleteItemList={deleteSchedules}
@@ -146,17 +148,17 @@ const Schedules = ({route}) => {
         deleteProcedure={deleteScheduleProcedure}
         isLoading={isRefreshing}
         onAddNavigateTo={() =>
-          navigate.push('ApplicationStack', {
-            screen: 'ScheduleRegister',
-            params: {schedule: [], date: moment(new Date()).format()},
+          navigate.push("ApplicationStack", {
+            screen: "ScheduleRegister",
+            params: { schedule: [], date: moment(new Date()).format() },
           })
         }
         onEditNavigateTo={item =>
-          navigate.push('ApplicationStack', {
-            screen: 'ScheduleRegister',
+          navigate.push("ApplicationStack", {
+            screen: "ScheduleRegister",
             params: {
               schedule: item,
-              date: {date: moment(new Date()).format()},
+              date: { date: moment(new Date()).format() },
             },
           })
         }
@@ -166,7 +168,7 @@ const Schedules = ({route}) => {
 
       <AlertModal
         text={
-          'Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!'
+          "Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!"
         }
         isVisible={showAlertModal.isVisible}
         onOk={showAlertModal.onOk}

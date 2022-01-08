@@ -1,8 +1,9 @@
-import {buildEmployeeObject} from './Employee';
-import {buildClientObject} from './Client';
+import { buildEmployeeObject } from './Employee';
+import { buildClientObject } from './Client';
 import moment from 'moment';
-import {getScheduleProcedureByScheduleId} from '../services/ScheduleProcedureService';
-import {buildProcedure} from './Procedure';
+import { getScheduleProcedureByScheduleId } from '../services/ScheduleProcedureService';
+import { buildProcedure } from './Procedure';
+import global from "../common/global";
 
 export const buildAgenda = schedules => {
   const scheduledDates = buildDateList(schedules);
@@ -18,13 +19,16 @@ export const buildAgenda = schedules => {
           formattedHour: schedule.formattedHour,
           passedHour: schedule.passedHour,
           nextHour: schedule.nextHour,
+          startingDay: true,
+          endingDay: true,
+          color: `${global.colors.purpleColor}`
         });
       }
     });
 
     scheduleList = {
       ...scheduleList,
-      [scheduledDate]: schedulesInformation,
+      [scheduledDate]: { periods: schedulesInformation },
     };
   });
 
@@ -37,6 +41,9 @@ export const buildSchedule = (schedule, procedures) => {
     procedures.length > 0
       ? procedures.some(procedure => procedure.accomplishedSchedule)
       : false;
+  const passedHour = moment(scheduleDate).isBefore(
+    moment(new Date().toString()).format(),
+  )
 
   if (procedures.length > 0) {
     return {
@@ -51,12 +58,13 @@ export const buildSchedule = (schedule, procedures) => {
       analyzedSchedule: schedule.analyzed_schedule,
       checked: isProceduresChecked,
       firstCheckedState: isProceduresChecked,
-      passedHour: moment(scheduleDate).isBefore(
-        moment(new Date().toString()).format(),
-      ),
+      passedHour: passedHour,
       needsToBeNotified:
         moment(scheduleDate).isBefore(moment(new Date().toString()).format()) &&
         !isProceduresChecked,
+      startingDay: true,
+      endingDay: true,
+      color: `${global.colors.purpleColor}`
     };
   } else {
     return {
@@ -68,9 +76,10 @@ export const buildSchedule = (schedule, procedures) => {
       formattedDate: moment(scheduleDate).format('YYYY-MM-DD'),
       formattedHour: moment(scheduleDate).format('HH:mm'),
       analyzedSchedule: schedule.analyzed_schedule,
-      passedHour: moment(scheduleDate).isBefore(
-        moment(new Date().toString()).format(),
-      ),
+      passedHour: passedHour,
+      startingDay: true,
+      endingDay: true,
+      color: `${global.colors.purpleColor}`
     };
   }
 };
@@ -172,7 +181,7 @@ export const setNextHour = schedules => {
   });
 
   schedules.forEach(schedule => {
-    schedule.nextHour = schedule.scheduleDate === nextScheduleHour;
+    schedule.nextHour = schedule.scheduleDate === nextScheduleHour;   
   });
 
   return schedules;
