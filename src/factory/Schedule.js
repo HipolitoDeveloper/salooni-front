@@ -198,7 +198,6 @@ export const sortSchedules = schedules => {
 
 export const buildClientProcedures = (schedulesProcedures) => {
   const newProcedures = [];
-  console.log("schedulesProcedures", schedulesProcedures)
   schedulesProcedures.map(schedule => {
     newProcedures.push({
       id: schedule.objectId,
@@ -208,5 +207,16 @@ export const buildClientProcedures = (schedulesProcedures) => {
   })
 
   return newProcedures
+
+}
+
+export const sortClientProcedures = (clientProcedures) => {
+  clientProcedures.sort((a, b) => {
+    if (a.schedule.scheduleDate > b.schedule.scheduleDate) return -1;
+    else if (a.schedule.scheduleDate < b.schedule.scheduleDate) return 1;
+    return 0;
+  });
+
+  return clientProcedures;
 
 }

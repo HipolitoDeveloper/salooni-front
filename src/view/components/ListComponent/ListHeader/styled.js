@@ -1,6 +1,6 @@
-import styled from 'styled-components/native';
-import global from '../../../../common/global';
-import {StyleSheet, Platform} from 'react-native';
+import styled from "styled-components/native";
+import global from "../../../../common/global";
+import { StyleSheet, Platform } from "react-native";
 
 export const Container = styled.View`
   width: 100%;
@@ -10,7 +10,7 @@ export const Container = styled.View`
   align-items: flex-start;
   border-bottom-width: ${StyleSheet.hairlineWidth}px;
   elevation: ${props => (props.backButtonHeader ? 0 : 10)};
-  padding-top: ${Platform.OS === 'ios' ? '40px' : '0'};
+  padding-top: ${Platform.OS === "ios" ? "40px" : "0"};
 `;
 
 export const Content = styled.View`
@@ -45,8 +45,8 @@ export const TitleContent = styled.View`
   justify-content: center;
   width: 100%;
   height: 150%;
-border: 1px solid red;
-`
+  border: 1px solid red;
+`;
 
 export const TitleName = styled.Text`
   font-family: ${global.fonts.mainFont};
@@ -65,7 +65,7 @@ export const SubTitleName = styled.Text`
   right: 90px;
   top: 30px;
 
-`
+`;
 
 export const DeleteContent = styled.View`
   padding: 0 20px 0 30px;
@@ -172,4 +172,12 @@ export const HeaderText = styled.Text`
   color: ${global.colors.purpleColor};
   font-size: 24px;
   text-align: center;
+`;
+
+export const CloseButton = styled.TouchableOpacity`
+  position: absolute;
+  right: 20px;
+  padding: 5px 8px;
+  border-radius: 100px;
+
 `;

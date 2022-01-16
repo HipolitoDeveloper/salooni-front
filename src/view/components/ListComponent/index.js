@@ -23,6 +23,7 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 const { diffClamp } = Animated;
 
 const List = ({
+                showCloseButton,
                 backButtonHeader,
                 showBackButton,
                 showCalendarButton,
@@ -348,6 +349,7 @@ const List = ({
             { transform: [{ translateY }] },
           ]}>
           <ListHeader
+            showCloseButton={showCloseButton}
             onBack={checkItem}
             backButtonHeader={backButtonHeader}
             showBackButton={showBackButton}

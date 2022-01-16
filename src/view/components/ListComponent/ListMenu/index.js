@@ -100,7 +100,7 @@ const ListMenu = ({
             </S.CloseButton>
           </S.CloseButtonContent>
           <S.Content color={color}>
-            {itemType === "schedule" && (
+            {itemType === "schedule" && menuState.itemToShow.passedHour && (
               <S.ConfimationMessageContent>
                 <S.ConfimationMessageText screenHeight={screenHeight}>
                   Os procedimentos do agendamento foram realizados?
@@ -120,7 +120,10 @@ const ListMenu = ({
               </S.ConfimationMessageContent>
             )}
             {itemType === "client" && (
-              <S.ScheduleButtonWrapper onPress={() => goToSchedules(menuState.itemToShow)}>
+              <S.ScheduleButtonWrapper onPress={() => {
+                handleMenu(menuState.itemToShow)
+                goToSchedules(menuState.itemToShow)}
+              } >
                 <S.ScheduleContent>
                   <Clock
                     fill={color}

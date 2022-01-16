@@ -51,6 +51,7 @@ const ClientSchedules = ({ route }) => {
       <List
         showMenu={false}
         showAddButton={true}
+        showCloseButton={true}
         onRefresh={onRefresh}
         refreshing={isLoading}
         searchPlaceHolder={"Procure por procedimentos"}

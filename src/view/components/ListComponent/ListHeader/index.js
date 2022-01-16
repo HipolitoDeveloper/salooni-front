@@ -7,7 +7,7 @@ import Search from "../../../../assets/svg/searchSVG.svg";
 import Times from "../../../../assets/svg/timesSVG.svg";
 import tourMessages from "../../../../common/tourMessages";
 import { View, Text, Dimensions } from "react-native";
-import { CalendarIcon, ProfileIcon } from "./styled";
+import { CalendarIcon, CloseButton, ProfileIcon } from "./styled";
 import Profile from "../../../../assets/svg/profileSVG.svg";
 import BackButton from "../../small/BackButton";
 import global from "../../../../common/global";
@@ -29,6 +29,7 @@ const ListHeader = ({
                       scrolling,
                       showBackButton,
                       onBack,
+                      showCloseButton
                     }) => {
   const screenHeight = Dimensions.get("screen").height;
   const screenWidth = Dimensions.get("screen").width;
@@ -123,6 +124,12 @@ const ListHeader = ({
                     backgroundColor={headerColor}>
                     <Icon name={"calendar"} size={14} color={"black"} />
                   </S.CalendarIcon>
+                )}
+
+                {showCloseButton && (
+                  <S.CloseButton onPress={() => navigation.pop()}>
+                    <Icon name={"window-close"} size={25} color={'black'}/>
+                  </S.CloseButton>
                 )}
 
                 {showProfileIcon && (

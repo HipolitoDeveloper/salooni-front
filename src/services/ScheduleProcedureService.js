@@ -1,7 +1,12 @@
 import Parse from "parse/react-native";
 import { convertToObj } from "../pipe/conversor";
 import { ScheduleObject } from "./ScheduleService";
-import { buildClientProcedures, buildScheduleProcedure, buildScheduleProcedureList } from "../factory/Schedule";
+import {
+  buildClientProcedures,
+  buildScheduleProcedure,
+  buildScheduleProcedureList,
+  sortClientProcedures,
+} from "../factory/Schedule";
 import { ProcedureObject } from "./ProcedureService";
 import { ClientObject } from "./ClientService";
 
@@ -205,9 +210,9 @@ export const getScheduleProcedureByClientId = (
         resolve(await ScheduleProcedureQuery.find());
       } else {
         resolve(
-          buildClientProcedures(
+          sortClientProcedures(buildClientProcedures(
             convertToObj(await ScheduleProcedureQuery.find()),
-          ),
+          )),
         );
       }
     } catch (e) {

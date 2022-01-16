@@ -107,7 +107,7 @@ const ListContent = ({
                 <BouncyCheckbox
                   style={{ borderColor: global.colors.purpleColor }}
                   isChecked={item.checked}
-                  onPress={isChecked => checkItem(id)}
+                  onPress={isChecked => checkItem(item.id)}
                   fillColor={`${global.colors.purpleColor}`}
                   disableBuiltInState={true}
                   disableText={true}
