@@ -1,5 +1,5 @@
-import styled from 'styled-components/native';
-import global from '../../../common/global';
+import styled from "styled-components/native";
+import global from "../../../common/global";
 
 export const Container = styled.SafeAreaView`
   flex: 1;
@@ -23,7 +23,7 @@ export const Header = styled.View`
 
 export const Body = styled.View`
   flex: 9;
-  height: ${props => (props.isDeleting || props.isConfirming ? '73%' : '100%')};
+  height: ${props => (props.isDeleting || props.isConfirming ? "73%" : "100%")};
 `;
 
 export const Footer = styled.View`
@@ -68,3 +68,18 @@ export const FooterButtonText = styled.Text`
   color: ${props => props.color};
   letter-spacing: 1px;
 `;
+
+export const EmptyMessageWrapper = styled.View`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+`;
+
+export const EmptyMessageText = styled.Text`  
+  width:70%;
+  font-size: 20px;
+  text-align: center;
+  font-family: ${global.fonts.mainFont};
+`;
+

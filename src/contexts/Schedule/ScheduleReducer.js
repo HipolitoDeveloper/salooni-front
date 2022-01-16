@@ -1,5 +1,5 @@
 import {
-  buildCalendar,
+  buildAgenda,
   setNextHour,
   sortSchedules,
 } from '../../factory/Schedule';
@@ -9,7 +9,7 @@ export const ScheduleReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_SCHEDULES':
       state.schedules = action.schedules;
-      state.calendarSchedule = buildCalendar(action.schedules);
+      state.calendarSchedule = buildAgenda(action.schedules);
       state.isSchedulesLoading = false;
 
       return {
@@ -181,7 +181,7 @@ export const ScheduleReducer = (state, action) => {
 
     case 'SORT_SCHEDULES':
       state.schedules = sortSchedules(state.schedules);
-      state.calendarSchedule = buildCalendar(state.schedules);
+      state.calendarSchedule = buildAgenda(state.schedules);
 
       return {
         schedules: state.schedules,

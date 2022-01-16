@@ -1,10 +1,11 @@
-import {buildEmployeeObject} from './Employee';
-import {buildClientObject} from './Client';
+import { buildEmployeeObject } from './Employee';
+import { buildClientObject } from './Client';
 import moment from 'moment';
-import {getScheduleProcedureByScheduleId} from '../services/ScheduleProcedureService';
-import {buildProcedure} from './Procedure';
+import { getScheduleProcedureByScheduleId } from '../services/ScheduleProcedureService';
+import { buildProcedure } from './Procedure';
+import global from "../common/global";
 
-export const buildCalendar = schedules => {
+export const buildAgenda = schedules => {
   const scheduledDates = buildDateList(schedules);
   let scheduleList = {};
 
@@ -13,18 +14,18 @@ export const buildCalendar = schedules => {
     schedules.forEach(schedule => {
       if (scheduledDate === schedule.formattedDate) {
         schedulesInformation.push({
-          clientName: schedule.client.name,
-          clientTel: schedule.client.tel,
-          formattedHour: schedule.formattedHour,
-          passedHour: schedule.passedHour,
-          nextHour: schedule.nextHour,
+          ...schedule,
+          startingDay: true,
+          endingDay: true,
+          color: `${global.colors.purpleColor}`,
+
         });
       }
     });
 
     scheduleList = {
       ...scheduleList,
-      [scheduledDate]: schedulesInformation,
+      [scheduledDate]: { periods: schedulesInformation },
     };
   });
 
@@ -37,6 +38,9 @@ export const buildSchedule = (schedule, procedures) => {
     procedures.length > 0
       ? procedures.some(procedure => procedure.accomplishedSchedule)
       : false;
+  const passedHour = moment(scheduleDate).isBefore(
+    moment(new Date().toString()).format(),
+  )
 
   if (procedures.length > 0) {
     return {
@@ -51,12 +55,13 @@ export const buildSchedule = (schedule, procedures) => {
       analyzedSchedule: schedule.analyzed_schedule,
       checked: isProceduresChecked,
       firstCheckedState: isProceduresChecked,
-      passedHour: moment(scheduleDate).isBefore(
-        moment(new Date().toString()).format(),
-      ),
+      passedHour: passedHour,
       needsToBeNotified:
         moment(scheduleDate).isBefore(moment(new Date().toString()).format()) &&
         !isProceduresChecked,
+      startingDay: true,
+      endingDay: true,
+      color: `${global.colors.purpleColor}`
     };
   } else {
     return {
@@ -68,9 +73,10 @@ export const buildSchedule = (schedule, procedures) => {
       formattedDate: moment(scheduleDate).format('YYYY-MM-DD'),
       formattedHour: moment(scheduleDate).format('HH:mm'),
       analyzedSchedule: schedule.analyzed_schedule,
-      passedHour: moment(scheduleDate).isBefore(
-        moment(new Date().toString()).format(),
-      ),
+      passedHour: passedHour,
+      startingDay: true,
+      endingDay: true,
+      color: `${global.colors.purpleColor}`
     };
   }
 };
@@ -119,6 +125,7 @@ export const buildScheduleList = schedules => {
 const buildDateList = schedules => {
   let scheduledDates = [];
   schedules.forEach(schedule => {
+    console.log("schedule.formattedDate", schedule.formattedDate)
     if (scheduledDates.length === 0)
       scheduledDates.push(schedule.formattedDate);
     else if (
@@ -188,3 +195,18 @@ export const sortSchedules = schedules => {
 
   return newSchedules;
 };
+
+export const buildClientProcedures = (schedulesProcedures) => {
+  const newProcedures = [];
+  console.log("schedulesProcedures", schedulesProcedures)
+  schedulesProcedures.map(schedule => {
+    newProcedures.push({
+      id: schedule.objectId,
+      procedure: {...buildProcedure(schedule.procedure_id)},
+      schedule: {...buildSchedule(schedule.schedule_id, [])}
+    })
+  })
+
+  return newProcedures
+
+}

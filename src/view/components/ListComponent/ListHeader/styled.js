@@ -39,13 +39,33 @@ export const SubHeader = styled.View`
   align-items: center;
 `;
 
+export const TitleContent = styled.View`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 150%;
+border: 1px solid red;
+`
+
 export const TitleName = styled.Text`
   font-family: ${global.fonts.mainFont};
   font-size: ${props => props.screenHeight / 25}px;
   color: ${props => props.headerColor};
   letter-spacing: 2px;
+  height: 120%;
   margin: 0 auto;
 `;
+
+export const SubTitleName = styled.Text`
+  position: absolute;
+  font-family: ${global.fonts.mainFont};
+  font-size: ${props => props.screenHeight / 40}px;
+  color: ${props => props.headerColor};
+  right: 90px;
+  top: 30px;
+
+`
 
 export const DeleteContent = styled.View`
   padding: 0 20px 0 30px;

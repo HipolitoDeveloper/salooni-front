@@ -1,17 +1,13 @@
-import React, {useContext, useState} from 'react';
-import * as S from './styled';
-import global from '../../../../../common/global';
-import {ScheduleContext} from '../../../../../contexts/Schedule/ScheduleContext';
-import Calendar from '../../../../components/huge/CalendarComponent';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
-import {UserContext} from '../../../../../contexts/User/UserContext';
-import CalendarHeader from '../../../../components/huge/CalendarComponent/CalendarHeader';
+import React, { useContext, useState } from 'react';
+import global from '../../../../../common/global';
+import notificationsMessages from '../../../../../common/notificationsMessages';
+import { ScheduleContext } from '../../../../../contexts/Schedule/ScheduleContext';
+import { UserContext } from '../../../../../contexts/User/UserContext';
 import List from '../../../../components/ListComponent';
 import AlertModal from '../../../../components/small/AlertModal';
-import Notification from '../../../../components/small/Notification';
-import {HeaderContent} from './styled';
-import notificationsMessages from '../../../../../common/notificationsMessages';
+import * as S from './styled';
 
 const UnconfirmedSchedules = ({route}) => {
   const {currentUser, verifyNotification} = useContext(UserContext);
@@ -110,6 +106,7 @@ const UnconfirmedSchedules = ({route}) => {
   return (
     <S.Container>
       <List
+        showMenu={true}
         backButtonHeader={true}
         onRefresh={onRefresh}
         refreshing={isLoading}

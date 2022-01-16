@@ -13,7 +13,7 @@ import {SalonObject} from './SalonService';
 
 export const ScheduleObject = Parse.Object.extend('schedule');
 
-export const getAllSchedules = (
+export const getAllSchedulesBySalon = (
   employeeId,
   salonId,
   employeeType,
@@ -46,8 +46,10 @@ export const getAllSchedules = (
   });
 };
 
+
+
 export const insertScheduleCRUD = (scheduleObj, returnParseObject) => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve, reFject) => {
     try {
       const {
         client,

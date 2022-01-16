@@ -57,7 +57,6 @@ const UserProvider = ({children}) => {
   }, []);
 
   useEffect(() => {
-    console.log('testewqe21');
     handleNotification(state.notifications.length > 0);
   }, []);
 

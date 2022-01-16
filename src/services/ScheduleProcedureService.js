@@ -1,13 +1,11 @@
-import Parse from 'parse/react-native';
-import {convertToObj} from '../pipe/conversor';
-import {ScheduleObject} from './ScheduleService';
-import {
-  buildScheduleProcedure,
-  buildScheduleProcedureList,
-} from '../factory/Schedule';
-import {ProcedureObject} from './ProcedureService';
+import Parse from "parse/react-native";
+import { convertToObj } from "../pipe/conversor";
+import { ScheduleObject } from "./ScheduleService";
+import { buildClientProcedures, buildScheduleProcedure, buildScheduleProcedureList } from "../factory/Schedule";
+import { ProcedureObject } from "./ProcedureService";
+import { ClientObject } from "./ClientService";
 
-const ScheduleProcedureObject = Parse.Object.extend('schedule_procedure');
+const ScheduleProcedureObject = Parse.Object.extend("schedule_procedure");
 
 export const getScheduleProcedureByScheduleId = (
   scheduleFK,
@@ -17,10 +15,10 @@ export const getScheduleProcedureByScheduleId = (
     try {
       const ScheduleProcedureQuery = new Parse.Query(ScheduleProcedureObject);
       ScheduleProcedureQuery.equalTo(
-        'schedule_id',
-        new ScheduleObject({objectId: scheduleFK}),
+        "schedule_id",
+        new ScheduleObject({ objectId: scheduleFK }),
       );
-      ScheduleProcedureQuery.include('procedure_id');
+      ScheduleProcedureQuery.include("procedure_id");
 
       if (returnParseObject) {
         resolve(await ScheduleProcedureQuery.find());
@@ -46,8 +44,8 @@ export const getScheduleProcedureByProcedureId = (
     try {
       const ScheduleProcedureQuery = new Parse.Query(ScheduleProcedureObject);
       ScheduleProcedureQuery.equalTo(
-        'procedure_id',
-        new ProcedureObject({objectId: procedureId}),
+        "procedure_id",
+        new ProcedureObject({ objectId: procedureId }),
       );
 
       if (returnParseObject) {
@@ -72,12 +70,12 @@ export const saveScheduleProcedure = (
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const {procedureId, scheduleId} = scheduleProcedureObj;
+      const { procedureId, scheduleId } = scheduleProcedureObj;
 
       const newScheduleProcedure = new ScheduleProcedureObject();
 
-      newScheduleProcedure.set('schedule_id', scheduleId);
-      newScheduleProcedure.set('procedure_id', procedureId);
+      newScheduleProcedure.set("schedule_id", scheduleId);
+      newScheduleProcedure.set("procedure_id", procedureId);
 
       newScheduleProcedure.save().then(
         savedProcedureEmployee => {
@@ -161,11 +159,11 @@ export const deleteScheduleProcedureByProcedureId = async procedureId => {
 export const confirmScheduleProcedure = async (procedures, checked) => {
   try {
     for (const scheduleProcedures of procedures) {
-      const {scheduleProcedureId} = scheduleProcedures;
+      const { scheduleProcedureId } = scheduleProcedures;
       const scheduleProcedure = new ScheduleProcedureObject({
         objectId: scheduleProcedureId,
       });
-      scheduleProcedure.set('accomplished_schedule', checked);
+      scheduleProcedure.set("accomplished_schedule", checked);
 
       await scheduleProcedure.save();
     }
@@ -187,3 +185,34 @@ export const confirmScheduleProcedure = async (procedures, checked) => {
 //     console.error(`Procedimento ${JSON.stringify(e)}`);
 //   }
 // };
+
+export const getScheduleProcedureByClientId = (
+  clientId,
+  returnParseObject,
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const ScheduleQuery = new Parse.Query(ScheduleObject);
+      ScheduleQuery.equalTo("client_id", new ClientObject({ objectId: clientId }));
+      ScheduleQuery.include("client_id");
+      const ScheduleProcedureQuery = new Parse.Query(ScheduleProcedureObject);
+
+      ScheduleProcedureQuery.include("procedure_id");
+      ScheduleProcedureQuery.matchesQuery("schedule_id", ScheduleQuery);
+
+
+      if (returnParseObject) {
+        resolve(await ScheduleProcedureQuery.find());
+      } else {
+        resolve(
+          buildClientProcedures(
+            convertToObj(await ScheduleProcedureQuery.find()),
+          ),
+        );
+      }
+    } catch (e) {
+      console.error(`Procedimentos do agendamento de cliente ${e}`);
+      reject(`Procedimentos do agendamento de cliente  ${JSON.stringify(e)}`);
+    }
+  });
+};

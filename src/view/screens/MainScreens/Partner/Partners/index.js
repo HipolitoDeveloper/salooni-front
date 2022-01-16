@@ -6,7 +6,7 @@ import {useNavigation} from '@react-navigation/native';
 import {PartnerContext} from '../../../../../contexts/Partner/PartnerContext';
 import {ScheduleContext} from '../../../../../contexts/Schedule/ScheduleContext';
 import List from '../../../../components/ListComponent';
-import Calendar from '../../../../components/huge/CalendarComponent';
+import Calendar from '../../../../components/huge/AgendaComponent';
 import Notification from '../../../../components/small/Notification';
 
 const Partners = () => {
@@ -31,11 +31,9 @@ const Partners = () => {
       salonId: currentUser.idSalon,
       employeeId: employee.id,
       employeeType: employee.employeeType,
-      showCurrentUserSchedules: false,
     }).then(
       calendarSchedule => {
         setIsLoading(false);
-        console.log('calendarSchedule', calendarSchedule);
         handleAgenda(calendarSchedule);
         // navigate.push('ApplicationStack', {
         //   screen: 'Schedules',
@@ -114,6 +112,7 @@ const Partners = () => {
       )}
 
       <List
+        showMenu={true}
         showAddButton={true}
         onRefresh={onRefresh}
         refreshing={isLoading}

@@ -1,40 +1,41 @@
-import React, {useEffect, useState} from 'react';
-import * as S from './styled';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import {useNavigation} from '@react-navigation/native';
-import Salooni from '../../../../assets/svg/salooniSVG.svg';
-import Search from '../../../../assets/svg/searchSVG.svg';
-import Times from '../../../../assets/svg/timesSVG.svg';
-import tourMessages from '../../../../common/tourMessages';
-import {View, Text, Dimensions} from 'react-native';
-import {CalendarIcon, ProfileIcon} from './styled';
-import Profile from '../../../../assets/svg/profileSVG.svg';
-import BackButton from '../../small/BackButton';
-import global from '../../../../common/global';
+import React, { useEffect, useState } from "react";
+import * as S from "./styled";
+import Icon from "react-native-vector-icons/FontAwesome5";
+import { useNavigation } from "@react-navigation/native";
+import Salooni from "../../../../assets/svg/salooniSVG.svg";
+import Search from "../../../../assets/svg/searchSVG.svg";
+import Times from "../../../../assets/svg/timesSVG.svg";
+import tourMessages from "../../../../common/tourMessages";
+import { View, Text, Dimensions } from "react-native";
+import { CalendarIcon, ProfileIcon } from "./styled";
+import Profile from "../../../../assets/svg/profileSVG.svg";
+import BackButton from "../../small/BackButton";
+import global from "../../../../common/global";
 
 const ListHeader = ({
-  backButtonHeader,
-  searchItems,
-  headerTitle,
-  headerColor,
-  calendarView,
-  showProfileIcon,
-  isDeleting,
-  selectedItemsLength,
-  cancelDelete,
-  handleAgenda,
-  headerHeight,
-  searchPlaceHolder,
-  scrolling,
-  showBackButton,
-  onBack,
-}) => {
-  const screenHeight = Dimensions.get('screen').height;
-  const screenWidth = Dimensions.get('screen').width;
+                      backButtonHeader,
+                      searchItems,
+                      headerTitle,
+                      headerSubTitle,
+                      headerColor,
+                      calendarView,
+                      showProfileIcon,
+                      isDeleting,
+                      selectedItemsLength,
+                      cancelDelete,
+                      handleAgenda,
+                      headerHeight,
+                      searchPlaceHolder,
+                      scrolling,
+                      showBackButton,
+                      onBack,
+                    }) => {
+  const screenHeight = Dimensions.get("screen").height;
+  const screenWidth = Dimensions.get("screen").width;
   const isSmallerScreen = screenHeight < 650;
 
-  const [scheduleView, setScheduleView] = useState('');
-  const [search, setSearch] = useState('');
+  const [scheduleView, setScheduleView] = useState("");
+  const [search, setSearch] = useState("");
 
   const navigation = useNavigation();
 
@@ -53,11 +54,11 @@ const ListHeader = ({
       {backButtonHeader ? (
         <S.HeaderContent>
           <BackButton
-            positionLeft={'20px'}
-            positionTop={'60px'}
+            positionLeft={"20px"}
+            positionTop={"60px"}
             onPress={() => {
               onBack(-1);
-              navigation.push('TabStack', {screen: 'Schedules'});
+              navigation.push("TabStack", { screen: "Schedules" });
             }}
             buttonColor={global.colors.purpleColor}
           />
@@ -71,18 +72,18 @@ const ListHeader = ({
                 {showBackButton ? (
                   <BackButton
                     onPress={() =>
-                      navigation.navigate('UserInformationStack', {
-                        screen: 'Profile',
+                      navigation.navigate("UserInformationStack", {
+                        screen: "Profile",
                       })
                     }
                     buttonColor={headerColor}
-                    positionTop={'20px'}
-                    positionLeft={'10px'}
+                    positionTop={"20px"}
+                    positionLeft={"10px"}
                   />
                 ) : (
                   <Salooni
                     fill={headerColor}
-                    borderFill={'#fff'}
+                    borderFill={"#fff"}
                     width={screenWidth / 8}
                     height={screenHeight / 8}
                   />
@@ -94,8 +95,8 @@ const ListHeader = ({
                 <S.DeleteText>{`Deseja apagar os ${selectedItemsLength} itens?`}</S.DeleteText>
                 <S.DeleteCancelIcon onPress={cancelDelete}>
                   <Times
-                    fill={'#fff'}
-                    borderFill={'#fff'}
+                    fill={"#fff"}
+                    borderFill={"#fff"}
                     width={10}
                     height={10}
                   />
@@ -103,30 +104,37 @@ const ListHeader = ({
               </S.DeleteContent>
             ) : (
               <>
-                <S.TitleName
-                  screenHeight={screenHeight}
-                  headerColor={headerColor}>
-                  {headerTitle}
-                </S.TitleName>
+                  <S.TitleName
+                    screenHeight={screenHeight}
+                    headerColor={headerColor}>
+                    {headerTitle}
+                  </S.TitleName>
+                  {headerSubTitle && (
+                    <S.SubTitleName
+                      screenHeight={screenHeight}
+                      headerColor={headerColor}>
+                      cliente {headerSubTitle}
+                    </S.SubTitleName>
+                  )}
                 {handleAgenda && (
                   <S.CalendarIcon
                     screenWidth={screenWidth}
                     onPress={handleAgenda}
                     backgroundColor={headerColor}>
-                    <Icon name={'calendar'} size={14} color={'black'} />
+                    <Icon name={"calendar"} size={14} color={"black"} />
                   </S.CalendarIcon>
                 )}
 
                 {showProfileIcon && (
                   <S.ProfileIcon
                     onPress={() =>
-                      navigation.push('ApplicationStack', {
-                        screen: 'UserInformationStack',
+                      navigation.push("ApplicationStack", {
+                        screen: "UserInformationStack",
                       })
                     }>
                     <Profile
                       fill={headerColor}
-                      borderFill={'#fff'}
+                      borderFill={"#fff"}
                       width={screenWidth / 12}
                       height={screenHeight / 12}
                     />
@@ -140,8 +148,8 @@ const ListHeader = ({
             <S.SearchContainer>
               <S.SearchIcon>
                 <Search
-                  fill={'#fff'}
-                  borderFill={'black'}
+                  fill={"#fff"}
+                  borderFill={"black"}
                   width={20}
                   height={20}
                 />
@@ -151,21 +159,21 @@ const ListHeader = ({
                 value={search.text}
                 onChangeText={text => {
                   searchItems(text);
-                  setSearch({text: text, isSearching: true});
+                  setSearch({ text: text, isSearching: true });
                 }}
                 placeholder={searchPlaceHolder}
-                placeholderTextColor={'black'}
+                placeholderTextColor={"black"}
               />
 
               <S.CancelInput
                 onPress={() => {
-                  setSearch({text: '', isSearching: false});
-                  searchItems('');
+                  setSearch({ text: "", isSearching: false });
+                  searchItems("");
                 }}
-                hitSlop={{top: 12, left: 12, right: 12, bottom: 12}}>
+                hitSlop={{ top: 12, left: 12, right: 12, bottom: 12 }}>
                 <Times
-                  fill={'#fff'}
-                  borderFill={'black'}
+                  fill={"#fff"}
+                  borderFill={"black"}
                   width={10}
                   height={10}
                 />
