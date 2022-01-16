@@ -1,49 +1,52 @@
-import React, {useState} from 'react';
-import * as S from './styled';
-import Button from '../../small/Button';
-import global from '../../../../common/global';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import {Dimensions, FlatList, ScrollView, View} from 'react-native';
-import RoundedTimes from '../../../../assets/svg/roundedTimesSVG.svg';
-import {Switch} from '../../small/Switch';
-import Modal from 'react-native-modal';
-import {useNavigation} from '@react-navigation/native';
+import React, { useState } from "react";
+import * as S from "./styled";
+import Button from "../../small/Button";
+import global from "../../../../common/global";
+import Icon from "react-native-vector-icons/FontAwesome5";
+import { Dimensions, FlatList, ScrollView, View } from "react-native";
+import RoundedTimes from "../../../../assets/svg/roundedTimesSVG.svg";
+import { Switch } from "../../small/Switch";
+import Modal from "react-native-modal";
+import { useNavigation } from "@react-navigation/native";
+import Clock from "../../../../assets/svg/clockSVG.svg";
+import { ItemInformationWrapper, ScheduleButtonWrapper, ScheduleContent } from "./styled";
 
 const ListMenu = ({
-  navigateToCalendar,
-  showCalendarButton,
-  color,
-  menuItems,
-  objectMenuItems,
-  menuState,
-  closeMenu,
-  deleteItem,
-  onEditNavigateTo,
-  deleteProcedure,
-  itemType,
-  checkItem,
-  isConfirming,
-  onConfirm,
-  handleMenu,
-  isOwner,
-}) => {
-  const screenHeight = Dimensions.get('screen').height;
-  const screenWidth = Dimensions.get('screen').width;
+                    navigateToCalendar,
+                    showCalendarButton,
+                    color,
+                    menuItems,
+                    objectMenuItems,
+                    menuState,
+                    closeMenu,
+                    deleteItem,
+                    onEditNavigateTo,
+                    deleteProcedure,
+                    itemType,
+                    checkItem,
+                    isConfirming,
+                    onConfirm,
+                    handleMenu,
+                    isOwner,
+                    goToSchedules,
+                  }) => {
+  const screenHeight = Dimensions.get("screen").height;
+  const screenWidth = Dimensions.get("screen").width;
   const isSmallerScreen = screenHeight < 650;
 
-  const hasProcedure = menuItems?.some(item => item === 'procedure');
+  const hasProcedure = menuItems?.some(item => item === "procedure");
   const showingItem = Object.keys(menuState.itemToShow).length > 0;
 
   const navigate = useNavigation();
 
   const showItemProperty = item => {
-    if (item === 'value') {
+    if (item === "value") {
       return (
         <S.ItemProperty screenHeight={screenHeight}>
           R$ {menuState.itemToShow[`${item}`]}
         </S.ItemProperty>
       );
-    } else if (item === 'time') {
+    } else if (item === "time") {
       return (
         <S.ItemProperty screenHeight={screenHeight}>
           {menuState.itemToShow[`${item}`]} min.
@@ -79,7 +82,7 @@ const ListMenu = ({
       <Modal
         scrollHorizontal={true}
         style={{
-          justifyContent: 'flex-end',
+          justifyContent: "flex-end",
           margin: 0,
         }}
         onBackButtonPress={closeMenu}
@@ -90,14 +93,14 @@ const ListMenu = ({
           <S.CloseButtonContent onPress={closeMenu}>
             <S.CloseButton color={color}>
               <Icon
-                name={'times'}
+                name={"times"}
                 size={25}
                 color={`${global.colors.lightGreyColor}`}
               />
             </S.CloseButton>
           </S.CloseButtonContent>
           <S.Content color={color}>
-            {itemType === 'schedule' && (
+            {itemType === "schedule" && (
               <S.ConfimationMessageContent>
                 <S.ConfimationMessageText screenHeight={screenHeight}>
                   Os procedimentos do agendamento foram realizados?
@@ -105,29 +108,42 @@ const ListMenu = ({
                 <Switch
                   backgroundColor={global.colors.lightGreyColor}
                   circleColor={global.colors.purpleColor}
-                  marginTop={'10px'}
+                  marginTop={"10px"}
                   handleSwitch={() => {
                     checkItem(menuState.itemToShow.id);
                   }}
                   switchState={{
                     state: menuState.itemToShow.checked,
-                    text: menuState.itemToShow.checked ? 'check' : 'times',
+                    text: menuState.itemToShow.checked ? "check" : "times",
                   }}
                 />
               </S.ConfimationMessageContent>
             )}
-            <S.ItemInformation hasProcedure={hasProcedure}>
+            {itemType === "client" && (
+              <S.ScheduleButtonWrapper onPress={() => goToSchedules(menuState.itemToShow)}>
+                <S.ScheduleContent>
+                  <Clock
+                    fill={color}
+                    borderFill={"#fff"}
+                    width={30}
+                    height={30}
+                  />
+                  <S.ScheduleText>Últimas visitas</S.ScheduleText>
+                </S.ScheduleContent>
+              </S.ScheduleButtonWrapper>
+            )}
+            <S.ItemInformationWrapper hasProcedure={hasProcedure}>
               {menuItems.map((item, index) => (
                 <View key={item}>
-                  {item === 'procedures' ? (
+                  {item === "procedures" ? (
                     <S.ProcedureContainer>
                       <FlatList
                         keyExtractor={item => item.id}
                         data={menuState.itemToShow[`${item}`]}
-                        renderItem={({item}) => (
+                        renderItem={({ item }) => (
                           <S.ProcedureContent
                             screenHeight={screenHeight}
-                            disabled={!isOwner && itemType !== 'schedule'}
+                            disabled={!isOwner && itemType !== "schedule"}
                             onPress={() =>
                               deleteProcedure(
                                 item,
@@ -137,7 +153,7 @@ const ListMenu = ({
                             }>
                             <S.ProcedureDeleteIcon>
                               <RoundedTimes
-                                fill={'#fff'}
+                                fill={"#fff"}
                                 borderFill={color}
                                 width={screenWidth / 20}
                                 height={screenHeight / 20}
@@ -158,42 +174,42 @@ const ListMenu = ({
                   )}
                 </View>
               ))}
-            </S.ItemInformation>
+            </S.ItemInformationWrapper>
             {isOwner && (
               <S.FooterButtons isSmallerScreen={isSmallerScreen}>
                 {isConfirming ? (
                   <>
                     <Button
                       disabled={false}
-                      marginBottom={'20px'}
+                      marginBottom={"20px"}
                       onPress={onConfirm}
                       color={color}
-                      text={'Confirmar'}
-                      width={'120px'}
-                      height={'35px'}
-                      fontSize={'17px'}
+                      text={"Confirmar"}
+                      width={"120px"}
+                      height={"35px"}
+                      fontSize={"17px"}
                       textColor={color}
                       backgroundColor={global.colors.backgroundColor}
                       leftContent={{
                         show: true,
-                        height: '20px',
-                        width: '20px',
-                        icon: 'check',
-                        iconColor: 'black',
+                        height: "20px",
+                        width: "20px",
+                        icon: "check",
+                        iconColor: "black",
                         backgroundColor: `${color}`,
-                        borderRadius: '20px',
+                        borderRadius: "20px",
                         iconSize: 13,
                       }}
                     />
                     <Button
                       disabled={false}
-                      marginBottom={'20px'}
+                      marginBottom={"20px"}
                       onPress={() => checkItem(-1)}
                       color={color}
-                      text={'Cancelar confirmação'}
-                      width={'120px'}
-                      height={'35px'}
-                      fontSize={'17px'}
+                      text={"Cancelar confirmação"}
+                      width={"120px"}
+                      height={"35px"}
+                      fontSize={"17px"}
                       textColor={global.colors.lightGreyColor}
                       backgroundColor={color}
                     />
@@ -203,26 +219,26 @@ const ListMenu = ({
                     {showCalendarButton && (
                       <Button
                         disabled={false}
-                        marginBottom={'20px'}
+                        marginBottom={"20px"}
                         onPress={() => {
                           navigateToCalendar(menuState.itemToShow);
                           handleMenu(menuState.itemToShow);
                         }}
                         color={color}
-                        text={'Agenda'}
-                        width={'120px'}
-                        height={'35px'}
-                        fontSize={'17px'}
+                        text={"Agenda"}
+                        width={"120px"}
+                        height={"35px"}
+                        fontSize={"17px"}
                         textColor={color}
                         backgroundColor={global.colors.backgroundColor}
                         leftContent={{
                           show: true,
-                          height: '20px',
-                          width: '20px',
-                          icon: 'calendar-alt',
-                          iconColor: 'black',
+                          height: "20px",
+                          width: "20px",
+                          icon: "calendar-alt",
+                          iconColor: "black",
                           backgroundColor: `${color}`,
-                          borderRadius: '20px',
+                          borderRadius: "20px",
                           iconSize: 13,
                         }}
                       />
@@ -230,32 +246,32 @@ const ListMenu = ({
 
                     <Button
                       disabled={false}
-                      marginBottom={'20px'}
+                      marginBottom={"20px"}
                       onPress={() => {
                         onEditNavigateTo(menuState.itemToShow);
                         handleMenu(menuState?.itemToShow);
                       }}
                       color={color}
-                      text={'Editar'}
-                      width={'120px'}
-                      height={'35px'}
-                      fontSize={'17px'}
+                      text={"Editar"}
+                      width={"120px"}
+                      height={"35px"}
+                      fontSize={"17px"}
                       textColor={color}
                       backgroundColor={global.colors.backgroundColor}
                       leftContent={{
                         show: true,
-                        height: '20px',
-                        width: '20px',
-                        icon: 'pen',
-                        iconColor: 'black',
+                        height: "20px",
+                        width: "20px",
+                        icon: "pen",
+                        iconColor: "black",
                         backgroundColor: `${color}`,
-                        borderRadius: '20px',
+                        borderRadius: "20px",
                         iconSize: 13,
                       }}
                     />
                     <Button
                       disabled={false}
-                      marginBottom={'20px'}
+                      marginBottom={"20px"}
                       onPress={() => {
                         deleteItem(menuState.itemToShow);
                         closeMenu();
@@ -263,18 +279,18 @@ const ListMenu = ({
                       color={global.colors.backgroundColor}
                       textColor={global.colors.backgroundColor}
                       backgroundColor={color}
-                      text={'Excluir'}
-                      width={'120px'}
-                      height={'35px'}
-                      fontSize={'17px'}
+                      text={"Excluir"}
+                      width={"120px"}
+                      height={"35px"}
+                      fontSize={"17px"}
                       leftContent={{
                         show: true,
-                        height: '20px',
-                        width: '20px',
-                        icon: 'trash',
-                        iconColor: 'black',
+                        height: "20px",
+                        width: "20px",
+                        icon: "trash",
+                        iconColor: "black",
                         backgroundColor: `${color}`,
-                        borderRadius: '20px',
+                        borderRadius: "20px",
                         iconSize: 13,
                       }}
                     />

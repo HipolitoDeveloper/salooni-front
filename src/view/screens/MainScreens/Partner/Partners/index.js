@@ -31,11 +31,9 @@ const Partners = () => {
       salonId: currentUser.idSalon,
       employeeId: employee.id,
       employeeType: employee.employeeType,
-      showCurrentUserSchedules: false,
     }).then(
       calendarSchedule => {
         setIsLoading(false);
-        console.log('calendarSchedule', calendarSchedule);
         handleAgenda(calendarSchedule);
         // navigate.push('ApplicationStack', {
         //   screen: 'Schedules',
@@ -114,6 +112,7 @@ const Partners = () => {
       )}
 
       <List
+        showMenu={true}
         showAddButton={true}
         onRefresh={onRefresh}
         refreshing={isLoading}

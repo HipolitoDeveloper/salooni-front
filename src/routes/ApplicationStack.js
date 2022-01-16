@@ -9,6 +9,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import UserInformationStack from './UserInformationStack';
 import Schedules from '../view/screens/MainScreens/Calendar/Schedules';
 import UnconfirmedSchedules from '../view/screens/MainScreens/Calendar/UnconfirmedSchedules';
+import ClientSchedules from "../view/screens/MainScreens/Client/ClientSchedules";
 
 const Stack = createStackNavigator();
 
@@ -21,6 +22,7 @@ const ApplicationStack = () => {
       <Stack.Group>
         <Stack.Screen name="Procedures" component={Procedures} />
         <Stack.Screen name="ClientRegister" component={ClientRegister} />
+        <Stack.Screen name="ClientSchedules" component={ClientSchedules} />
         <Stack.Screen name="ScheduleRegister" component={ScheduleRegister} />
         <Stack.Screen name="PartnerRegister" component={PartnerRegister} />
         <Stack.Screen name="ProcedureRegister" component={ProcedureRegister} />

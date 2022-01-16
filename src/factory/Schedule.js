@@ -14,14 +14,11 @@ export const buildAgenda = schedules => {
     schedules.forEach(schedule => {
       if (scheduledDate === schedule.formattedDate) {
         schedulesInformation.push({
-          clientName: schedule.client.name,
-          clientTel: schedule.client.tel,
-          formattedHour: schedule.formattedHour,
-          passedHour: schedule.passedHour,
-          nextHour: schedule.nextHour,
+          ...schedule,
           startingDay: true,
           endingDay: true,
-          color: `${global.colors.purpleColor}`
+          color: `${global.colors.purpleColor}`,
+
         });
       }
     });
@@ -128,6 +125,7 @@ export const buildScheduleList = schedules => {
 const buildDateList = schedules => {
   let scheduledDates = [];
   schedules.forEach(schedule => {
+    console.log("schedule.formattedDate", schedule.formattedDate)
     if (scheduledDates.length === 0)
       scheduledDates.push(schedule.formattedDate);
     else if (
@@ -181,7 +179,7 @@ export const setNextHour = schedules => {
   });
 
   schedules.forEach(schedule => {
-    schedule.nextHour = schedule.scheduleDate === nextScheduleHour;   
+    schedule.nextHour = schedule.scheduleDate === nextScheduleHour;
   });
 
   return schedules;
@@ -197,3 +195,18 @@ export const sortSchedules = schedules => {
 
   return newSchedules;
 };
+
+export const buildClientProcedures = (schedulesProcedures) => {
+  const newProcedures = [];
+  console.log("schedulesProcedures", schedulesProcedures)
+  schedulesProcedures.map(schedule => {
+    newProcedures.push({
+      id: schedule.objectId,
+      procedure: {...buildProcedure(schedule.procedure_id)},
+      schedule: {...buildSchedule(schedule.schedule_id, [])}
+    })
+  })
+
+  return newProcedures
+
+}

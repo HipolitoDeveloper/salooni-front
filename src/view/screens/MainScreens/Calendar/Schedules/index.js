@@ -124,8 +124,10 @@ const Schedules = ({ route }) => {
         isVisible={isShowingAgenda}
         color={global.colors.purpleColor}
         handleModal={handleAgenda}
+        calendarSchedule={calendarSchedule}
       />
       <List
+        showMenu={true}
         showAddButton={true}
         onRefresh={onRefresh}
         refreshing={isLoading}

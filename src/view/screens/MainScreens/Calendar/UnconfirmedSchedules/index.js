@@ -106,6 +106,7 @@ const UnconfirmedSchedules = ({route}) => {
   return (
     <S.Container>
       <List
+        showMenu={true}
         backButtonHeader={true}
         onRefresh={onRefresh}
         refreshing={isLoading}

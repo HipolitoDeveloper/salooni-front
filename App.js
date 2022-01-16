@@ -10,9 +10,7 @@ import PartnerProvider from "./src/contexts/Partner/PartnerContext";
 import ScheduleProvider from "./src/contexts/Schedule/ScheduleContext";
 import ProcedureProvider from "./src/contexts/Procedure/ProcedureContext";
 
-import { StyleSheet, Text, TouchableOpacity, View, SafeAreaView } from "react-native";
-
-Parse.setAsyncStorage(AsyncStorage);
+ Parse.setAsyncStorage(AsyncStorage);
 Parse.initialize(keys.applicationId, keys.javascriptKey, "master");
 Parse.serverURL = keys.serverURL;
 

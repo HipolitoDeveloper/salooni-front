@@ -5,27 +5,59 @@ import { StyleSheet, Dimensions, FlatList } from "react-native";
 
 const screenHeight = Dimensions.get("screen").height;
 
+export const DayWrapper = styled.TouchableOpacity`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: ${props => props.selected? `1px solid ${global.colors.purpleColor}  `: 'none'};
+  padding: 5px;
+  border-radius: 2px;
+`;
+
+export const DayText = styled.Text`
+  font-family: ${global.fonts.mainFont};
+  opacity: ${props => props.state === 'disabled'? '0.3' : '1'};
+  color: ${props => props.state === 'today'? `${global.colors.purpleColor}`: 'black'};
+`;
+
+export const DayEvent = styled.View`
+  border-radius: 5px;
+  height: 5px;
+  width: 80%;
+  background-color: ${global.colors.purpleColor};;
+
+`;
+export const EmptyMessageWrapper = styled.View`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+export const EmptyMessageText = styled.Text`
+  font-family: ${global.fonts.mainFont};
+`
+
+
 export const EventsContainer = styled.View`
   background-color: ${global.colors.lightGreyColor};
   height: 100%;
   width: 100%;
 
 `;
-
-
-export const EventWrapper = styled.View`  
+export const EventWrapper = styled.TouchableOpacity`
   width: 100%;
   height: 100%;
   padding: 15px 20px;`
 ;
 
-export const EventContent = styled.TouchableOpacity`
+export const EventContent = styled.View`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   border-bottom-width: ${StyleSheet.hairlineWidth}px;
   border-bottom-color: ${global.colors.purpleColor};
-  padding: 10px 0;
+  padding: 10px 10px;
   background-color: ${props => props.nextHour ? `${global.colors.purpleColor}` : "transparent"}
 `;
 
@@ -70,8 +102,8 @@ export const TelText = styled.Text`
 export const EmptyList = styled.Text`
   font-family: ${global.fonts.mainFont};
   font-size: 16px;
-  color:${global.colors.purpleColor}
-`
+  color: ${global.colors.purpleColor}
+`;
 
 
 export const ModalContent = styled.View`

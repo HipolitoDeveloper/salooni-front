@@ -1,59 +1,65 @@
-import React, {useEffect, useRef, useState} from 'react';
-import global from '../../../common/global';
-import * as S from './styled';
-import ListContent from './ListContent';
-import ListHeader from './ListHeader';
-import Button from '../small/Button';
-import ListMenu from './ListMenu';
+import React, { useEffect, useRef, useState } from "react";
+import global from "../../../common/global";
+import * as S from "./styled";
+import ListContent from "./ListContent";
+import ListHeader from "./ListHeader";
+import Button from "../small/Button";
+import ListMenu from "./ListMenu";
 import {
   FlatList,
   Animated,
   Platform,
   RefreshControl,
   Dimensions,
-} from 'react-native';
-import FloatButton from '../small/FloatButton';
-import Times from '../../../assets/svg/timesSVG.svg';
-import Loading from '../small/Loading';
-import {getCloser} from '../../../common/headerFunctions';
-import {useNavigation} from '@react-navigation/native';
-import AlertModal from '../small/AlertModal';
-const {diffClamp} = Animated;
+} from "react-native";
+import FloatButton from "../small/FloatButton";
+import Times from "../../../assets/svg/timesSVG.svg";
+import Loading from "../small/Loading";
+import { getCloser } from "../../../common/headerFunctions";
+import { useNavigation } from "@react-navigation/native";
+import AlertModal from "../small/AlertModal";
+import Icon from "react-native-vector-icons/FontAwesome5";
+
+const { diffClamp } = Animated;
 
 const List = ({
-  backButtonHeader,
-  showBackButton,
-  showCalendarButton,
-  showHeader,
-  color,
-  headerText,
-  menuItems,
-  objectMenuItems,
-  checkItems,
-  confirmItems,
-  itemType,
-  itemList,
-  deleteUniqueItem,
-  deleteItemList,
-  isLoading,
-  onAddNavigateTo,
-  onEditNavigateTo,
-  deleteProcedure,
-  handleAgenda,
-  navigateToCalendar,
-  isOwner,
-  searchPlaceHolder,
-  showProfileIcon,
-  onRefresh,
-  refreshing,
-  showAddButton,
-}) => {
-  const screenHeight = Dimensions.get('screen').height;
-  const screenWidth = Dimensions.get('screen').width;
+                backButtonHeader,
+                showBackButton,
+                showCalendarButton,
+                showHeader,
+                color,
+                headerText,
+                subHeaderText,
+                menuItems,
+                objectMenuItems,
+                checkItems,
+                confirmItems,
+                itemType,
+                itemList,
+                deleteUniqueItem,
+                deleteItemList,
+                isLoading,
+                onAddNavigateTo,
+                onEditNavigateTo,
+                deleteProcedure,
+                handleAgenda,
+                navigateToCalendar,
+                isOwner,
+                searchPlaceHolder,
+                showProfileIcon,
+                onRefresh,
+                refreshing,
+                showAddButton,
+                goToSchedules,
+
+                showMenu,
+              }) => {
+  const screenHeight = Dimensions.get("screen").height;
+  const screenWidth = Dimensions.get("screen").width;
   const isSmallerScreen = screenHeight < 650;
 
   // const headerHeight = Platform.OS === 'ios' ? 90 * 2 : 70 * 2;
-  const headerHeight = Platform.OS === 'ios' ? 90 * 2 : (screenHeight / 10) * 2;
+  const headerHeight = Platform.OS === "ios" ? 90 * 2 : (screenHeight / 10) * 2;
 
   const scrollY = useRef(new Animated.Value(0));
   const scrollYClamped = diffClamp(scrollY.current, 0, headerHeight);
@@ -74,22 +80,24 @@ const List = ({
   const [checkedItems, setCheckedItems] = useState([]);
   const [scrolling, setScrolling] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState({
-    text: '',
+    text: "",
     isVisible: false,
-    onOk: () => {},
-    title: '',
-    onClose: () => {},
-    cancelTitle: '',
-    okTitle: '',
+    onOk: () => {
+    },
+    title: "",
+    onClose: () => {
+    },
+    cancelTitle: "",
+    okTitle: "",
   });
 
-  const isDeleting = items.some(item => item.selected);
-  const selectedItems = items.filter(item => item.selected);
+  const isDeleting = items?.some(item => item.selected);
+  const selectedItems = items?.filter(item => item.selected);
   const showFooter = isDeleting || isConfirming;
 
   const navigate = useNavigation();
 
-  navigate.addListener('focus', () => {
+  navigate.addListener("focus", () => {
     setItems(itemList);
   });
 
@@ -97,7 +105,7 @@ const List = ({
     [
       {
         nativeEvent: {
-          contentOffset: {y: scrollY.current},
+          contentOffset: { y: scrollY.current },
         },
       },
     ],
@@ -106,12 +114,12 @@ const List = ({
     },
   );
 
-  translateY.addListener(({value}) => {
+  translateY.addListener(({ value }) => {
     translateYNumber.current = value;
     setScrolling(translateYNumber.current === 0);
   });
 
-  const handleSnap = ({nativeEvent}) => {
+  const handleSnap = ({ nativeEvent }) => {
     const offsetY = nativeEvent.contentOffset.y;
 
     if (
@@ -137,7 +145,7 @@ const List = ({
   };
 
   const selectItem = (itemId, changingState) => {
-    if (isDeleting || changingState) {
+    if ((isDeleting || changingState) && deleteItemList) {
       setItems(
         items.map(item => {
           if (item.id === itemId) {
@@ -156,16 +164,28 @@ const List = ({
   };
 
   const searchItems = text => {
-    if (itemType === 'schedule') {
-      const regex = new RegExp(`${text.trim()}`, 'i');
-      setItems(
-        itemList.filter(
-          i => i.client.name.search(regex) >= 0 || i.selected || i.checked,
-        ),
-      );
-    } else {
-      const regex = new RegExp(`${text.trim()}`, 'i');
-      setItems(itemList.filter(i => i.name.search(regex) >= 0 || i.selected));
+    let regex = ""
+    switch(itemType) {
+      case "schedule":
+        regex = new RegExp(`${text.trim()}`, "i");
+        setItems(
+          itemList.filter(
+            i => i.client.name.search(regex) >= 0 || i.selected || i.checked,
+          ),
+        );
+        break;
+      case "clientSchedule":
+        regex = new RegExp(`${text.trim()}`, "i");
+        setItems(
+          itemList.filter(
+            i => i.procedure.name.search(regex) >= 0,
+          ),
+        );
+        break;
+      default:
+        regex = new RegExp(`${text.trim()}`, "i");
+        setItems(itemList.filter(i => i.name.search(regex) >= 0 || i.selected));
+        break;
     }
   };
 
@@ -228,23 +248,23 @@ const List = ({
   const handleItemProcedure = (itemProcedure, itemId) => {
     let ableToDelete = true;
     const item = items.find(item => item.id === itemId);
-    const {procedures} = item;
+    const { procedures } = item;
 
-    if (itemType === 'schedule') {
+    if (itemType === "schedule") {
       if (procedures.length === 1) {
         ableToDelete = false;
         setShowAlertModal({
-          text: 'Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!',
+          text: "Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!",
           isVisible: true,
           onOk: () => {
             deleteItemProcedure(itemProcedure, itemId, true, item);
-            setShowAlertModal({isVisible: false});
+            setShowAlertModal({ isVisible: false });
             handleMenu(item);
           },
-          title: 'Atenção',
-          onClose: () => setShowAlertModal({isVisible: false}),
-          cancelTitle: 'Cancelar',
-          okTitle: 'Apagar',
+          title: "Atenção",
+          onClose: () => setShowAlertModal({ isVisible: false }),
+          cancelTitle: "Cancelar",
+          okTitle: "Apagar",
         });
       }
     }
@@ -286,43 +306,46 @@ const List = ({
 
   const doRefresh = async () => {
     await onRefresh().then(items => {
-      console.log('items', items);
+      console.log("items", items);
       setItems(items);
     });
   };
 
   return (
     <S.Container>
-      <ListMenu
-        isOwner={isOwner}
-        navigateToCalendar={navigateToCalendar}
-        handleMenu={handleMenu}
-        showCalendarButton={showCalendarButton}
-        isConfirming={isConfirming}
-        checkItem={checkItem}
-        onConfirm={onConfirm}
-        itemType={itemType}
-        objectMenuItems={objectMenuItems}
-        menuState={menuState}
-        color={color}
-        menuItems={menuItems}
-        deleteItem={deleteItem}
-        closeMenu={closeMenu}
-        onEditNavigateTo={onEditNavigateTo}
-        deleteProcedure={deleteItemProcedure}
-      />
+      {showMenu && (
+        <ListMenu
+          isOwner={isOwner}
+          navigateToCalendar={navigateToCalendar}
+          handleMenu={handleMenu}
+          showCalendarButton={showCalendarButton}
+          isConfirming={isConfirming}
+          checkItem={checkItem}
+          onConfirm={onConfirm}
+          itemType={itemType}
+          objectMenuItems={objectMenuItems}
+          menuState={menuState}
+          color={color}
+          menuItems={menuItems}
+          deleteItem={deleteItem}
+          closeMenu={closeMenu}
+          onEditNavigateTo={onEditNavigateTo}
+          deleteProcedure={deleteItemProcedure}
+          goToSchedules={goToSchedules}
+        />
+      )}
       <Loading isLoading={isLoading} color={color} />
       {showHeader && (
         <Animated.View
           style={[
             {
-              position: 'absolute',
+              position: "absolute",
               left: 0,
               right: 0,
-              width: '100%',
+              width: "100%",
               zIndex: 1,
             },
-            {transform: [{translateY}]},
+            { transform: [{ translateY }] },
           ]}>
           <ListHeader
             onBack={checkItem}
@@ -332,8 +355,9 @@ const List = ({
             items={items}
             headerColor={color}
             headerTitle={headerText}
+            headerSubTitle={subHeaderText}
             searchItems={searchItems}
-            selectedItemsLength={selectedItems.length}
+            selectedItemsLength={selectedItems?.length}
             cancelDelete={unselectItems}
             handleAgenda={handleAgenda}
             showProfileIcon={showProfileIcon}
@@ -347,11 +371,12 @@ const List = ({
         <Animated.FlatList
           ref={ref}
           scrollEventThrottle={16}
-          contentContainerStyle={{paddingTop: showHeader ? headerHeight : 0}}
+          contentContainerStyle={{ paddingTop: showHeader ? headerHeight : 0 }}
           onMomentumScrollEnd={handleSnap}
           onScroll={handleScroll}
           keyExtractor={item => item.id}
           data={items}
+
           refreshControl={
             <RefreshControl
               onRefresh={doRefresh}
@@ -359,9 +384,8 @@ const List = ({
               progressViewOffset={180}
             />
           }
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <ListContent
-              {...item}
               item={item}
               isDeleting={isDeleting}
               itemType={itemType}
@@ -370,47 +394,62 @@ const List = ({
               selectItem={selectItem}
               checkItem={checkItem}
               onPressItem={() => {
-                handleMenu(item);
+                 handleMenu(item)
               }}
+              showMenu={showMenu}
             />
           )}
+          ListEmptyComponent={
+            <S.EmptyMessageWrapper>
+              <S.EmptyMessageText>
+                Não existem informações disponíveis.
+                {"\n \n"}
+                Para adicionar, clique no <Icon
+                name={"plus-circle"}
+                size={18}
+                color={`${global.colors.purpleColor}`}
+              /> abaixo!
+              </S.EmptyMessageText>
+            </S.EmptyMessageWrapper>
+          }
         />
       </S.Body>
       {!showFooter && showAddButton && (
         <FloatButton
-          bottom={'40px'}
-          right={'30px'}
+          bottom={"40px"}
+          right={"30px"}
           onPress={onAddNavigateTo}
           buttonColor={color}
-          icon={'plus'}
+          icon={"plus"}
         />
       )}
 
-      {showFooter && (
+      {showFooter && deleteItemList && (
         <S.Footer color={color}>
           <S.FooterButtons>
             {isDeleting && (
               <Button
                 disabled={false}
                 onPress={() => deleteItems(selectedItems)}
-                text={'Apagar'}
-                width={'120px'}
-                height={'35px'}
-                fontSize={'17px'}
+                text={"Apagar"}
+                width={"120px"}
+                height={"35px"}
+                fontSize={"17px"}
                 color={color}
                 textColor={global.colors.backgroundColor}
                 backgroundColor={color}
               />
             )}
+
             {isConfirming && (
               <>
                 <Button
                   disabled={false}
                   onPress={onConfirm}
-                  text={'Confirmar'}
-                  width={'120px'}
-                  height={'35px'}
-                  fontSize={'17px'}
+                  text={"Confirmar"}
+                  width={"120px"}
+                  height={"35px"}
+                  fontSize={"17px"}
                   color={color}
                   textColor={color}
                   backgroundColor={global.colors.backgroundColor}
@@ -420,8 +459,8 @@ const List = ({
                     checkItem(-1);
                   }}>
                   <Times
-                    fill={'#fff'}
-                    borderFill={'#fff'}
+                    fill={"#fff"}
+                    borderFill={"#fff"}
                     width={15}
                     height={15}
                   />
@@ -433,7 +472,7 @@ const List = ({
       )}
       <AlertModal
         text={
-          'Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!'
+          "Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!"
         }
         isVisible={showAlertModal.isVisible}
         onOk={showAlertModal.onOk}

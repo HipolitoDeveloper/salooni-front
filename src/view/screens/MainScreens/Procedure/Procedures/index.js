@@ -66,6 +66,7 @@ const Procedures = () => {
   return (
     <S.Container>
       <List
+        showMenu={true}
         showAddButton={true}
         onRefresh={onRefresh}
         refreshing={isLoading}

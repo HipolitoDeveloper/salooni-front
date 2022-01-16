@@ -60,11 +60,38 @@ export const ConfimationMessageText = styled.Text`
   color: ${global.colors.lightGreyColor};
 `;
 
-export const ItemInformation = styled.View`
+export const ScheduleButtonWrapper = styled.TouchableOpacity`
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;  
+`
+
+export const ScheduleContent = styled.View`
+  width: 50%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 5px;
+  margin-right: -10px;
+  border: 1px solid ${global.colors.lightGreyColor};
+`
+
+export const ScheduleText = styled.Text`
+  font-family: ${global.fonts.mainFont};
+  color: ${global.colors.lightGreyColor};
+  margin: 0 20px 0 10px;
+`
+
+export const ItemInformationWrapper = styled.View`
+  flex: 5;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 40%;
+  justify-content: flex-start;
 `;
 export const ItemProperty = styled.Text`
   font-family: ${global.fonts.mainFont};
@@ -101,10 +128,12 @@ export const ProcedureText = styled.Text`
 `;
 
 export const FooterButtons = styled.View`
+  flex: 2;
   display: flex;
   flex-direction: ${props => (props.isSmallerScreen ? 'row' : 'column')};
   align-items: flex-end;
   justify-content: flex-end;
   height: 20%;
   margin-top: 20px;
+  
 `;

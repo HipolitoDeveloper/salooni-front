@@ -1,21 +1,20 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {TabArea, TabItem} from './style';
-import global from '../../../common/global';
-import Partner from '../../../assets/svg/partnerSVG.svg';
+import React, { useContext, useState } from 'react';
+import { View } from 'react-native';
 import Client from '../../../assets/svg/clientSVG.svg';
-
 import Clock from '../../../assets/svg/clockSVG.svg';
-import {ScheduleContext} from '../../../contexts/Schedule/ScheduleContext';
-import {UserContext} from '../../../contexts/User/UserContext';
+import Partner from '../../../assets/svg/partnerSVG.svg';
+import global from '../../../common/global';
+import { ScheduleContext } from '../../../contexts/Schedule/ScheduleContext';
+import { UserContext } from '../../../contexts/User/UserContext';
 import Loading from '../../../view/components/small/Loading';
-import {Button, TouchableOpacity, View, Text} from 'react-native';
-import Notification from '../../../view/components/small/Notification';
+import { TabArea, TabItem } from './style';
 
-export default ({state, navigation}) => {
-  const {currentUser} = useContext(UserContext);
+
+export default ({ state, navigation }) => {
+  const { currentUser } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
 
-  const {loadAllSchedules, showingCurrentUserSchedule} =
+  const { loadAllSchedules, showingCurrentUserSchedule } =
     useContext(ScheduleContext);
 
   const tabBarColor = () => {
