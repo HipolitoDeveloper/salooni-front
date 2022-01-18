@@ -70,7 +70,6 @@ const SignupTabBar = ({children, state, navigation}) => {
           data => {
             setTutorial({windowVideo: data[0], signupVideo: data[1]});
             setIsLoadingSignup(false);
-            console.log('data', data);
           },
           error => {
             console.error(error);
@@ -194,7 +193,6 @@ const SignupTabBar = ({children, state, navigation}) => {
         }
       });
 
-      console.log('verifications', verifications);
     }
   };
   const goWithoutProceduresOrPartners = async () => {

@@ -93,14 +93,12 @@ const ScheduleProvider = ({children}) => {
     dispatch({type: 'ADD_SCHEDULE', payload});
   };
 
-  const saveSchedule = payload => {
+  const saveSchedule = (payload) => {
     return new Promise((resolve, reject) => {
       try {
-        state.registeredSchedules.forEach(schedule => {
-          insertScheduleCRUD(schedule, false).then(newSchedule => {
+          insertScheduleCRUD(payload, false).then(newSchedule => {
             resolve(dispatch({type: 'SAVE_SCHEDULE', newSchedule}));
           });
-        });
       } catch (e) {
         reject(`Deu ruim ao salvar agendamentos ${e}`);
       }

@@ -107,50 +107,53 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
     setShowAlertModal({isShowing: isShowing, text: text, method: method});
   };
 
-  const chooseAddPartnerMethod = async () => {
-    const {isInView, indexInView} = {...partner};
+  // const chooseAddPartnerMethod = async () => {
+  //   const {isInView, indexInView} = {...partner};
+  //
+  //   if (verifyInformation(true) && isInView) {
+  //     partner.isInView = false;
+  //     editPartner({partner: partner, index: indexInView});
+  //     setErrorMessage('');
+  //     clearPartner();
+  //   }
+  //
+  //   if (verifyInformation(true) && !isInView) {
+  //     if (!isSigningUp) partner.salonId = currentUser.idSalon;
+  //     addPartner(partner);
+  //     setErrorMessage('');
+  //     clearPartner();
+  //   }
+  // };
 
-    if (verifyInformation(true) && isInView) {
-      partner.isInView = false;
-      editPartner({partner: partner, index: indexInView});
-      setErrorMessage('');
-      clearPartner();
-    }
+  // const handlePartner = (partner, index) => {
+  //   updatePartnerInView(index);
+  //   partner.isInView = !partner.isInView;
+  //   partner.indexInView = index;
+  //
+  //   setPartner(partner);
+  //
+  //   if (!verifyIfIsPreRegisteredEditing()) {
+  //     clearPartner();
+  //   }
+  // };
 
-    if (verifyInformation(true) && !isInView) {
-      if (!isSigningUp) partner.salonId = currentUser.idSalon;
-      addPartner(partner);
-      setErrorMessage('');
-      clearPartner();
-    }
-  };
-
-  const handlePartner = (partner, index) => {
-    updatePartnerInView(index);
-    partner.isInView = !partner.isInView;
-    partner.indexInView = index;
-
-    setPartner(partner);
-
-    if (!verifyIfIsPreRegisteredEditing()) {
-      clearPartner();
-    }
-  };
-
-  const verifyIfIsPreRegisteredEditing = () => {
-    return registeredPartners.some(partner => partner.isInView === true);
-  };
+  // const verifyIfIsPreRegisteredEditing = () => {
+  //   return registeredPartners.some(partner => partner.isInView === true);
+  // };
 
   const savePartners = async () => {
-    let isSaving = false;
-    setIsLoading(true);
-
-    if (verifyInformationToGo()) {
-      for (const partner of registeredPartners) {
+    if (verifyInformation(true)) {
+      setIsLoading(true);
+      // for (const partner of registeredPartners) {
+      if (!isSigningUp) partner.salonId = currentUser.idSalon;
+      partner.employeeType =  'PRC'
         await savePartner(partner).then(
           () => {
             setErrorMessage('');
-            isSaving = true;
+            setIsLoading(false);
+            clearPartner();
+            cleanPartnersInformation();
+            handleModal(true, "Gostaria de adicionar mais algum parceiro?")
           },
           error => {
             setIsLoading(false);
@@ -161,17 +164,9 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
             }
           },
         );
-      }
+      // }
 
-      if (isSaving) {
-        setTimeout(() => {
-          setIsLoading(false);
-          navigate.push('TabStack', {screen: 'Partners'});
-          clearPartner();
 
-          cleanPartnersInformation();
-        }, 3000);
-      }
     }
   };
 
@@ -197,51 +192,51 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
     );
   };
 
-  const cancelEditing = () => {
-    updatePartnerInView(-1);
-    clearPartner();
-  };
+  // const cancelEditing = () => {
+  //   updatePartnerInView(-1);
+  //   clearPartner();
+  // };
+  //
+  // const deletePreRegisteredItem = partner => {
+  //   deletePartnerInView(partner);
+  //   clearPartner();
+  // };
 
-  const deletePreRegisteredItem = partner => {
-    deletePartnerInView(partner);
-    clearPartner();
-  };
+  // const deletePartners = () => {
+  //   setIsLoading(true);
+  //   deletePartner(partner).then(
+  //     () => {
+  //       setIsLoading(false);
+  //       navigate.navigate('Partners');
+  //       setErrorMessage('');
+  //       clearPartner();
+  //     },
+  //     error => {
+  //       setIsLoading(false);
+  //       console.log(error);
+  //     },
+  //   );
+  // };
 
-  const deletePartners = () => {
-    setIsLoading(true);
-    deletePartner(partner).then(
-      () => {
-        setIsLoading(false);
-        navigate.navigate('Partners');
-        setErrorMessage('');
-        clearPartner();
-      },
-      error => {
-        setIsLoading(false);
-        console.log(error);
-      },
-    );
-  };
-
-  const verifyInformationToGo = () => {
-    let ableToGo = true;
-    if (Object.keys(partner).length >= 3) {
-      addPartner(partner);
-      setPartner({procedures: []});
-      setErrorMessage('');
-      return ableToGo;
-    } else if (registeredPartners.length === 0) {
-      ableToGo = false;
-
-      setErrorMessage(
-        isSigningUp
-          ? errorMessages.noPartnerSignupMessage
-          : errorMessages.noPartnerMessage,
-      );
-      setIsLoading(false);
-    }
-    return ableToGo;
-  };
+  // const verifyInformationToGo = () => {
+  //   let ableToGo = true;
+  //   if (Object.keys(partner).length >= 3) {
+  //     addPartner(partner);
+  //     setPartner({procedures: []});
+  //     setErrorMessage('');
+  //     return ableToGo;
+  //   } else if (registeredPartners.length === 0) {
+  //     ableToGo = false;
+  //
+  //     setErrorMessage(
+  //       isSigningUp
+  //         ? errorMessages.noPartnerSignupMessage
+  //         : errorMessages.noPartnerMessage,
+  //     );
+  //     setIsLoading(false);
+  //   }
+  //   return ableToGo;
+  // };
 
   const verifyInformation = showErrorMessages => {
     let ableToGo = true;
@@ -261,7 +256,7 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
       partner.email === ''
     ) {
       ableToGo = false;
-      errorMessage = errorMessages.partnerMessage;
+      errorMessage = errorMessages.formErrorMessage;
       if (showErrorMessages) setIsLoading(false);
     } else {
       if (!TELVerifier(partner.tel).state) {
@@ -286,32 +281,33 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
       errorMessage = errorMessages.invalidCNPJ;
       if (showErrorMessages) setIsLoading(false);
     }
+    //
+    // if (
+    //   registeredPartners.some(
+    //     registeredPartner =>
+    //       registeredPartner.name !== partner.name &&
+    //       registeredPartner.email === partner.email,
+    //   )
+    // ) {
+    //   ableToGo = false;
+    //   errorMessage = errorMessages.duplicateInformation;
+    //   setErrorMessage(errorMessages.duplicateInformation);
+    //   if (showErrorMessages) setIsLoading(false);
+    // }
 
-    if (
-      registeredPartners.some(
-        registeredPartner =>
-          registeredPartner.name !== partner.name &&
-          registeredPartner.email === partner.email,
-      )
-    ) {
-      ableToGo = false;
-      errorMessage = errorMessages.duplicateInformation;
-      setErrorMessage(errorMessages.duplicateInformation);
-      if (showErrorMessages) setIsLoading(false);
-    }
-
-    if (
-      registeredPartners.some(
-        registeredPartner => registeredPartner.errorProperties.length > 0,
-      )
-    ) {
-      ableToGo = false;
-      errorMessage = errorMessages.duplicateInformation;
-      setErrorMessage(errorMessages.duplicateInformation);
-      if (showErrorMessages) setIsLoading(false);
-    }
+    // if (
+    //   registeredPartners.some(
+    //     registeredPartner => registeredPartner.errorProperties.length > 0,
+    //   )
+    // ) {
+    //   ableToGo = false;
+    //   errorMessage = errorMessages.duplicateInformation;
+    //   setErrorMessage(errorMessages.duplicateInformation);
+    //   if (showErrorMessages) setIsLoading(false);
+    // }
     if (showErrorMessages) setErrorMessage(errorMessage);
     if (errorMessage === '') setErrorMessage('');
+    console.log("abletTogo", ableToGo)
     return ableToGo;
   };
 
@@ -438,19 +434,15 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
         text={showAlertModal.text}
         isVisible={showAlertModal.isShowing}
         onClose={() => {
-          handleModal(false, '', false);
+          goBack();
         }}
         onOk={() => {
-          deletePartners(partner);
+          handleModal(false, '', false);
+          // deletePartners(partner);
         }}
         title={'Atenção.'}
-      />
-      <AlertModal
-        text={showAlertModal.text}
-        isVisible={showAlertModal.isShowing}
-        onClose={() => handleModal(false, '', null)}
-        onOk={showAlertModal.method}
-        title={'Atenção'}
+        okTitle={"SIM"}
+        cancelTitle={"VER PARCEIROS"}
       />
     </>
   );
@@ -465,15 +457,17 @@ const PartnerForm = ({route, goBack, isSigningUp, color}) => {
       }}
       color={color}
       preRegisteredItems={registeredPartners}
-      handleSelect={handlePartner}
-      deletePreRegisteredItem={deletePreRegisteredItem}
+      // handleSelect={handlePartner}
+      // deletePreRegisteredItem={deletePreRegisteredItem}
       onConfirm={isEditing ? updatePartners : savePartners}
       isEditing={isEditing}
-      isPreRegisteredEditing={verifyIfIsPreRegisteredEditing()}
-      cancelEditing={cancelEditing}
-      onAdd={chooseAddPartnerMethod}
+      // isPreRegisteredEditing={verifyIfIsPreRegisteredEditing()}
+      // cancelEditing={cancelEditing}
+      // onAdd={chooseAddPartnerMethod}
       registeredItemRightInformation={'procedures'}
-      headerTitle={'Parceiros'}>
+      headerTitle={'Parceiros'}
+      isMultiInsert={false}
+    >
       {renderChildren()}
     </RegisterComponent>
   );

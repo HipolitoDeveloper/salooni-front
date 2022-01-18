@@ -28,7 +28,6 @@ export const buildVideoList = videos => {
     }
 
     if (categories.length === 0) {
-      console.log('teste');
       categories.push({
         id: video.category_id.objectId,
         category: video.category_id.name,
@@ -47,7 +46,6 @@ export const buildVideoList = videos => {
     }
   });
 
-  console.log(categories);
 
   categories.forEach(({category, items, idRef}) => {
     videos.forEach(video => {

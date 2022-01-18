@@ -49,7 +49,7 @@ export const getAllSchedulesBySalon = (
 
 
 export const insertScheduleCRUD = (scheduleObj, returnParseObject) => {
-  return new Promise(async (resolve, reFject) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const {
         client,
@@ -59,7 +59,6 @@ export const insertScheduleCRUD = (scheduleObj, returnParseObject) => {
         analyzedSchedule,
         salonId,
       } = scheduleObj;
-
       const schedule = new ScheduleObject();
       schedule.set('employee_id', new EmployeeObject({objectId: employee.id}));
       schedule.set('client_id', new ClientObject({objectId: client.id}));

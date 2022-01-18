@@ -43,7 +43,6 @@ const TopTabBar = ({
 
   const handleState = currentPage => {
     let position = 0;
-    console.log('screenHeight', screenHeight);
     if (pages.length === 3) {
       switch (currentPage) {
         case 1:

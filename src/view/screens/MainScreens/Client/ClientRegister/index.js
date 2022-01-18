@@ -64,7 +64,7 @@ const ClientRegister = ({ route }) => {
   }, [navigate]);
 
   useEffect(() => {
-    registeredClients.forEach(client => (client.isInView = false));
+    // registeredClients.forEach(client => (client.isInView = false));
   }, []);
 
   const cleanClient = () => {
@@ -92,7 +92,6 @@ const ClientRegister = ({ route }) => {
   };
 
   const onChangeDate = (event, selectedDate) => {
-    console.log("event.type", event.type)
     if (event.type === "neutralButtonPressed") {
       setIsDateSelected(false);
       setShowDate(false);
@@ -105,68 +104,63 @@ const ClientRegister = ({ route }) => {
     }
   };
 
-  const chooseAddClientMethod = async () => {
-    const { isInView, indexInView } = { ...client };
+  // const chooseAddClientMethod = async () => {
+  //   const { isInView, indexInView } = { ...client };
+  //
+  //   if (verifyInformation(true) && isInView) {
+  //     client.isInView = false;
+  //     editClient({ client: client, index: indexInView });
+  //     setErrorMessage("");
+  //     cleanClient();
+  //   }
+  //
+  //   if (verifyInformation(true) && !isInView) {
+  //     client.salonId = currentUser.idSalon;
+  //     client.bornDate = isDateSelected ? client.bornDate : null;
+  //     addClient(client);
+  //     setErrorMessage("");
+  //     cleanClient();
+  //   }
+  // };
 
-    if (verifyInformation(true) && isInView) {
-      client.isInView = false;
-      editClient({ client: client, index: indexInView });
-      setErrorMessage("");
-      cleanClient();
-    }
+  // const handleClient = (client, index) => {
+  //   updateClientInView(index);
+  //   client.isInView = !client.isInView;
+  //   client.indexInView = index;
+  //
+  //   setClient(client);
+  //
+  //   if (!verifyIfIsPreRegisteredEditing()) {
+  //     cleanClient();
+  //   }
+  // };
 
-    if (verifyInformation(true) && !isInView) {
-      client.salonId = currentUser.idSalon;
-      client.bornDate = isDateSelected ? client.bornDate : null;
-      addClient(client);
-      setErrorMessage("");
-      cleanClient();
-    }
-  };
-
-  const handleClient = (client, index) => {
-    updateClientInView(index);
-    client.isInView = !client.isInView;
-    client.indexInView = index;
-
-    setClient(client);
-
-    if (!verifyIfIsPreRegisteredEditing()) {
-      cleanClient();
-    }
-  };
-
-  const verifyIfIsPreRegisteredEditing = () => {
-    return registeredClients.some(client => client.isInView === true);
-  };
+  // const verifyIfIsPreRegisteredEditing = () => {
+  //   return registeredClients.some(client => client.isInView === true);
+  // };
 
   const saveClients = async () => {
-    let isSaving = false;
-    setIsLoading(true);
-    if (verifyInformationToGo()) {
-      for (const client of registeredClients) {
-        await saveClient(client).then(
-          () => {
-            setErrorMessage("");
-            isSaving = true;
-          },
-          error => {
-            setIsLoading(false);
-            // if (error === 137)
-            //   handleClientRegisterError({ item: client, property: "cpf" });
-            setErrorMessage(errorMessages.duplicateEmailPreRegisteredItems);
-          },
-        );
-      }
-
-      if (isSaving) {
-        setTimeout(() => {
+    if (verifyInformation(true)) {
+      client.salonId = currentUser.idSalon;
+      client.bornDate = isDateSelected ? client.bornDate : null;
+      setIsLoading(true);
+      await saveClient(client).then(
+        () => {
+          setErrorMessage("");
           setIsLoading(false);
-          navigate.push("TabStack", { screen: "Clients" });
           cleanClient();
           cleanRegisteredClients();
-        }, 3000);
-      }
+          handleModal(true, "Gostaria de adicionar mais algum cliente?");
+        },
+        error => {
+          setIsLoading(false);
+          // if (error === 137)
+          //   handleClientRegisterError({ item: client, property: "cpf" });
+          setErrorMessage(errorMessages.duplicateEmailPreRegisteredItems);
+        },
+      );
+
+
     }
   };
 
@@ -190,48 +184,48 @@ const ClientRegister = ({ route }) => {
     );
   };
 
-  const deletePreRegisteredItem = client => {
-    deleteClientInView(client);
-    cleanClient();
-  };
+  // const deletePreRegisteredItem = client => {
+  //   deleteClientInView(client);
+  //   cleanClient();
+  // };
 
-  const cancelEditing = () => {
-    updateClientInView(-1);
-    cleanClient();
-  };
-
-  const deleteClients = () => {
-    setIsLoading(true);
-    deleteClient(client).then(
-      () => {
-        setIsLoading(false);
-        navigate.navigate("Clients");
-        setErrorMessage("");
-        cleanClient();
-      },
-      error => {
-        setIsLoading(false);
-        console.log(error);
-      },
-    );
-  };
-
-  const verifyInformationToGo = () => {
-    let ableToGo = true;
-    // if (Object.keys(client).length < 4) {
-    // addClient(client);
-    // return ableToGo;
-    // ableToGo = false;
-    // setErrorMessage(errorMessages.noClientMessage);
-    // setIsLoading(false);
-    // } else
-    if (registeredClients.length === 0) {
-      ableToGo = false;
-      setErrorMessage(errorMessages.noClientMessage);
-      setIsLoading(false);
-    }
-    return ableToGo;
-  };
+  // const cancelEditing = () => {
+  //   updateClientInView(-1);
+  //   cleanClient();
+  // };
+  //
+  // const deleteClients = () => {
+  //   setIsLoading(true);
+  //   deleteClient(client).then(
+  //     () => {
+  //       setIsLoading(false);
+  //       navigate.navigate("Clients");
+  //       setErrorMessage("");
+  //       cleanClient();
+  //     },
+  //     error => {
+  //       setIsLoading(false);
+  //       console.log(error);
+  //     },
+  //   );
+  // };
+  //
+  // const verifyInformationToGo = () => {
+  //   let ableToGo = true;
+  //   // if (Object.keys(client).length < 4) {
+  //   // addClient(client);
+  //   // return ableToGo;
+  //   // ableToGo = false;
+  //   // setErrorMessage(errorMessages.noClientMessage);
+  //   // setIsLoading(false);
+  //   // } else
+  //   if (registeredClients.length === 0) {
+  //     ableToGo = false;
+  //     setErrorMessage(errorMessages.noClientMessage);
+  //     setIsLoading(false);
+  //   }
+  //   return ableToGo;
+  // };
 
   const verifyInformation = showErrorMessages => {
     let ableToGo = true;
@@ -246,7 +240,7 @@ const ClientRegister = ({ route }) => {
 
     ) {
       ableToGo = false;
-      errorMessage = errorMessages.clientMessage;
+      errorMessage = errorMessages.formErrorMessage;
       if (showErrorMessages) setIsLoading(false);
     } else {
       if (!TELVerifier(client.tel).state) {
@@ -275,21 +269,23 @@ const ClientRegister = ({ route }) => {
       errorMessage = errorMessages.invalidCPF;
       if (showErrorMessages) setIsLoading(false);
     }
-
-    if (
-      registeredClients.some(
-        registeredClient =>
-          registeredClient.email === client.email && registeredClient?.email,
-      )
-    ) {
-      ableToGo = false;
-      errorMessage = errorMessages.duplicateClientInformation;
-      setErrorMessage(errorMessages.duplicateClientInformation);
-      if (showErrorMessages) setIsLoading(false);
-    }
+    //
+    // if (
+    //   registeredClients.some(
+    //     registeredClient =>
+    //       registeredClient.email === client.email && registeredClient?.email,
+    //   )
+    // ) {
+    //   ableToGo = false;
+    //   errorMessage = errorMessages.duplicateClientInformation;
+    //   setErrorMessage(errorMessages.duplicateClientInformation);
+    //   if (showErrorMessages) setIsLoading(false);
+    // }
 
     if (showErrorMessages) setErrorMessage(errorMessage);
     if (errorMessage === "") setErrorMessage("");
+
+    console.log("ableToGo", ableToGo);
     return ableToGo;
   };
 
@@ -301,16 +297,19 @@ const ClientRegister = ({ route }) => {
       }}
       color={`${global.colors.blueColor}`}
       preRegisteredItems={registeredClients}
-      handleSelect={handleClient}
-      deletePreRegisteredItem={deletePreRegisteredItem}
+      // handleSelect={handleClient}
+      // deletePreRegisteredItem={deletePreRegisteredItem}
       onConfirm={isEditing ? updateClients : saveClients}
-      isPreRegisteredEditing={verifyIfIsPreRegisteredEditing()}
-      cancelEditing={cancelEditing}
+      // isPreRegisteredEditing={verifyIfIsPreRegisteredEditing()}
+      // cancelEditing={cancelEditing}
       isEditing={isEditing}
-      onAdd={chooseAddClientMethod}
+      // onAdd={chooseAddClientMethod}
       registeredItemRightInformation={"tel"}
       headerTitle={"Clientes"}
-      validForm={() => verifyInformation(false)}>
+      validForm={() => verifyInformation(false)}
+      isMultiInsert={false}
+
+    >
       {errorMessage !== "" && (
         <ErrorMessage
           text={errorMessage}
@@ -458,12 +457,13 @@ const ClientRegister = ({ route }) => {
         text={showAlertModal.text}
         isVisible={showAlertModal.isShowing}
         onClose={() => {
-          handleModal(false, "");
+          navigate.goBack();
         }}
         onOk={() => {
-          deleteClients();
+          handleModal(false, "");
         }}
-        title={"Atenção."}
+        title={"Atenção."}  okTitle={"SIM"}
+        cancelTitle={"VER CLIENTES"}
       />
     </RegisterComponent>
   );

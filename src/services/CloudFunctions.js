@@ -53,7 +53,6 @@ export const verifyInformationBeforeInsertion = params => {
         partners: newPartners,
       };
       let resultObject = await Parse.Cloud.run('verifyInformation', params);
-      console.log(resultObject);
       resolve(resultObject);
     } catch (error) {
       reject(error);

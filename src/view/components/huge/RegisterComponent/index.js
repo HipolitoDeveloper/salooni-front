@@ -28,6 +28,7 @@ const RegisterComponent = ({
   registeredItemLeftInformation,
   headerTitle,
   validForm,
+  isMultiInsert
 }) => {
   const [isRegisteredItemsBoxOpened, setIsRegisteredItemsBoxOpened] =
     useState(false);
@@ -77,7 +78,7 @@ const RegisterComponent = ({
           </S.CancelButton>
         )}
 
-        {!isEditing && (
+        {!isEditing && isMultiInsert && (
           <>
             <FloatButton
               disabled={!validForm()}
@@ -96,7 +97,7 @@ const RegisterComponent = ({
           </>
         )}
       </S.Content>
-      {!isEditing && (
+      {!isEditing && isMultiInsert && (
         <RegisteredItemsModal
           color={color}
           isOpened={isRegisteredItemsBoxOpened}

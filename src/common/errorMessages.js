@@ -1,6 +1,6 @@
 export default {
   signinMessage: 'Usuário ou senha estão errados',
-  partnerMessage: 'Nem todas as informações do parceiro foram preenchidas',
+
   profileMessage: 'Nem todas as informações do perfil foram preenchidas',
   noPartnerSignupMessage:
     'Tem certeza que deseja realizar o cadastro sem parceiros pré-registrado?',
@@ -20,22 +20,24 @@ export default {
   maintenanceMessage: 'A manutenção foi selecionada, preencha as informações.',
   commissionMismatchMessage:
     'Valor da comissão deve ser inferior ao valor do procedimento',
-  clientMessage:
-    'Nem todas as informações relacionadas ao cliente foram preenchidas',
+
   noClientMessage: 'Nenhum cliente foi pré-registrado',
   noScheduleMessage: 'Nenhum agendamento foi pré-registrado',
   passwordsNotMatch: 'Senhas não são idênticas',
   notOwner:
     'Esse e-mail não pertence à um proprietário. Tente o acesso na aba de parceiros',
   deleteMessage: 'Deseja mesmo realizar essa exclusão?',
-  scheduleMessage:
-    'Nem todas as informações relacionadas ao agendamento foram preenchidas',
+  formErrorMessage:
+    'Preencha todas as informações obrigatórias (*)',
+  scheduleDateMessage:
+    'Já existe um agendamento para esse horário!',
   invalidCNPJ: 'CNPJ inválido',
   invalidCPF: 'CPF inválido',
   invalidEmail: 'E-mail inválido',
   invalidTel: 'Telefone inválido',
   partnerSignupMessage: 'Preencha todas as informações!',
   duplicateInformation: 'CNPJ ou E-mail informados já estão sendo utilizados!',
+  duplicateClientInformation: 'CPF ou E-mail informados já estão sendo utilizados!',
   profileErrorMessage:
     'Não foi possível atualizar o perfil, pois as informações já estão sendo utilizadas por outro usuário no sistema!',
   duplicateEmailPreRegisteredItems:

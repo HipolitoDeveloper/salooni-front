@@ -409,7 +409,7 @@ const List = ({
                 Para adicionar, clique no <Icon
                 name={"plus-circle"}
                 size={18}
-                color={`${global.colors.purpleColor}`}
+                color={color}
               /> abaixo!
               </S.EmptyMessageText>
             </S.EmptyMessageWrapper>

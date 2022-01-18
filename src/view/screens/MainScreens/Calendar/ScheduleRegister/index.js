@@ -1,33 +1,33 @@
-import React, {useContext, useState} from 'react';
-import {ActivityIndicator, Dimensions, Platform} from 'react-native';
+import React, { useContext, useState } from "react";
+import { ActivityIndicator, Dimensions, Platform } from "react-native";
 
-import * as S from './styled';
-import BackButton from '../../../../components/small/BackButton';
-import global from '../../../../../common/global';
-import {useNavigation} from '@react-navigation/native';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
-import {ProcedureContext} from '../../../../../contexts/Procedure/ProcedureContext';
-import {xorBy} from 'lodash';
-import SubmitButton from '../../../../components/small/SubmitButton';
-import errorMessages from '../../../../../common/errorMessages';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import {ScheduleContext} from '../../../../../contexts/Schedule/ScheduleContext';
-import AlertModal from '../../../../components/small/AlertModal';
-import ErrorMessage from '../../../../components/small/ErrorMessage';
-import {UserContext} from '../../../../../contexts/User/UserContext';
-import {PartnerContext} from '../../../../../contexts/Partner/PartnerContext';
-import {ClientContext} from '../../../../../contexts/Client/ClientContext';
-import AutoComplete from '../../../../components/small/AutoComplete';
-import MultipleSelect from '../../../../components/small/MultipleSelect';
-import moment from 'moment';
-import RegisterComponent from '../../../../components/huge/RegisterComponent';
-import {buildDateTime} from '../../../../../pipe/dateBuilder';
-import Loading from '../../../../components/small/Loading';
-import {InputTitle} from '../../../../components/small/Input/styled';
-import {IconContainer} from './styled';
-import {Text} from '../../../../components/small/InputModal/styled';
+import * as S from "./styled";
+import BackButton from "../../../../components/small/BackButton";
+import global from "../../../../../common/global";
+import { useNavigation } from "@react-navigation/native";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
+import { ProcedureContext } from "../../../../../contexts/Procedure/ProcedureContext";
+import { xorBy } from "lodash";
+import SubmitButton from "../../../../components/small/SubmitButton";
+import errorMessages from "../../../../../common/errorMessages";
+import Icon from "react-native-vector-icons/FontAwesome5";
+import { ScheduleContext } from "../../../../../contexts/Schedule/ScheduleContext";
+import AlertModal from "../../../../components/small/AlertModal";
+import ErrorMessage from "../../../../components/small/ErrorMessage";
+import { UserContext } from "../../../../../contexts/User/UserContext";
+import { PartnerContext } from "../../../../../contexts/Partner/PartnerContext";
+import { ClientContext } from "../../../../../contexts/Client/ClientContext";
+import AutoComplete from "../../../../components/small/AutoComplete";
+import MultipleSelect from "../../../../components/small/MultipleSelect";
+import moment from "moment";
+import RegisterComponent from "../../../../components/huge/RegisterComponent";
+import { buildDateTime } from "../../../../../pipe/dateBuilder";
+import Loading from "../../../../components/small/Loading";
+import { InputTitle } from "../../../../components/small/Input/styled";
+import { IconContainer } from "./styled";
+import { Text } from "../../../../components/small/InputModal/styled";
 
-const ScheduleRegister = ({route}) => {
+const ScheduleRegister = ({ route }) => {
   const {
     saveSchedule,
     registeredSchedules,
@@ -39,20 +39,21 @@ const ScheduleRegister = ({route}) => {
     deleteSchedule,
     deleteScheduleInView,
     sortScheduleList,
+    schedules,
   } = useContext(ScheduleContext);
-  const screenHeight = Dimensions.get('screen').height;
+  const screenHeight = Dimensions.get("screen").height;
 
-  const {partners} = useContext(PartnerContext);
-  const {clients} = useContext(ClientContext);
-  const {procedures} = useContext(ProcedureContext);
-  const {currentUser, isOwner} = useContext(UserContext);
+  const { partners } = useContext(PartnerContext);
+  const { clients } = useContext(ClientContext);
+  const { procedures } = useContext(ProcedureContext);
+  const { currentUser, isOwner } = useContext(UserContext);
 
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState({
     isShowing: false,
-    text: '',
+    text: "",
   });
 
   const currentEmployee =
@@ -61,13 +62,13 @@ const ScheduleRegister = ({route}) => {
       : {};
 
   const [schedule, setSchedule] = useState({
-    client: '',
+    client: "",
     employee: currentEmployee,
     procedures: [],
     scheduleDate: new Date(route.params?.date),
   });
 
-  const [mode, setMode] = useState('date');
+  const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
 
   const navigate = useNavigation();
@@ -76,11 +77,7 @@ const ScheduleRegister = ({route}) => {
   //   sortSchedules();
   // });
 
-  navigate.addListener('focus', () => {
-    console.log(
-      'partners.find(partner => partner.id === currentUser.idFunc)',
-      partners.find(partner => partner.id === currentUser.idFunc),
-    );
+  navigate.addListener("focus", () => {
     const scheduleInView = route.params?.schedule ? route.params?.schedule : {};
 
     if (Object.keys(scheduleInView).length !== 0) {
@@ -93,10 +90,10 @@ const ScheduleRegister = ({route}) => {
   });
 
   const clearSchedule = () => {
-    const {scheduleDate, employee} = schedule;
+    const { scheduleDate, employee } = schedule;
 
     setSchedule({
-      client: '',
+      client: "",
       employee: employee,
       procedures: [],
       scheduleDate: scheduleDate,
@@ -104,18 +101,18 @@ const ScheduleRegister = ({route}) => {
   };
 
   const handleMultiSelect = items => {
-    let selectedItem = xorBy(schedule.procedures, [items], 'name');
+    let selectedItem = xorBy(schedule.procedures, [items], "name");
 
     setSchedule({
       ...schedule,
-      ['procedures']: selectedItem,
+      ["procedures"]: selectedItem,
     });
   };
 
   const handleChange = (name, value) => {
-    if (name === 'scheduleHour') {
+    if (name === "scheduleHour") {
       value = buildDateTime(schedule.scheduleDate, value);
-      name = 'scheduleDate';
+      name = "scheduleDate";
     }
 
     setSchedule({
@@ -125,44 +122,37 @@ const ScheduleRegister = ({route}) => {
   };
 
   const handleModal = (isShowing, text) => {
-    setShowAlertModal({isShowing: isShowing, text: text});
+    setShowAlertModal({ isShowing: isShowing, text: text });
   };
 
-  const chooseAddScheduleMethod = async () => {
-    const {isInView, indexInView} = schedule;
-    if (verifyInformation(true) && isInView) {
-      schedule.isInView = false;
-      editSchedule({schedule: schedule, index: indexInView});
-      setErrorMessage('');
-      clearSchedule();
-    }
-    if (verifyInformation(true) && !isInView) {
-      schedule.salonId = currentUser.idSalon;
-      addSchedule(schedule);
-      setErrorMessage('');
-      clearSchedule();
-    }
-  };
+  // const chooseAddScheduleMethod = async () => {
+  //   const { isInView, indexInView } = schedule;
+  //   if (verifyInformation(true) && isInView) {
+  //     schedule.isInView = false;
+  //     editSchedule({ schedule: schedule, index: indexInView });
+  //     setErrorMessage("");
+  //     clearSchedule();
+  //   }
+  //   if (verifyInformation(true) && !isInView) {
+  //
+  //     addSchedule(schedule);
+  //     setErrorMessage("");
+  //     clearSchedule();
+  //   }
+  // };
 
   const saveSchedules = () => {
-    setIsLoading(true);
-
-    if (verifyInformationToGo()) {
-      saveSchedule().then(
+    schedule.salonId = currentUser.idSalon;
+    if (verifyInformation(true)) {
+      setIsLoading(true);
+      saveSchedule(schedule).then(
         () => {
           sortScheduleList();
           cleanRegisteredSchedules();
-          setTimeout(() => {
-            setErrorMessage('');
+            setErrorMessage("");
             clearSchedule();
-            navigate.push('TabStack', {
-              screen: 'Schedules',
-              params: {
-                isToShowAgenda: false,
-              },
-            });
+            handleModal(true, "Gostaria de marcar mais algum agendamento? ")
             setIsLoading(false);
-          }, 5000);
         },
         error => {
           setIsLoading(false);
@@ -179,14 +169,14 @@ const ScheduleRegister = ({route}) => {
         () => {
           sortScheduleList();
           setIsLoading(false);
-          navigate.replace('TabStack', {
-            screen: 'Schedules',
+          navigate.replace("TabStack", {
+            screen: "Schedules",
             params: {
               isToShowAgenda: false,
             },
           });
           setIsLoading(false);
-          setErrorMessage('');
+          setErrorMessage("");
           clearSchedule();
         },
 
@@ -198,75 +188,76 @@ const ScheduleRegister = ({route}) => {
     }
   };
 
-  const deleteSchedules = () => {
-    setIsLoading(true);
-    deleteSchedule(schedule).then(
-      () => {
-        setIsLoading(false);
-        navigate.push('TabStack', {
-          screen: 'Schedules',
-          params: {
-            isToShowAgenda: false,
-          },
-        });
-        setErrorMessage('');
-        clearSchedule();
-      },
-      error => {
-        setIsLoading(false);
-        console.error(error);
-      },
-    );
-  };
+  // const deleteSchedules = () => {
+  //   setIsLoading(true);
+  //   deleteSchedule(schedule).then(
+  //     () => {
+  //       setIsLoading(false);
+  //       navigate.push("TabStack", {
+  //         screen: "Schedules",
+  //         params: {
+  //           isToShowAgenda: false,
+  //         },
+  //       });
+  //       setErrorMessage("");
+  //       clearSchedule();
+  //     },
+  //     error => {
+  //       setIsLoading(false);
+  //       console.error(error);
+  //     },
+  //   );
+  // };
+  //
+  // const cancelEditing = () => {
+  //   updateScheduleInView(-1);
+  //   clearSchedule();
+  // };
 
-  const cancelEditing = () => {
-    updateScheduleInView(-1);
-    clearSchedule();
-  };
+  // const deletePreRegisteredItem = schedule => {
+  //   deleteScheduleInView(schedule);
+  //   clearSchedule();
+  // };
 
-  const deletePreRegisteredItem = schedule => {
-    deleteScheduleInView(schedule);
-    clearSchedule();
-  };
+  // const handleSchedule = (schedule, index) => {
+  //   updateScheduleInView(index);
+  //   schedule.isInView = !schedule.isInView;
+  //   schedule.indexInView = index;
+  //
+  //   setSchedule(schedule);
+  //
+  //   if (!verifyIfIsPreRegisteredEditing()) clearSchedule();
+  // };
 
-  const handleSchedule = (schedule, index) => {
-    updateScheduleInView(index);
-    schedule.isInView = !schedule.isInView;
-    schedule.indexInView = index;
+  // const verifyIfIsPreRegisteredEditing = () => {
+  //   return registeredSchedules.some(schedule => schedule.isInView === true);
+  // };
 
-    setSchedule(schedule);
-
-    if (!verifyIfIsPreRegisteredEditing()) clearSchedule();
-  };
-
-  const verifyIfIsPreRegisteredEditing = () => {
-    return registeredSchedules.some(schedule => schedule.isInView === true);
-  };
-
-  const verifyInformationToGo = () => {
-    let ableToGo = true;
-
-    if (Object.keys(schedule).length === 3) {
-      // addSchedule(schedule);
-      return ableToGo;
-    } else if (registeredSchedules.length === 0) {
-      ableToGo = false;
-      setErrorMessage(errorMessages.noScheduleMessage);
-      setIsLoading(false);
-    }
-    return ableToGo;
-  };
+  // const verifyInformationToGo = () => {
+  //   let ableToGo = true;
+  //
+  //   if (Object.keys(schedule).length === 3) {
+  //     // addSchedule(schedule);
+  //     return ableToGo;
+  //   } else if (registeredSchedules.length === 0) {
+  //     ableToGo = false;
+  //     setErrorMessage(errorMessages.noScheduleMessage);
+  //     setIsLoading(false);
+  //   }
+  //   return ableToGo;
+  // };
 
   const verifyInformation = showErrorMessages => {
     let ableToGo = true;
-    let errorMessage = '';
-
+    let errorMessage = "";
     if (
       schedule === {} ||
       schedule.client === undefined ||
       Object.keys(schedule.client).length === 0 ||
+      typeof schedule.client === 'string' ||
       schedule.employee === undefined ||
       Object.keys(schedule.employee).length === 0 ||
+      typeof schedule.employee === 'string' ||
       schedule.procedures === undefined ||
       schedule.procedures.length === 0
     ) {
@@ -274,45 +265,62 @@ const ScheduleRegister = ({route}) => {
       errorMessage = errorMessages.scheduleMessage;
       if (showErrorMessages) setIsLoading(false);
     }
-
+    // else if (verifyHourBeforeSet(schedule.scheduleDate)) {
+    //   ableToGo = false;
+    //   if (showErrorMessages) setIsLoading(false);
+    // }
     if (showErrorMessages) setErrorMessage(errorMessage);
     return ableToGo;
   };
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || schedule.scheduleDate;
-    if (mode === 'date') {
-      handleChange('scheduleDate', currentDate);
 
-      showMode(false, 'time');
-    } else if (mode === 'time') {
-      showMode(false, '');
+  const verifyHourBeforeSet = (selectedDate) => {
+    let ableToSet = true;
+    const formattedSelectDate = moment(selectedDate.toString()).format("DD/MM/YYYY - HH:mm");
 
-      handleChange('scheduleHour', currentDate);
+    if (schedules.some(registeredSchedule => registeredSchedule.formattedDateHour === formattedSelectDate)) {
+      setErrorMessage(errorMessages.scheduleDateMessage);
+      ableToSet = false;
     }
-    // setShow(Platform.OS === 'ios');
+
+    return ableToSet;
+  };
+
+  const onChange = (event, selectedDate) => {
+    setErrorMessage("");
+    const currentDate = selectedDate || schedule.scheduleDate;
+    if (mode === "date") {
+      handleChange("scheduleDate", currentDate);
+      showMode(false, "time");
+    } else if (mode === "time") {
+      showMode(false, "");
+      handleChange("scheduleHour", currentDate);
+
+      // setShow(Platform.OS === 'ios');
+    }
+
   };
 
   const showMode = (state, currentMode) => {
-    if (currentMode === 'date' && state) {
+    if (currentMode === "date" && state) {
       setShow(true);
       setMode(currentMode);
-    } else if (currentMode === 'time' && !state) {
+    } else if (currentMode === "time" && !state) {
       setMode(currentMode);
-    } else if (currentMode === '') {
+    } else if (currentMode === "") {
       setShow(false);
     }
   };
 
   const clearProcedures = () => {
-    setSchedule({...schedule, procedures: []});
+    setSchedule({ ...schedule, procedures: [] });
   };
 
   return (
     <RegisterComponent
       validForm={() => verifyInformation(false)}
       onCancel={() =>
-        navigate.push('TabStack', {
-          screen: 'Schedules',
+        navigate.push("TabStack", {
+          screen: "Schedules",
           params: {
             isToShowAgenda: false,
           },
@@ -320,20 +328,22 @@ const ScheduleRegister = ({route}) => {
       }
       color={global.colors.purpleColor}
       preRegisteredItems={registeredSchedules}
-      handleSelect={handleSchedule}
-      deletePreRegisteredItem={deletePreRegisteredItem}
+      // handleSelect={handleSchedule}
+      // deletePreRegisteredItem={deletePreRegisteredItem}
       onConfirm={isEditing ? updateSchedules : saveSchedules}
       isEditing={isEditing}
-      isPreRegisteredEditing={verifyIfIsPreRegisteredEditing()}
-      cancelEditing={cancelEditing}
-      onAdd={chooseAddScheduleMethod}
-      registeredItemRightInformation={'procedures'}
-      registeredItemLeftInformation={'client'}
-      headerTitle={'Agendamento'}>
-      {errorMessage !== '' && (
+      // isPreRegisteredEditing={verifyIfIsPreRegisteredEditing()}
+      // cancelEditing={cancelEditing}
+      // onAdd={chooseAddScheduleMethod}
+      registeredItemRightInformation={"procedures"}
+      registeredItemLeftInformation={"client"}
+      headerTitle={"Agendamento"}
+      isMultiInsert={false}
+    >
+      {errorMessage !== "" && (
         <ErrorMessage
           text={errorMessage}
-          width={'70%'}
+          width={"70%"}
           textColor={`${global.colors.purpleColor}`}
         />
       )}
@@ -355,7 +365,7 @@ const ScheduleRegister = ({route}) => {
           />
         )}
 
-        <S.DateTextContainer onPress={() => showMode(true, 'date')}>
+        <S.DateTextContainer onPress={() => showMode(true, "date")}>
           <InputTitle
             color={global.colors.purpleColor}
             screenHeight={screenHeight}>
@@ -364,35 +374,35 @@ const ScheduleRegister = ({route}) => {
           <S.DateTextContent>
             <S.IconContainer>
               <Icon
-                name={'calendar'}
+                name={"calendar"}
                 size={30}
                 color={global.colors.purpleColor}
               />
             </S.IconContainer>
             <S.DateText>
-              {moment(schedule.scheduleDate).format('DD/MM/YYYY HH:mm')}
+              {moment(schedule.scheduleDate).format("DD/MM/YYYY HH:mm")}
             </S.DateText>
           </S.DateTextContent>
         </S.DateTextContainer>
         <AutoComplete
-          inputText={'Cliente*'}
-          placeholder={'Procure por um cliente'}
-          iconName={'user'}
+          inputText={"Cliente*"}
+          placeholder={"Procure por um cliente"}
+          iconName={"user"}
           textColor={global.colors.darkGreyColor}
           iconColor={global.colors.purpleColor}
           searchLengthToSuggest={2}
           options={clients}
-          name={'client'}
+          name={"client"}
           value={schedule.client}
           handleChange={handleChange}
         />
 
         <AutoComplete
-          inputText={'Parceiro*'}
+          inputText={"Parceiro*"}
           editable={isOwner}
-          placeholder={'Procure por um parceiro'}
+          placeholder={"Procure por um parceiro"}
           textColor={global.colors.darkGreyColor}
-          iconName={'cut'}
+          iconName={"cut"}
           iconColor={global.colors.purpleColor}
           searchLengthToSuggest={2}
           options={
@@ -400,44 +410,51 @@ const ScheduleRegister = ({route}) => {
               ? partners
               : partners.filter(partner => partner.id === currentUser.idFunc)
           }
-          name={'employee'}
+          name={"employee"}
           value={schedule.employee}
           handleChange={handleChange}
         />
 
         {Object.keys(schedule.employee).length > 5 &&
-          typeof schedule.employee !== 'string' && (
-            <MultipleSelect
-              inputText={'Procedimentos*'}
-              disabled={Object.keys(schedule.employee).length > 5}
-              iconColor={global.colors.purpleColor}
-              plusIconColor={global.colors.purpleColor}
-              modalHeaderText={'Escolha os procedimentos'}
-              options={
-                currentUser.idFunc === schedule.employee.id
-                  ? procedures
-                  : schedule.employee.procedures
-              }
-              selectTextColor={global.colors.darkGreyColor}
-              selectedItemBorderColor={global.colors.purpleColor}
-              value={schedule.procedures}
-              handleMultiSelect={handleMultiSelect}
-              placeholderText={'Procedimentos'}
-              clearValue={clearProcedures}
-            />
-          )}
+        typeof schedule.employee !== "string" && (
+          <MultipleSelect
+            inputText={"Procedimentos*"}
+            disabled={Object.keys(schedule.employee).length > 5}
+            iconColor={global.colors.purpleColor}
+            plusIconColor={global.colors.purpleColor}
+            modalHeaderText={"Escolha os procedimentos"}
+            options={
+              currentUser.idFunc === schedule.employee.id
+                ? procedures
+                : schedule.employee.procedures
+            }
+            selectTextColor={global.colors.darkGreyColor}
+            selectedItemBorderColor={global.colors.purpleColor}
+            value={schedule.procedures}
+            handleMultiSelect={handleMultiSelect}
+            placeholderText={"Procedimentos"}
+            clearValue={clearProcedures}
+          />
+        )}
       </S.BodyContent>
 
       <AlertModal
         text={showAlertModal.text}
         isVisible={showAlertModal.isShowing}
         onClose={() => {
-          handleModal(false, '');
+          navigate.push("TabStack", {
+            screen: "Schedules",
+            params: {
+              isToShowAgenda: false,
+            },
+          })
         }}
         onOk={() => {
-          deleteSchedules();
+          handleModal(false, "");
         }}
-        title={'Atenção.'}
+        title={"Atenção."}
+        okTitle={"SIM"}
+        cancelTitle={"VER AGENDAMENTOS"}
       />
     </RegisterComponent>
   );
