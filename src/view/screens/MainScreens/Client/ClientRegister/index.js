@@ -1,25 +1,25 @@
-import React, {useContext, useEffect, useState} from 'react';
-import * as S from './styled';
-import Input from '../../../../components/small/Input';
-import global from '../../../../../common/global';
-import ErrorMessage from '../../../../components/small/ErrorMessage';
-import {useNavigation} from '@react-navigation/native';
-import {ClientContext} from '../../../../../contexts/Client/ClientContext';
-import errorMessages from '../../../../../common/errorMessages';
-import AlertModal from '../../../../components/small/AlertModal';
-import {UserContext} from '../../../../../contexts/User/UserContext';
-import RegisterComponent from '../../../../components/huge/RegisterComponent';
-import Loading from '../../../../components/small/Loading';
+import React, { useContext, useEffect, useState } from "react";
+import * as S from "./styled";
+import Input from "../../../../components/small/Input";
+import global from "../../../../../common/global";
+import ErrorMessage from "../../../../components/small/ErrorMessage";
+import { useNavigation } from "@react-navigation/native";
+import { ClientContext } from "../../../../../contexts/Client/ClientContext";
+import errorMessages from "../../../../../common/errorMessages";
+import AlertModal from "../../../../components/small/AlertModal";
+import { UserContext } from "../../../../../contexts/User/UserContext";
+import RegisterComponent from "../../../../components/huge/RegisterComponent";
+import Loading from "../../../../components/small/Loading";
 import {
   CPFVerifier,
   TELVerifier,
-} from '../../../../components/small/Input/verifier';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment';
-import {InputTitle} from '../../../../components/small/Input/styled';
-import {Dimensions} from 'react-native';
+} from "../../../../components/small/Input/verifier";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
+import moment from "moment";
+import { InputPlaceholder, InputTitle } from "../../../../components/small/Input/styled";
+import { Dimensions } from "react-native";
 
-const ClientRegister = ({route}) => {
+const ClientRegister = ({ route }) => {
   const {
     addClient,
     editClient,
@@ -33,26 +33,27 @@ const ClientRegister = ({route}) => {
     handleClientRegisterError,
   } = useContext(ClientContext);
 
-  const {currentUser} = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState({
     isShowing: false,
-    text: '',
+    text: "",
   });
   const [client, setClient] = useState({
     bornDate: new Date(),
     errorProperties: [],
   });
-  const [invalidForm, setInvalidForm] = useState(false);
+
   const [showDate, setShowDate] = useState(false);
+  const [isDateSelected, setIsDateSelected] = useState(false);
 
   const navigate = useNavigation();
-  const screenHeight = Dimensions.get('screen').height;
+  const screenHeight = Dimensions.get("screen").height;
   useEffect(() => {
-    navigate.addListener('focus', () => {
+    navigate.addListener("focus", () => {
       if (Object.keys(route.params?.client).length !== 0) {
         const clientInView = route.params?.client;
 
@@ -87,29 +88,38 @@ const ClientRegister = ({route}) => {
   };
 
   const handleModal = (isShowing, text) => {
-    setShowAlertModal({isShowing: isShowing, text: text});
+    setShowAlertModal({ isShowing: isShowing, text: text });
   };
 
   const onChangeDate = (event, selectedDate) => {
-    selectedDate = selectedDate || client.bornDate;
-    handleChange(selectedDate, 'bornDate');
-    setShowDate(false);
+    console.log("event.type", event.type)
+    if (event.type === "neutralButtonPressed") {
+      setIsDateSelected(false);
+      setShowDate(false);
+    } else {
+
+      selectedDate = selectedDate || client.bornDate;
+      handleChange(selectedDate, "bornDate");
+      setIsDateSelected(true);
+      setShowDate(false);
+    }
   };
 
   const chooseAddClientMethod = async () => {
-    const {isInView, indexInView} = {...client};
+    const { isInView, indexInView } = { ...client };
 
     if (verifyInformation(true) && isInView) {
       client.isInView = false;
-      editClient({client: client, index: indexInView});
-      setErrorMessage('');
+      editClient({ client: client, index: indexInView });
+      setErrorMessage("");
       cleanClient();
     }
 
     if (verifyInformation(true) && !isInView) {
       client.salonId = currentUser.idSalon;
+      client.bornDate = isDateSelected ? client.bornDate : null;
       addClient(client);
-      setErrorMessage('');
+      setErrorMessage("");
       cleanClient();
     }
   };
@@ -137,13 +147,13 @@ const ClientRegister = ({route}) => {
       for (const client of registeredClients) {
         await saveClient(client).then(
           () => {
-            setErrorMessage('');
+            setErrorMessage("");
             isSaving = true;
           },
           error => {
             setIsLoading(false);
-            if (error === 137)
-              handleClientRegisterError({item: client, property: 'email'});
+            // if (error === 137)
+            //   handleClientRegisterError({ item: client, property: "cpf" });
             setErrorMessage(errorMessages.duplicateEmailPreRegisteredItems);
           },
         );
@@ -152,7 +162,7 @@ const ClientRegister = ({route}) => {
       if (isSaving) {
         setTimeout(() => {
           setIsLoading(false);
-          navigate.push('TabStack', {screen: 'Clients'});
+          navigate.push("TabStack", { screen: "Clients" });
           cleanClient();
           cleanRegisteredClients();
         }, 3000);
@@ -166,15 +176,15 @@ const ClientRegister = ({route}) => {
       () => {
         setTimeout(() => {
           setIsLoading(false);
-          navigate.push('TabStack', {screen: 'Clients'});
+          navigate.push("TabStack", { screen: "Clients" });
           cleanClient();
         }, 500);
-        setErrorMessage('');
+        setErrorMessage("");
       },
       error => {
         setIsLoading(false);
-        if (error.code === 137)
-          handleClientRegisterError({item: client, property: 'email'});
+        // if (error.code === 137)
+        //   handleClientRegisterError({ item: client, property: "email" });
         setErrorMessage(errorMessages.duplicateEmailPreRegisteredItems);
       },
     );
@@ -195,8 +205,8 @@ const ClientRegister = ({route}) => {
     deleteClient(client).then(
       () => {
         setIsLoading(false);
-        navigate.navigate('Clients');
-        setErrorMessage('');
+        navigate.navigate("Clients");
+        setErrorMessage("");
         cleanClient();
       },
       error => {
@@ -225,18 +235,15 @@ const ClientRegister = ({route}) => {
 
   const verifyInformation = showErrorMessages => {
     let ableToGo = true;
-    let errorMessage = '';
+    let errorMessage = "";
 
     if (
       client === {} ||
       client.name === undefined ||
-      client.name === '' ||
-      client.email === undefined ||
-      client.email === '' ||
+      client.name === "" ||
       client.tel === undefined ||
-      client.tel === '' ||
-      client.bornDate === undefined ||
-      client.bornDate === ''
+      client.tel === ""
+
     ) {
       ableToGo = false;
       errorMessage = errorMessages.clientMessage;
@@ -250,7 +257,7 @@ const ClientRegister = ({route}) => {
     }
 
     if (
-      client.tel2 !== '' &&
+      client.tel2 !== "" &&
       client.tel2 !== undefined &&
       !TELVerifier(client.tel2).state
     ) {
@@ -260,7 +267,7 @@ const ClientRegister = ({route}) => {
     }
 
     if (
-      client.cpf !== '' &&
+      client.cpf !== "" &&
       client.cpf !== undefined &&
       !CPFVerifier(client.cpf).state
     ) {
@@ -272,18 +279,17 @@ const ClientRegister = ({route}) => {
     if (
       registeredClients.some(
         registeredClient =>
-          registeredClient.name !== client.name &&
-          registeredClient.email === client.email,
+          registeredClient.email === client.email && registeredClient?.email,
       )
     ) {
       ableToGo = false;
-      errorMessage = errorMessages.duplicateInformation;
-      setErrorMessage(errorMessages.duplicateInformation);
+      errorMessage = errorMessages.duplicateClientInformation;
+      setErrorMessage(errorMessages.duplicateClientInformation);
       if (showErrorMessages) setIsLoading(false);
     }
 
     if (showErrorMessages) setErrorMessage(errorMessage);
-    if (errorMessage === '') setErrorMessage('');
+    if (errorMessage === "") setErrorMessage("");
     return ableToGo;
   };
 
@@ -302,13 +308,13 @@ const ClientRegister = ({route}) => {
       cancelEditing={cancelEditing}
       isEditing={isEditing}
       onAdd={chooseAddClientMethod}
-      registeredItemRightInformation={'tel'}
-      headerTitle={'Clientes'}
+      registeredItemRightInformation={"tel"}
+      headerTitle={"Clientes"}
       validForm={() => verifyInformation(false)}>
-      {errorMessage !== '' && (
+      {errorMessage !== "" && (
         <ErrorMessage
           text={errorMessage}
-          width={'70%'}
+          width={"70%"}
           textColor={global.colors.blueColor}
         />
       )}
@@ -316,59 +322,59 @@ const ClientRegister = ({route}) => {
       <S.BodyContent>
         <Input
           invalidValue={client?.errorProperties?.some(
-            property => property === 'name',
+            property => property === "name",
           )}
           handleChange={handleChange}
-          name={'name'}
-          placeholder={'Nome do Cliente'}
+          name={"name"}
+          placeholder={"Nome do Cliente"}
           value={client.name}
-          width={'80%'}
-          keyboard={'default'}
+          width={"80%"}
+          keyboard={"default"}
           isSecureTextEntry={false}
           fontSize={50}
           disabled={false}
           color={global.colors.blueColor}
-          label={'Nome*'}
+          label={"Nome*"}
           isToValidate={true}
           noEmpty={true}
         />
 
         <Input
           invalidValue={client?.errorProperties?.some(
-            property => property === 'email',
+            property => property === "email",
           )}
           handleChange={handleChange}
-          name={'email'}
-          placeholder={'E-mail do Cliente'}
+          name={"email"}
+          placeholder={"E-mail do Cliente"}
           value={client.email}
-          width={'80%'}
-          keyboard={'email-address'}
+          width={"80%"}
+          keyboard={"email-address"}
           isSecureTextEntry={false}
           fontSize={50}
           disabled={false}
           mask="email"
           color={global.colors.blueColor}
-          label={'E-mail*'}
+          label={"E-mail"}
           isToValidate={true}
-          noEmpty={true}
+          noEmpty={false}
         />
 
         <Input
           invalidValue={client?.errorProperties?.some(
-            property => property === 'cpf',
+            property => property === "cpf",
           )}
           handleChange={handleChange}
-          name={'cpf'}
-          placeholder={'CPF'}
+          name={"cpf"}
+          placeholder={"CPF"}
           value={client.cpf}
-          width={'80%'}
-          keyboard={'numeric'}
+          width={"80%"}
+          keyboard={"numeric"}
           isSecureTextEntry={false}
           fontSize={50}
           disabled={false}
-          mask={'cpf'}
+          mask={"cpf"}
           color={global.colors.blueColor}
-          label={'CPF'}
+          label={"CPF"}
           isToValidate={true}
           noEmpty={false}
         />
@@ -379,16 +385,25 @@ const ClientRegister = ({route}) => {
           <InputTitle
             color={global.colors.blueColor}
             screenHeight={screenHeight}>
-            Data de Nascimento*
+            Data de Nascimento
           </InputTitle>
-          <S.DateText>
-            {moment(client.bornDate).format('DD/MM/YYYY')}
-          </S.DateText>
+          {isDateSelected
+            ? (
+              <S.DateText>
+                {moment(client.bornDate).format("DD/MM/YYYY")}
+              </S.DateText>)
+            : (
+              <InputPlaceholder>
+                Data de Nascimento
+              </InputPlaceholder>
+            )}
+
         </S.DateTextContent>
         {showDate && (
           <RNDateTimePicker
+            neutralButtonLabel="LIMPAR"
             value={client.bornDate}
-            mode={'date'}
+            mode={"date"}
             is24Hour={true}
             display="default"
             minimumDate={new Date(1950, 0, 1)}
@@ -400,40 +415,40 @@ const ClientRegister = ({route}) => {
 
         <Input
           invalidValue={client?.errorProperties?.some(
-            property => property === 'tel',
+            property => property === "tel",
           )}
           handleChange={handleChange}
-          name={'tel'}
-          placeholder={'Celular'}
+          name={"tel"}
+          placeholder={"Celular"}
           value={client.tel}
-          width={'80%'}
-          keyboard={'numeric'}
+          width={"80%"}
+          keyboard={"numeric"}
           isSecureTextEntry={false}
           fontSize={50}
           disabled={false}
-          mask={'phone'}
+          mask={"phone"}
           color={global.colors.blueColor}
-          label={'Celular*'}
+          label={"Celular*"}
           isToValidate={true}
           noEmpty={true}
         />
 
         <Input
           invalidValue={client?.errorProperties?.some(
-            property => property === 'tel2',
+            property => property === "tel2",
           )}
           handleChange={handleChange}
-          name={'tel2'}
-          placeholder={'Telefone'}
+          name={"tel2"}
+          placeholder={"Telefone"}
           value={client.tel2}
-          width={'80%'}
-          keyboard={'numeric'}
+          width={"80%"}
+          keyboard={"numeric"}
           isSecureTextEntry={false}
           fontSize={50}
           disabled={false}
-          mask={'phone'}
+          mask={"phone"}
           color={global.colors.blueColor}
-          label={'Telefone Residencial'}
+          label={"Telefone Residencial"}
           isToValidate={true}
           noEmpty={false}
         />
@@ -443,12 +458,12 @@ const ClientRegister = ({route}) => {
         text={showAlertModal.text}
         isVisible={showAlertModal.isShowing}
         onClose={() => {
-          handleModal(false, '');
+          handleModal(false, "");
         }}
         onOk={() => {
           deleteClients();
         }}
-        title={'Atenção.'}
+        title={"Atenção."}
       />
     </RegisterComponent>
   );

@@ -42,3 +42,8 @@ export const MessageBox = styled.View`
   border-radius: 5px;
   elevation: 2;
 `;
+
+export const InputPlaceholder = styled.Text`
+  font-family: ${global.fonts.mainFont};
+  color: grey
+`
