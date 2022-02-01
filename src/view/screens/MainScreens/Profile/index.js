@@ -1,33 +1,21 @@
-import React, {useContext, useEffect, useState} from 'react';
-import * as S from './styled';
-import {Text} from '../../../components/small/InputModal/styled';
-import {
-  BodyContent,
-  Container,
-  FooterContainer,
-  FooterContent,
-  ProcedureContent,
-} from './styled';
-import Input from '../../../components/small/Input';
-import {UserContext} from '../../../../contexts/User/UserContext';
-import {useNavigation} from '@react-navigation/native';
-import global from '../../../../common/global';
-import Button from '../../../components/small/Button';
+import { useNavigation } from '@react-navigation/native';
+import React, { useContext, useState } from 'react';
+import { Dimensions } from 'react-native';
 import Times from '../../../../assets/svg/timesSVG.svg';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import errorMessages from '../../../../common/errorMessages';
-import {
-  CNPJVerifier,
-  CPFVerifier,
-  EMAILVerifier,
-  TELVerifier,
-} from '../../../components/small/Input/verifier';
+import global from '../../../../common/global';
+import { UserContext } from '../../../../contexts/User/UserContext';
+import Button from '../../../components/small/Button';
 import ErrorMessage from '../../../components/small/ErrorMessage';
+import Input from '../../../components/small/Input';
+import {
+  CNPJVerifier
+} from '../../../components/small/Input/verifier';
 import Loading from '../../../components/small/Loading';
-import {Dimensions} from 'react-native';
+import * as S from './styled';
 
 const Profile = () => {
-  const {currentUser, updateProfile} = useContext(UserContext);
+  const { currentUser, updateProfile } = useContext(UserContext);
   const [profile, setProfile] = useState({});
   const [isEditting, setIsEditting] = useState(false);
   const [validForm, setValidForm] = useState(false);
@@ -112,7 +100,7 @@ const Profile = () => {
             disabled={false}
             marginBottom={'20px'}
             onPress={() =>
-              navigate.navigate('ApplicationStack', {screen: 'Procedures'})
+              navigate.navigate('ApplicationStack', { screen: 'Procedures' })
             }
             color={global.colors.purpleColor}
             text={'Procedimentos'}

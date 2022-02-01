@@ -12,6 +12,7 @@ import Loading from "../../../../components/small/Loading";
 import Notification from "../../../../components/small/Notification";
 import * as S from "./styled";
 import Agenda from "../../../../components/huge/AgendaComponent";
+import { getFinanceInformation } from "../../../../../services/CloudFunctions";
 
 const Schedules = ({ route }) => {
   const { currentUser, verifyNotification } = useContext(UserContext);
@@ -149,11 +150,12 @@ const Schedules = ({ route }) => {
         deleteUniqueItem={deleteSchedule}
         deleteProcedure={deleteScheduleProcedure}
         isLoading={isRefreshing}
-        onAddNavigateTo={() =>
-          navigate.push("ApplicationStack", {
-            screen: "ScheduleRegister",
-            params: { schedule: [], date: moment(new Date()).format() },
-          })
+        onAddNavigateTo={async () =>
+          await getFinanceInformation("rb0fU0FEH0")
+          // navigate.push("ApplicationStack", {
+          //   screen: "ScheduleRegister",
+          //   params: { schedule: [], date: moment(new Date()).format() },
+          // })
         }
         onEditNavigateTo={item =>
           navigate.push("ApplicationStack", {

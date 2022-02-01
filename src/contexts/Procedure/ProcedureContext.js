@@ -28,7 +28,8 @@ const ProcedureProvider = ({children}) => {
     return new Promise(async (resolve, reject) => {
       try {
         await getAllProceduresBySalonId(payload, false).then(procedures => {
-          resolve(dispatch({type: 'LOAD_PROCEDURES', procedures}));
+          dispatch({type: 'LOAD_PROCEDURES', procedures})
+          resolve(state.procedures);
         });
       } catch (e) {
         reject(`Deu ruim ao listar procedimentos ${e}`);

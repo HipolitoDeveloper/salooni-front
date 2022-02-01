@@ -1,8 +1,14 @@
 import Parse from 'parse/react-native';
+import { ScheduleObject } from './ScheduleService';
+import { ScheduleProcedureObject } from './ScheduleProcedureService'
+import { SalonObject } from './SalonService';
+import { convertToObj } from "../pipe/conversor";
+import moment from 'moment';
+import { reject } from 'lodash';
 
 export const verifyInformationBeforeInsertion = params => {
   return new Promise(async (resolve, reject) => {
-    const {partners, owner} = params;
+    const { partners, owner } = params;
     const newPartners = [];
     const verifications = [];
     partners.forEach(partner => {
@@ -59,3 +65,24 @@ export const verifyInformationBeforeInsertion = params => {
     }
   });
 };
+
+export const getFinanceInformation = async (salonId) => {
+  try {
+    const params = {
+      salonId: salonId
+    }
+
+    let resultObject = await Parse.Cloud.run('getFinanceInformation', params);
+    return resultObject
+  } catch (error) {
+    console.error(error)
+  }
+
+  // return { finances: finances, totalSalonFinances: totalSalonFinances, totalPartnerFinances: totalPartnerFinances }
+
+}
+
+
+
+
+

@@ -10,7 +10,7 @@ import {
 import { ProcedureObject } from "./ProcedureService";
 import { ClientObject } from "./ClientService";
 
-const ScheduleProcedureObject = Parse.Object.extend("schedule_procedure");
+export const ScheduleProcedureObject = Parse.Object.extend("schedule_procedure");
 
 export const getScheduleProcedureByScheduleId = (
   scheduleFK,

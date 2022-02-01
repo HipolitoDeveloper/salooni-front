@@ -50,17 +50,21 @@ const Procedures = () => {
     );
   };
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
+    return new Promise(resolve => {
+
     setIsLoading(true);
     loadAllProcedures(currentUser.idSalon).then(
-      () => {
+      (newProcedures) => {
         setIsLoading(false);
+        resolve(newProcedures);
       },
       error => {
         console.log(error);
         setIsLoading(false);
       },
     );
+    })
   };
 
   return (

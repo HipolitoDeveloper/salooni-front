@@ -42,6 +42,7 @@ const TopTabBar = ({
   );
 
   const handleState = currentPage => {
+    console.log("pages", currentPage)
     let position = 0;
     if (pages.length === 3) {
       switch (currentPage) {

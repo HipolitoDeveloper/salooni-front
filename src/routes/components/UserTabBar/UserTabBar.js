@@ -9,6 +9,7 @@ const UserTabBar = ({children, state, navigation}) => {
   const {isOwner} = useContext(UserContext);
   let pages = [
     {screen: 'Profile', name: 'Perfil'},
+    {screen: 'Finance', name: 'Financeiro'},
     {screen: 'Videos', name: 'Vídeos'},
   ];
 

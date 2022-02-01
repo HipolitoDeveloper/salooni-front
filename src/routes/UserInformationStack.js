@@ -6,6 +6,7 @@ import Profile from '../view/screens/MainScreens/Profile';
 import Procedures from '../view/screens/MainScreens/Procedure/Procedures';
 import UserTabBar from './components/UserTabBar/UserTabBar';
 import Video from '../view/screens/MainScreens/Video';
+import Finance from '../view/screens/MainScreens/Finance';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -23,7 +24,9 @@ export default () => (
     }}>
     <>
       <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Finance" component={Finance} />
       <Tab.Screen name="Videos" component={Video} />
+
     </>
   </Tab.Navigator>
 );
