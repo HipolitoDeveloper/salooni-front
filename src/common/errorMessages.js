@@ -23,6 +23,7 @@ export default {
 
   noClientMessage: 'Nenhum cliente foi pré-registrado',
   noScheduleMessage: 'Nenhum agendamento foi pré-registrado',
+  scheduleRegisterMessage: 'Você precisa preencher todas as informações sobre o agendamento!',
   passwordsNotMatch: 'Senhas não são idênticas',
   notOwner:
     'Esse e-mail não pertence à um proprietário. Tente o acesso na aba de parceiros',

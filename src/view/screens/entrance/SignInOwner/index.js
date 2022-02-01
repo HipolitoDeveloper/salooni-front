@@ -11,6 +11,7 @@ import ErrorMessage from '../../../components/small/ErrorMessage';
 import global from '../../../../common/global';
 import {ActivityIndicator, Dimensions} from 'react-native';
 import Loading from '../../../components/small/Loading';
+import { ForgotPassword } from '../../../components/huge/ForgotPasswordComponent';
 
 const SignInOwner = () => {
   const screenHeight = Dimensions.get('screen').height;
@@ -24,6 +25,8 @@ const SignInOwner = () => {
     email: '',
     password: '',
   });
+  const [isShowingForgot, setIsShowingForgot] = useState(false)
+
   const navigate = useNavigation();
 
   const handleChange = (text, name) => {
@@ -57,6 +60,10 @@ const SignInOwner = () => {
       },
     );
   };
+
+  const handleForgotModal = () => {
+    setIsShowingForgot(!isShowingForgot)
+  }
 
   return (
     <S.Container>
@@ -99,7 +106,7 @@ const SignInOwner = () => {
           noEmpty={true}
         />
 
-        <S.PasswordResetButton>
+        <S.PasswordResetButton onPress={handleForgotModal}>
           <S.PasswordResetText screenHeight={screenHeight}>
             Esqueceu a senha?
           </S.PasswordResetText>
@@ -131,6 +138,11 @@ const SignInOwner = () => {
           </S.RegisterButton>
         </S.RegisterContent>
       </S.Content>
+
+      {isShowingForgot && (
+      <ForgotPassword emailFromLogin={userData.email} isVisible={isShowingForgot} handleModal={handleForgotModal} />
+
+      )}
     </S.Container>
   );
 };

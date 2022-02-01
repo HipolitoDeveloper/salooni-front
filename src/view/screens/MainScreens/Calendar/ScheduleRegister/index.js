@@ -262,13 +262,15 @@ const ScheduleRegister = ({ route }) => {
       schedule.procedures.length === 0
     ) {
       ableToGo = false;
-      errorMessage = errorMessages.scheduleMessage;
+      errorMessage = errorMessages.scheduleRegisterMessage;
       if (showErrorMessages) setIsLoading(false);
     }
-    // else if (verifyHourBeforeSet(schedule.scheduleDate)) {
-    //   ableToGo = false;
-    //   if (showErrorMessages) setIsLoading(false);
-    // }
+    else if (!verifyHourBeforeSet(schedule.scheduleDate)) {
+      ableToGo = false;
+      errorMessage = errorMessages.scheduleDateMessage;
+
+      if (showErrorMessages) setIsLoading(false);
+    }
     if (showErrorMessages) setErrorMessage(errorMessage);
     return ableToGo;
   };
@@ -278,7 +280,6 @@ const ScheduleRegister = ({ route }) => {
     const formattedSelectDate = moment(selectedDate.toString()).format("DD/MM/YYYY - HH:mm");
 
     if (schedules.some(registeredSchedule => registeredSchedule.formattedDateHour === formattedSelectDate)) {
-      setErrorMessage(errorMessages.scheduleDateMessage);
       ableToSet = false;
     }
 

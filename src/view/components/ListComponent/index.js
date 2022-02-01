@@ -307,7 +307,6 @@ const List = ({
 
   const doRefresh = async () => {
     await onRefresh().then(items => {
-      console.log("items", items);
       setItems(items);
     });
   };
