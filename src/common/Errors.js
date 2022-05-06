@@ -44,7 +44,6 @@ export default {
     PROFILE_ERROR: 'Nem todas as informações do perfil foram preenchidas',
     OWNER_FORM_ERROR: 'Preencha todas as informações do proprietário',
     PROCEDURE_FORM_ERROR: 'As informações estão incompletas, não é possível avançar',
-    EMAIL_FORMAT_ERROR: "Por favor, digite um e-mail válido",
     NO_REGISTERED_PROCEDURES_ERROR:
         'Não é possível salvar sem procedimentos pré-registrados.',
     SIGNUP_ERROR:
