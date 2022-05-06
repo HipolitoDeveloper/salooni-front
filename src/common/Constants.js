@@ -10,6 +10,8 @@ export default {
   FIRST_ACCESS_EMPLOYEE_ALERT: "Parece que esse é o seu primeiro acesso, preencha as informações conforme o cadastro realizado pelo dono do seu salão.",
   FOUND_CNPJ_EMPLOYEE: "O CNPJ foi encontrado.\nPara continuar, cadastre sua senha.",
   MORE_EMPLOYEE_REGISTER: "Gostaria de adicionar mais algum parceiro?",
-  MORE_CLIENT_REGISTER: "Gostaria de adicionar mais algum parceiro?"
+  MORE_SCHEDULE_REGISTER: "Gostaria de marcar mais algum agendamento?",
+
+  MORE_CLIENT_REGISTER: "Gostaria de adicionar mais algum cliente?"
 
 }

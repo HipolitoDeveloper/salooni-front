@@ -12,10 +12,12 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {signinValidationSchema} from "../../../../common/validators/Schemas";
 import {useLayout} from "../../../../hooks/Layout";
 import {useUser} from "../../../../hooks";
+import Errors from "../../../../common/Errors";
 
 const defaultValues = {
-    email: "gabriel@gmail.com",
-    password: "123Abc@"
+    email: "",
+    password: ""
+    // password: "123Abc@"
 };
 
 const SignInOwner = () => {
@@ -41,8 +43,8 @@ const SignInOwner = () => {
             await onLogin(data)
             handleLoading(false);
         } catch (error) {
-            console.log("error", error)
-            handleModal({...modal, visible: true, variant: "alert", errors: error});
+            console.error("SigninOwnerError", JSON.stringify(error))
+            handleModal({...modal, visible: true, variant: "alert", errors: [{message: Errors.ERROR_MESSAGE}]});
             handleLoading(false);
         }
     };
@@ -71,7 +73,7 @@ const SignInOwner = () => {
                             name={name}
                             placeholder={"E-mail"}
                             value={value}
-                            width={"70%"}
+                            width={"80%"}
                             keyboard={"email-address"}
                             fontSize={40}
                             mask="email"
@@ -91,7 +93,7 @@ const SignInOwner = () => {
                             name={name}
                             placeholder={"Senha"}
                             value={value}
-                            width={"70%"}
+                            width={"80%"}
                             keyboard={"default"}
                             isSecureTextEntry
                             fontSize={40}

@@ -65,15 +65,9 @@ const RegisteredItemsModal = ({
           )}
           <S.Content color={color}>
             {items.map((item, index) => (
-              <S.ItemContent key={item.name}>
-                <S.RightItemContent onPress={() => handleSelect(item, index)}>
-                  {item.errorProperties?.length > 0 && (
-                    <Warning
-                      right={`${screenWidth / 4}px`}
-                      color={color}
-                      size={15}
-                    />
-                  )}
+              <S.ItemContent key={index}>
+                <S.RightItemContent onPress={() => handleSelect(item)}>
+
                   <S.ItemName isEditing={item.isInView}>
                     {leftInformation
                       ? item[`${leftInformation}`].name

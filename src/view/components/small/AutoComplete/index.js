@@ -2,7 +2,7 @@ import React, {useRef, useState} from 'react';
 import * as S from './styled';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-import {FlatList} from 'react-native';
+import {Dimensions, FlatList, Text} from 'react-native';
 import {InputTitle} from './styled';
 import Input from "../Input";
 import Colors from "../../../../common/style/Colors";
@@ -19,37 +19,39 @@ const AutoComplete = ({
                           textColor,
                           editable,
                           inputText,
-                          error
+                          error,
+                          persistProcedures,
+                          fontSize
                       }) => {
+    const screenHeight = Dimensions.get("screen").height;
+
     const [suggestions, setSuggestions] = useState([]);
-    const [search, setSearch] = useState("")
 
     const handleSuggestion = text => {
-        setSearch(text);
+        handleChange({name: text})
         if (text === "") setSuggestions([])
         else {
-
             const regex = new RegExp(`${text.trim()}`, 'i');
             setSuggestions(options.filter(i => i.name.search(regex) >= 0));
         }
     };
 
     const chooseSuggestion = suggestion => {
-        console.log("suggestion", suggestion)
         setSuggestions([]);
         handleChange(suggestion);
-        setSearch(suggestion.name);
+
+        if(persistProcedures) persistProcedures(suggestion.procedures)
+
     };
 
     const clearSearch = () => {
-        setSearch("")
         handleChange({name: ''});
     };
 
     return (
         <S.Container>
             <S.InputContainer>
-                <S.InputTitle color={iconColor}>{inputText}</S.InputTitle>
+                <S.InputTitle screenHeight={screenHeight} fontSize={fontSize} color={iconColor}>{inputText}</S.InputTitle>
                 <S.InputContent>
                     {iconName && (
                         <S.IconContainer>
@@ -66,7 +68,7 @@ const AutoComplete = ({
                         name={name}
                         placeholder={placeholder}
                         // placeholderTextColor={textColor}
-                        value={search}
+                        value={value?.name}
                         handleChange={handleSuggestion}
                         editable={editable}
                         error={error}
@@ -74,7 +76,7 @@ const AutoComplete = ({
                         fontSize={38}
                         width={"90%"}
                     />
-                    {value.length > 0 && (
+                    {value?.length > 0 && (
                         <S.ClearButton onPress={() => clearSearch()}>
                             <Icon
                                 name={'times'}

@@ -6,32 +6,24 @@ import * as S from './styled';
 import Colors from "../../../../../common/style/Colors";
 import Modal from "../../../../components/small/Modal";
 import { useSchedule, useUser } from "../../../../../hooks";
+import {useLayout} from "../../../../../hooks/Layout";
+import Errors from "../../../../../common/Errors";
 
 const UnconfirmedSchedules = ({route}) => {
-  const {currentUser, verifyNotification} = useUser();
+  const {currentUser} = useUser();
   const {
     calendarSchedule,
     schedules,
     loadAllSchedules,
-    deleteScheduleProcedure,
-    deleteUniqueSchedule,
-    deleteScheduleList,
-    checkSchedule,
-    confirmSchedules,
-  } = useSchedule()
+    updateSchedule,
+    deleteSchedule,
+    analyzeSchedules,
+  } = useSchedule();
+
+  const {handleLoading, modal, handleModal, loading, handleNotification} = useLayout()
 
   const [isShowingAgenda, setIsShowingAgenda] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showAlertModal, setShowAlertModal] = useState({
-    text: '',
-    isVisible: false,
-    onOk: () => {},
-    title: '',
-    onClose: () => {},
-    cancelTitle: '',
-    okTitle: '',
-  });
 
   const navigate = useNavigation();
 
@@ -39,94 +31,101 @@ const UnconfirmedSchedules = ({route}) => {
     setIsShowingAgenda(!isShowingAgenda);
   };
 
-  const confirmSchedule = checkedItems => {
-    confirmSchedules(checkedItems);
+  // const confirmSchedule = checkedItems => {
+  //   confirmSchedules(checkedItems);
+  //
+  //   // verifyNotification({
+  //   //   // name: notificationsMessages.notifications[0].name,
+  //   //   verification: checkedItems.some(
+  //   //     schedule => !schedule.checked && schedule.passedHour,
+  //   //   ),
+  //   //   method: () =>
+  //   //     navigate.push('ApplicationStack', {
+  //   //       screen: 'UnconfirmedSchedules',
+  //   //     }),
+  //   // });
+  // };
 
-    // verifyNotification({
-    //   // name: notificationsMessages.notifications[0].name,
-    //   verification: checkedItems.some(
-    //     schedule => !schedule.checked && schedule.passedHour,
-    //   ),
-    //   method: () =>
-    //     navigate.push('ApplicationStack', {
-    //       screen: 'UnconfirmedSchedules',
-    //     }),
-    // });
+  const onDeleteSchedule = async scheduleToDelete => {
+    handleLoading(true);
+    try {
+      await deleteSchedule(scheduleToDelete)
+      handleLoading(false)
+    } catch (error) {
+      handleLoading(false);
+      console.log(error);
+    }
   };
 
-  const deleteSchedule = scheduleToDelete => {
-    setIsLoading(true);
-    deleteUniqueSchedule(scheduleToDelete).then(
-      () => {
-        setIsLoading(false);
-      },
-      error => {
-        setIsLoading(false);
-        console.log(error);
-      },
-    );
+  const fetchData = async (skip, limit) => {
+    handleLoading(true);
+    try {
+      const {idSalon: salonId, idFunc: employeeId, employeeType} = currentUser
+
+      await loadAllSchedules({employeeId, salonId, employeeType})
+      handleLoading(false);
+    } catch (e) {
+      console.error(e)
+      handleLoading(false);
+      handleModal({
+        ...modal,
+        visible: true,
+        variant: "alert",
+        errors: Errors.LOAD_MORE_ERROR,
+      });
+    }
   };
 
-  const deleteSchedules = schedulesToDelete => {
-    setIsLoading(true);
-    deleteScheduleList(schedulesToDelete).then(
-      () => {
-        setIsLoading(false);
-      },
-      error => {
-        setIsLoading(false);
-        console.log(error);
-      },
-    );
+  const onUpdateSchedule = async (data) => {
+    handleLoading(true);
+    try {
+      await updateSchedule(data)
+      handleLoading(false);
+
+    } catch (error) {
+      console.error(error)
+      handleLoading(false);
+    }
   };
 
-  const checkSchedules = scheduleId => {
-    checkSchedule(scheduleId);
-  };
+  const onAnalyzeSchedule = async (analyzedSchedules) => {
+    handleLoading(true);
+    try {
+      const newSchedules = await analyzeSchedules(analyzedSchedules)
+      handleLoading(false);
 
-  const onRefresh = () => {
-    setIsLoading(true);
-    loadAllSchedules({
-      salonId: currentUser.idSalon,
-      employeeId: currentUser.idFunc,
-      employeeType: currentUser.employeeType,
-    }).then(
-      () => {
-        setIsLoading(false);
-      },
-      error => {
-        console.log(error);
-        setIsLoading(false);
-      },
-    );
-  };
+      if (newSchedules.every(schedule => schedule.analyzedSchedule)) {
+        handleNotification(false)
+        navigate.push("TabStack", { screen: "Schedules" });
+      }
+
+    } catch (error) {
+      console.error(error)
+      handleLoading(false);
+    }
+  }
+
 
   return (
     <S.Container>
       <List
-        showMenu={true}
-        backButtonHeader={true}
-        onRefresh={onRefresh}
-        refreshing={isLoading}
+        showMenu
+        backButtonHeader
+        fetchData={fetchData}
+        refreshing={loading}
         searchPlaceHolder={'Procure pela sua agenda '}
-        isOwner={false}
-        showHeader={true}
-        showAddButton={false}
+        showHeader
         handleAgenda={handleAgenda}
-        showProfileIcon={false}
         headerText={'Calendário'}
         color={Colors.PURPLE}
-        itemList={schedules.filter(schedule => schedule.passedHour)}
+        items={schedules.filter(schedule => !schedule.analyzedSchedule && schedule.passedHour)}
         menuItems={['name', 'tel', 'email', 'procedures']}
         objectMenuItems={['client', 'client', 'client']}
         itemType={'schedule'}
         listProperty={['name', 'scheduleHour']}
-        checkItems={checkSchedules}
-        confirmItems={confirmSchedule}
-        deleteItemList={deleteSchedules}
-        deleteUniqueItem={deleteSchedule}
-        deleteProcedure={deleteScheduleProcedure}
-        isLoading={isRefreshing}
+        analyzeItem={onAnalyzeSchedule}
+        onDeleteItem={onDeleteSchedule}
+        onUpdateItem={onUpdateSchedule}
         onAddNavigateTo={() =>
           navigate.push('ApplicationStack', {
             screen: 'ScheduleRegister',

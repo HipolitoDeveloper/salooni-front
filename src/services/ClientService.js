@@ -1,8 +1,9 @@
 import Parse from "parse/react-native";
 import { SalonObject } from "./SalonService";
- import { deleteSchedulesByClientId } from "./ScheduleService";
+ import {deleteSchedulesByClientId, deleteSchedulesByClients, deleteSchedulesByEmployees} from "./ScheduleService";
 import { buildClientList, buildClientObject } from "../factory/ClientFactory";
 import { convertToObj } from "../common/converters/GenericConverter";
+import {EmployeeObject} from "./EmployeeService";
 
 export const ClientObject = Parse.Object.extend("client");
 
@@ -37,7 +38,7 @@ export const updateClientParse = async (client) => {
   ParseClient.set("cpf", cpf);
   ParseClient.set("tel", tel);
   ParseClient.set("tel2", tel2);
-  ParseClient.set("birthdate", birthDate);
+  ParseClient.set("birthdate", birthDate.toString());
 
   try {
     const updatedClient = await ParseClient.save();
@@ -75,12 +76,16 @@ export const deleteClientParse = async (clientId) => {
 };
 
 export const deleteClientsParse = async clients => {
+  const clientsToDelete = []
+
+  clients.forEach(({id}) => {
+    clientsToDelete.push(new ClientObject({ objectId: id }))
+  })
+
   try {
-    for (const client of clients) {
-      const clientToDelete = new ClientObject({ objectId: client.id });
-      await clientToDelete.destroy();
-      await deleteSchedulesByClientId(client.id, false);
-    }
+    await deleteSchedulesByClients(clientsToDelete.map(client => {return client.id}));
+    await Parse.Object.destroyAll(clientsToDelete);
+
   } catch (e) {
     throw e;
   }

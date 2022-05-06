@@ -6,76 +6,74 @@ import {ProcedureContext} from '../../../../../hooks';
 import List from '../../../../components/huge/ListComponent';
 import Colors from "../../../../../common/style/Colors";
 import Loading from "../../../../components/small/Loading";
+import Errors from "../../../../../common/Errors";
+import {useLayout} from "../../../../../hooks/Layout";
 
 const Procedures = () => {
     const {
         loadAllProcedures,
         procedures,
-        deleteUniqueProcedure,
-        deleteProcedureList,
+        deleteProcedure,
+        updateProcedure,
     } = useContext(ProcedureContext);
 
     const {currentUser, isOwner} = useContext(UserContext);
+    const {handleModal, modal, handleLoading, loading} = useLayout();
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [refreshing, setRefresing] = useState(false)
 
     const navigate = useNavigation();
 
-    const deleteProcedure = procedureToDelete => {
-        setIsLoading(true);
-        deleteUniqueProcedure(procedureToDelete).then(
-            () => {
-                setIsLoading(false);
-            },
-            error => {
-                setIsLoading(false);
-                console.log(error);
-            },
-        );
+    const onDeleteProcedure = async procedureToDelete => {
+        handleLoading(true);
+        try {
+            await deleteProcedure(procedureToDelete)
+            handleLoading(false);
+        } catch (error) {
+            handleLoading(false);
+            console.error(JSON.stringify(error));
+        }
     };
 
-    const deleteProcedures = proceduresToDelete => {
-        setIsLoading(true);
-        deleteProcedureList(proceduresToDelete).then(
-            () => {
-                setIsLoading(false);
-            },
-            error => {
-                setIsLoading(false);
-                console.log(error);
-            },
-        );
+    const onUpdateProcedure = async (data) => {
+        handleLoading(true);
+        try {
+            await updateProcedure(data)
+            handleLoading(false);
+
+        } catch (error) {
+            console.error(error)
+            handleLoading(false);
+        }
     };
 
-    const onRefresh = async () => {
-        return new Promise(resolve => {
 
-            setIsLoading(true);
-            loadAllProcedures(currentUser.idSalon).then(
-                (newProcedures) => {
-                    setIsLoading(false);
-                    resolve(newProcedures);
-                },
-                error => {
-                    console.log(error);
-                    setIsLoading(false);
-                },
-            );
-        })
+    const fetchData = async (skip, limit) => {
+        setRefresing(true);
+        try {
+            const procedures = await loadAllProcedures(currentUser.idSalon)
+            setRefresing(false);
+
+            return procedures
+        } catch (e) {
+            console.error(e)
+            setRefresing(false);
+            handleModal({
+                ...modal,
+                visible: true,
+                variant: "alert",
+                errors: Errors.LOAD_MORE_ERROR,
+            });
+        }
     };
 
     return (
         <S.Container>
-            {procedures.length === 0
-                ? (
-                    <Loading isLoading={isLoading} color={Colors.PURPLE}/>
-                ) : (
                     <List
                         showMenu={true}
                         showAddButton={true}
-                        onRefresh={onRefresh}
-                        refreshing={isLoading}
+                        fetchData={fetchData}
+                        refreshing={refreshing}
                         showBackButton={true}
                         searchPlaceHolder={'Procure pelos seus procedimentos'}
                         isOwner={isOwner}
@@ -83,11 +81,11 @@ const Procedures = () => {
                         showHeader={true}
                         headerText={'Procedimentos'}
                         color={Colors.PURPLE}
-                        itemList={procedures}
-                        menuItems={['name', 'value', 'time']}
-                        deleteUniqueItem={deleteProcedure}
-                        deleteItemList={deleteProcedures}
-                        isLoading={isLoading}
+                        items={procedures}
+                        menuItems={['name', 'cost', 'duration']}
+                        onDeleteItem={onDeleteProcedure}
+                        onUpdateItem={onUpdateProcedure}
+                        isLoading={loading}
                         onAddNavigateTo={() =>
                             navigate.push('ApplicationStack', {
                                 screen: 'ProcedureRegister',
@@ -100,7 +98,7 @@ const Procedures = () => {
                                 params: {procedure: procedure},
                             })
                         }
-                    />)}
+                    />
         </S.Container>
     );
 };

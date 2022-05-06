@@ -1,24 +1,15 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import * as S from "./styled";
 import ListContent from "./ListContent";
 import ListHeader from "./ListHeader";
 import Button from "../../small/Button";
 import ListMenu from "./ListMenu";
-import {
-    FlatList,
-    Animated,
-    Platform,
-    RefreshControl,
-    Dimensions,
-} from "react-native";
+import {Animated, Dimensions, Platform, RefreshControl,} from "react-native";
 import FloatButton from "../../small/FloatButton";
 import Times from "../../../../assets/svg/timesSVG.svg";
-import Loading from "../../small/Loading";
-import {useFocusEffect, useIsFocused, useNavigation} from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import {removeParenthesis} from "../../../../common/RegexFns";
 import Colors from "../../../../common/style/Colors";
-import Modal from "../../small/Modal";
 
 const {diffClamp} = Animated;
 
@@ -33,16 +24,13 @@ const List = ({
                   subHeaderText,
                   menuItems,
                   objectMenuItems,
-                  checkItems,
-                  confirmItems,
+                  analyzeItem,
                   itemType,
-                  itemList,
-                  deleteUniqueItem,
-                  deleteItemList,
-                  isLoading,
+                  items,
+                  onDeleteItem,
+                  onUpdateItem,
                   onAddNavigateTo,
                   onEditNavigateTo,
-                  deleteProcedure,
                   handleAgenda,
                   navigateToCalendar,
                   isOwner,
@@ -52,290 +40,236 @@ const List = ({
                   refreshing,
                   showAddButton,
                   goToSchedules,
-
                   showMenu,
               }) => {
-    const screenHeight = Dimensions.get("screen").height;
-    const screenWidth = Dimensions.get("screen").width;
-    const isSmallerScreen = screenHeight < 650;
+        const screenHeight = Dimensions.get("screen").height;
+        const screenWidth = Dimensions.get("screen").width;
+        const isSmallerScreen = screenHeight < 650;
 
-    // const headerHeight = Platform.OS === 'ios' ? 90 * 2 : 70 * 2;
-    const headerHeight = Platform.OS === "ios" ? 90 * 2 : (screenHeight / 10) * 2;
+        const [isConfirming, setIsConfirming] = useState(false);
+        const [selectedItems, setSelectedItems] = useState([])
+        const [markedItems, setMarkedItems] = useState([])
+        const [menuState, setMenuState] = useState({
+            itemInView: {},
+            open: false,
+        });
+        const [search, setSearch] = useState("")
 
-    const scrollY = useRef(new Animated.Value(0));
-    const scrollYClamped = diffClamp(scrollY.current, 0, headerHeight);
-    const translateY = scrollYClamped.interpolate({
-        inputRange: [0, headerHeight],
-        outputRange: [0, -(headerHeight / 2)],
-    });
-    const translateYNumber = useRef();
+        const regex = new RegExp(`${search.replace("(", "").replace(")", "").trim()}`, "i");
+        const isDeleting = selectedItems.length > 0;
+        const showFooter = isDeleting || isConfirming;
 
-    const ref = useRef(null);
+        //HEADER POSITION HANDLER
+        const [scrolling, setScrolling] = useState(false);
 
-    const [skip, setSkip] = useState(0)
-    const [limit, setLimit] = useState(5)
-    const [items, setItems] = useState(itemList);
-    const [menuState, setMenuState] = useState({
-        itemToShow: {},
-        open: false,
-    });
-    const [isConfirming, setIsConfirming] = useState(false);
-    const [checkedItems, setCheckedItems] = useState([]);
-    const [scrolling, setScrolling] = useState(false);
-    const [showAlertModal, setShowAlertModal] = useState({
-        text: "",
-        isVisible: false,
-        onOk: () => {
-        },
-        title: "",
-        onClose: () => {
-        },
-        cancelTitle: "",
-        okTitle: "",
-    });
-
-    const isDeleting = items.some(item => item?.selected);
-    const selectedItems = items.filter(item => item?.selected);
-    const showFooter = isDeleting || isConfirming;
-
-    const navigate = useNavigation();
-
-    const isFocused = useIsFocused();
-
-    const handleScroll = Animated.event(
-        [
-            {
-                nativeEvent: {
-                    contentOffset: {y: scrollY.current},
+        const headerHeight = Platform.OS === "ios" ? 90 * 2 : (screenHeight / 10) * 2;
+        const scrollY = useRef(new Animated.Value(0));
+        const scrollYClamped = diffClamp(scrollY.current, 0, headerHeight);
+        const translateY = scrollYClamped.interpolate({
+            inputRange: [0, headerHeight],
+            outputRange: [0, -(headerHeight / 2)],
+        });
+        const translateYNumber = useRef();
+        const scrollRef = useRef(null);
+        const handleScroll = Animated.event(
+            [
+                {
+                    nativeEvent: {
+                        contentOffset: {y: scrollY.current},
+                    },
                 },
+            ],
+            {
+                useNativeDriver: true,
             },
-        ],
-        {
-            useNativeDriver: true,
-        },
-    );
+        );
 
-    translateY.addListener(({value}) => {
-        translateYNumber.current = value;
-        setScrolling(translateYNumber.current === 0);
-    });
+        translateY.addListener(({value}) => {
+            translateYNumber.current = value;
+            setScrolling(translateYNumber.current === 0);
+        });
 
-    const getCloser = (value, checkOne, checkTwo) =>
-        Math.abs(value - checkOne) < Math.abs(value - checkTwo) ? checkOne : checkTwo;
+        const getCloser = (value, checkOne, checkTwo) =>
+            Math.abs(value - checkOne) < Math.abs(value - checkTwo) ? checkOne : checkTwo;
 
-    const handleSnap = ({nativeEvent}) => {
-        const offsetY = nativeEvent.contentOffset.y;
+        const handleSnap = ({nativeEvent}) => {
+            const offsetY = nativeEvent.contentOffset.y;
 
-        if (
-            !(
-                translateYNumber.current === 0 ||
-                translateYNumber.current === -headerHeight / 2
-            )
-        ) {
-            if (ref.current) {
-                ref.current.scrollToOffset({
-                    offset:
-                        getCloser(translateYNumber.current, -headerHeight / 2, 0) ===
-                        -headerHeight / 2
-                            ? offsetY + headerHeight / 2
-                            : offsetY - headerHeight / 2,
-                });
+            if (
+                !(
+                    translateYNumber.current === 0 ||
+                    translateYNumber.current === -headerHeight / 2
+                )
+            ) {
+                if (scrollRef.current) {
+                    scrollRef.current.scrollToOffset({
+                        offset:
+                            getCloser(translateYNumber.current, -headerHeight / 2, 0) ===
+                            -headerHeight / 2
+                                ? offsetY + headerHeight / 2
+                                : offsetY - headerHeight / 2,
+                    });
+                }
             }
-        }
-    };
+        };
 
-    const changeListState = itemId => {
-        selectItem(itemId, true);
-    };
-
-    const selectItem = (itemId, changingState) => {
-        if ((isDeleting || changingState) && deleteItemList) {
-            setItems(
-                items.map(item => {
-                    if (item.id === itemId) {
-                        item.selected = !item.selected;
-
-                        if (item.selected && isConfirming) {
-                            checkItem(item.id);
-                            item.checked = false;
-                            setIsConfirming(false);
-                        }
-                    }
-                    return item;
-                }),
-            );
-        }
-    };
+        const handleMenu = item => {
+            setMenuState({
+                open: !menuState.open,
+                itemInView: items.find(itemInView => itemInView.id === item.id),
+            });
+        };
 
 
-    const searchItems = text => {
-        let regex = ""
+        const selectItem = (itemId) => {
+            console.log("itemId", itemId)
+            items.map(item => {
+                if (item.id === itemId) {
+                    item.selected = !item.selected;
+                }
+                return item;
+            })
 
-        const newText = text.replace("(", "").replace(")", "")
+            setSelectedItems(items.filter(item => item.selected))
+        };
 
-        switch (itemType) {
-            case "schedule":
-                regex = new RegExp(`${newText.trim()}`, "i");
-                setItems(
-                    itemList.filter(
-                        i => i.client.name.search(regex) >= 0 || i.selected || i.checked,
-                    ),
-                );
-                break;
-            case "clientSchedule":
-                regex = new RegExp(`${newText.trim()}`, "i");
-                setItems(
-                    itemList.filter(
-                        i => i.procedure.name.search(regex) >= 0,
-                    ),
-                );
-                break;
-            case "client":
-                regex = new RegExp(`${newText.trim()}`, "i");
-                setItems(
-                    itemList.filter(
-                        i => i.name.search(regex) >= 0 || removeParenthesis(i.tel).search(regex) >= 0,
-                    ),
-                );
-
-                break;
-            case "partner":
-                regex = new RegExp(`${newText.trim()}`, "i");
-                setItems(
-                    itemList.filter(
-                        i => i.name.search(regex) >= 0 || removeParenthesis(i.tel).search(regex) >= 0,
-                    ),
-                );
-
-                break;
-            default:
-                regex = new RegExp(`${newText.trim()}`, "i");
-                setItems(itemList.filter(i => i.name.search(regex) >= 0 || i.selected));
-                break;
-        }
-    };
-
-    const unselectItems = () => {
-        setItems(
+        const unselectItems = () => {
+            setSelectedItems([])
             items.map(item => {
                 item.selected = false;
                 return item;
-            }),
-        );
-    };
+            })
+        };
 
-    const closeMenu = () => {
-        setMenuState({
-            open: false,
-            itemToShow: {},
-        });
-    };
 
-    const deleteItem = itemToDelete => {
-        deleteUniqueItem(itemToDelete);
-
-        setItems(items.filter(item => item.id !== itemToDelete.id));
-    };
-    const deleteItems = itemsToDelete => {
-        deleteItemList(itemsToDelete);
-        let newItems = items;
-
-        itemsToDelete.forEach(itemToDelete => {
-            newItems.forEach((item, index) => {
-                if (itemToDelete.id === item.id) {
-                    newItems.splice(index, 1);
-                }
-            });
-        });
-
-        setItems(newItems);
-    };
-
-    const deleteItemProcedure = (itemProcedure, itemId, forceDelete, item) => {
-        if (handleItemProcedure(itemProcedure, itemId) || forceDelete) {
-            deleteProcedure(itemProcedure);
-            const newItemList = itemList;
-            newItemList.forEach(item => {
+        const markItem = (itemId) => {
+            items.map(item => {
                 if (item.id === itemId) {
-                    item.procedures.forEach((procedure, index) => {
-                        if (procedure.id === itemProcedure.id) {
-                            item.procedures.splice(index, 1);
-                        }
-                    });
+                    item.marked = !item.marked;
+                }
+                return item;
+            })
+
+            setIsConfirming(true);
+            setMarkedItems(items.filter(item => item.marked))
+        }
+
+
+        const unmarkItems = () => {
+            setMarkedItems([])
+            items.map(item => {
+                item.marked = item.analyzedSchedule;
+                return item;
+            })
+
+            setIsConfirming(false);
+        };
+
+        const doSearch = () => {
+            let searchedItems = items;
+
+            const searchType = {
+                "schedule": () => {
+                    searchedItems = items.filter(
+                        i => i.client.name.search(regex) >= 0 || i.selected || i.checked,
+                    )
+                },
+                "clientSchedule": () => {
+                    searchedItems = items.filter(
+                        i => i.procedure.name.search(regex) >= 0,
+                    )
+                },
+                "employee": () => {
+                    searchedItems = items.filter(
+                        i => i.name.search(regex) >= 0 || removeParenthesis(i.tel).search(regex) >= 0,
+                    )
+                },
+                "procedure": () => {
+                    searchedItems = items.filter(i => i.name.search(regex) >= 0 || i.selected)
+                },
+                "client": () => {
+                    searchedItems = items.filter(
+                        i => i.name.search(regex) >= 0 || removeParenthesis(i.tel).search(regex) >= 0,
+                    )
+                },
+                "default": () => {
+                    searchedItems = items.filter(i => i.name.search(regex) >= 0 || i.selected)
+                }
+            }
+
+            if (search !== "") {
+                searchType[itemType || "default"]()
+            }
+
+            return searchedItems
+        };
+
+
+        const closeMenu = () => {
+            setMenuState({
+                open: false,
+                itemInView: {},
+            });
+        };
+
+        const onDelete = (item) => {
+            onDeleteItem(item || selectedItems);
+            unselectItems()
+        };
+
+        const onDeleteItemProcedure = (procedure, item) => {
+            item.procedures.forEach((itemProcedure, index) => {
+                if (itemProcedure.id === procedure.id) {
+                    item.procedures.splice(index, 1);
                 }
             });
+            setMenuState({
+                ...menuState,
+                itemInView: item,
+            });
+            onUpdateItem(item)
+        };
 
-            setItems(newItemList);
+// const handleItemProcedure = (itemProcedure, itemId) => {
+//     let ableToDelete = true;
+//     const item = items.find(item => item.id === itemId);
+//     const {procedures} = item;
+//
+//     if (itemType === "schedule") {
+//         if (procedures.length === 1) {
+//             ableToDelete = false;
+//             setShowAlertModal({
+//                 text: "Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!",
+//                 isVisible: true,
+//                 onOk: () => {
+//                     deleteItemProcedure(itemProcedure, itemId, true, item);
+//                     setShowAlertModal({isVisible: false});
+//                     handleMenu(item);
+//                 },
+//                 title: "Atenção",
+//                 onClose: () => setShowAlertModal({isVisible: false}),
+//                 cancelTitle: "Cancelar",
+//                 okTitle: "Apagar",
+//             });
+//         }
+//     }
+//     return ableToDelete;
+// };
 
-            if (forceDelete) deleteItem(item);
-        }
-    };
 
-    const handleItemProcedure = (itemProcedure, itemId) => {
-        let ableToDelete = true;
-        const item = items.find(item => item.id === itemId);
-        const {procedures} = item;
-
-        if (itemType === "schedule") {
-            if (procedures.length === 1) {
-                ableToDelete = false;
-                setShowAlertModal({
-                    text: "Se você apagar o último procedimento desse agendamento, o agendamento por inteiro também será excluído!",
-                    isVisible: true,
-                    onOk: () => {
-                        deleteItemProcedure(itemProcedure, itemId, true, item);
-                        setShowAlertModal({isVisible: false});
-                        handleMenu(item);
-                    },
-                    title: "Atenção",
-                    onClose: () => setShowAlertModal({isVisible: false}),
-                    cancelTitle: "Cancelar",
-                    okTitle: "Apagar",
-                });
-            }
-        }
-        return ableToDelete;
-    };
-
-    const checkItem = id => {
-        checkItems(id);
-        const newItemList = itemList;
-        if (id === -1) {
+        const doConfirm = () => {
+            analyzeItem([...markedItems, ...items]);
+            setSelectedItems([]);
+            setMarkedItems([]);
             setIsConfirming(false);
-            setCheckedItems([]);
-        } else {
-            setIsConfirming(true);
-            const itemToConfirm = newItemList.find(item => item.id === id);
-            if (checkedItems.length === 0)
-                setCheckedItems([...checkedItems, itemToConfirm]);
-            else if (
-                !checkedItems.some(checkedItem => checkedItem.id === itemToConfirm.id)
-            )
-                setCheckedItems([...checkedItems, itemToConfirm]);
-        }
-
-        setItems(newItemList);
-    };
-
-    const onConfirm = () => {
-        confirmItems(checkedItems);
-        setCheckedItems([]);
-        setIsConfirming(false);
-    };
-
-    const handleMenu = item => {
-        setMenuState({
-            open: !menuState.open,
-            itemToShow: itemList.find(itemToShow => itemToShow.id === item.id),
-        });
-    };
-    const doRefresh = async () => {
-        setItems(await fetchData());
-    };
-
-    return (
+        };
 
 
+        const doRefresh = async () => {
+            await fetchData();
+        };
+
+        return (
             <S.Container>
                 {showMenu && (
                     <ListMenu
@@ -344,22 +278,21 @@ const List = ({
                         handleMenu={handleMenu}
                         showCalendarButton={showCalendarButton}
                         isConfirming={isConfirming}
-                        checkItem={checkItem}
-                        onConfirm={onConfirm}
+                        onConfirm={doConfirm}
                         itemType={itemType}
                         objectMenuItems={objectMenuItems}
                         menuState={menuState}
                         color={color}
+                        onMarkItem={markItem}
+                        onCancel={unmarkItems}
                         menuItems={menuItems}
-                        deleteItem={deleteItem}
+                        onDeleteItem={onDelete}
                         closeMenu={closeMenu}
                         onEditNavigateTo={onEditNavigateTo}
-                        deleteProcedure={deleteItemProcedure}
+                        onDeleteProcedure={onDeleteItemProcedure}
                         goToSchedules={goToSchedules}
                     />
                 )}
-
-                <Loading isLoading={isLoading} color={color}/>
 
                 {showHeader && (
                     <Animated.View
@@ -375,7 +308,6 @@ const List = ({
                         ]}>
                         <ListHeader
                             showCloseButton={showCloseButton}
-                            onBack={checkItem}
                             backButtonHeader={backButtonHeader}
                             showBackButton={showBackButton}
                             isDeleting={isDeleting}
@@ -383,9 +315,9 @@ const List = ({
                             headerColor={color}
                             headerTitle={headerText}
                             headerSubTitle={subHeaderText}
-                            searchItems={searchItems}
+                            onSearch={(text) => setSearch(text)}
                             selectedItemsLength={selectedItems?.length}
-                            cancelDelete={unselectItems}
+                            onCancel={unselectItems}
                             handleAgenda={handleAgenda}
                             showProfileIcon={showProfileIcon}
                             headerHeight={headerHeight}
@@ -396,13 +328,13 @@ const List = ({
                 )}
                 <S.Body isDeleting={isDeleting} isConfirming={isConfirming}>
                     <Animated.FlatList
-                        ref={ref}
+                        ref={scrollRef}
                         scrollEventThrottle={16}
                         contentContainerStyle={{paddingTop: showHeader ? headerHeight : 0}}
                         onMomentumScrollEnd={handleSnap}
                         onScroll={handleScroll}
                         keyExtractor={item => item.id}
-                        data={items}
+                        data={doSearch()}
                         // onEndReached={fetchMoreData}
                         // onEndReachedThreshold={0.2}
 
@@ -419,12 +351,12 @@ const List = ({
                                 isDeleting={isDeleting}
                                 itemType={itemType}
                                 color={color}
-                                changeListState={changeListState}
-                                selectItem={selectItem}
-                                checkItem={checkItem}
+                                onSelect={selectItem}
+                                selectedItems={selectedItems}
                                 onPressItem={() => {
                                     handleMenu(item)
                                 }}
+                                onMarkItem={markItem}
                                 showMenu={showMenu}
                             />
                         )}
@@ -453,28 +385,28 @@ const List = ({
                     />
                 )}
 
-                {showFooter && deleteItemList && (
+                {showFooter && (
                     <S.Footer color={color}>
                         <S.FooterButtons>
                             {isDeleting && (
                                 <Button
                                     disabled={false}
-                                    onPress={() => deleteItems(selectedItems)}
+                                    onPress={() => onDelete()}
                                     text={"Apagar"}
                                     width={"120px"}
                                     height={"35px"}
                                     fontSize={"17px"}
                                     color={color}
-                                    textColor={Colors.BACKGROUND_COLOR}
-                                    backgroundColor={color}
+                                    textColor={color}
+                                    backgroundColor={Colors.BACKGROUND_COLOR}
                                 />
                             )}
 
-                            {isConfirming && (
+                            {isConfirming && !isDeleting && (
                                 <>
                                     <Button
                                         disabled={false}
-                                        onPress={onConfirm}
+                                        onPress={doConfirm}
                                         text={"Confirmar"}
                                         width={"120px"}
                                         height={"35px"}
@@ -484,9 +416,7 @@ const List = ({
                                         backgroundColor={Colors.BACKGROUND_COLOR}
                                     />
                                     <S.CancelButton
-                                        onPress={() => {
-                                            checkItem(-1);
-                                        }}>
+                                        onPress={unmarkItems}>
                                         <Times
                                             fill={"#fff"}
                                             borderFill={"#fff"}
@@ -511,7 +441,8 @@ const List = ({
                 {/*  okTitle={showAlertModal.okTitle}*/}
                 {/*/>*/}
             </S.Container>
-    );
-};
+        );
+    }
+;
 
 export default List;

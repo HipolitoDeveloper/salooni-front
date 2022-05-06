@@ -36,7 +36,7 @@ export const validateInformationBeforeInsert = async params => {
     {
       cnpj: owner.cnpj,
       email: owner.email,
-      name: owner.userName,
+      name: owner.name,
       tel: owner.tel,
       employeeType: "OWN",
     },

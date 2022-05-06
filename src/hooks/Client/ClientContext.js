@@ -36,10 +36,11 @@ const ClientProvider = ({ children }) => {
     let clients = [];
     try {
       clients = await getAllClientsBySalonId(payload);
+      dispatch({ type: "LOAD_CLIENTS", clients });
+
     } catch (e) {
       handleError(e, "client");
     }
-    dispatch({ type: "LOAD_CLIENTS", clients });
   };
 
 
@@ -47,11 +48,10 @@ const ClientProvider = ({ children }) => {
     let newClient = {};
     try {
       newClient = await saveClientParse(client);
-      return newClient;
+      dispatch({ type: "SAVE_CLIENTS", newClient });
     } catch (e) {
       handleError(e, "client");
     }
-    dispatch({ type: "SAVE_CLIENTS", newClient });
   };
 
   const updateClient = async payload => {
@@ -64,25 +64,14 @@ const ClientProvider = ({ children }) => {
     dispatch({ type: "UPDATE_CLIENT", updatedClient });
   };
 
-  const deleteUniqueClient = async payload => {
-    const { id } = payload;
-    let deletedClient = {};
-      try {
-        deletedClient = await deleteClientParse(id);
-      } catch (e) {
-        handleError(e, "client");
-      }
-    dispatch({ type: "DELETE_CLIENT", deletedClient })
-  };
-
-  const deleteClientList = async payload => {
+  const deleteClient = async payload => {
       const clients = payload;
       try {
         await deleteClientsParse(clients);
       } catch (e) {
         handleError(e, "client");
       }
-    dispatch({ type: "DELETE_CLIENTS", clients })
+    dispatch({ type: "DELETE_CLIENT", clients })
   };
 
 
@@ -94,8 +83,7 @@ const ClientProvider = ({ children }) => {
     loadAllClients,
     saveClient,
     updateClient,
-    deleteUniqueClient,
-    deleteClientList,
+    deleteClient,
     clearClients,
     ...state,
   };

@@ -20,19 +20,9 @@ export const ProcedureReducer = (state, action) => {
           return procedure;
         })
       };
+
     case 'DELETE_PROCEDURE':
-      const { id } = action.deletedProcedures;
-      state.procedures.forEach((procedure, index) => {
-        if (procedure.id === id) {
-          state.procedures.splice(index, 1);
-        }
-      });
-      return {
-        ...state,
-        procedures: state.procedures,
-      };
-    case 'DELETE_PROCEDURES':
-      const procedures = action.procedures;
+      const procedures = action.deletedProcedures;
       procedures.forEach(deletedProcedure => {
         state.procedures.forEach((procedure, index) => {
           if (procedure.id === deletedProcedure.id) {

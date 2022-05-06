@@ -45,9 +45,9 @@ export const HeaderText = styled.Text`
 `;
 
 export const BodyContent = styled.View`
-  height: 68%;
+  height: 100%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
 `;

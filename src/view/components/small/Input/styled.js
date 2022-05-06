@@ -1,22 +1,15 @@
 import styled from 'styled-components/native/dist/styled-components.native.esm';
 import Fonts from "../../../../common/style/Fonts";
+import {StyleSheet} from "react-native";
 
 export const InputContent = styled.View`
+  padding-bottom: 10px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   width: ${props => (props.width ? props.width : '100%')};
-`;
-
-export const Input = styled.TextInput`
-  font-family: ${Fonts.MAIN};
-  color: black;
-  opacity: ${props => (props.disabled ? 0.4 : 1)};
-  width: 100%;
-  border-bottom-width: 1px;
-  border-bottom-color: ${props =>
-    props.borderBottomColor ? props.borderBottomColor : 'black'};
+  
 `;
 
 export const InputTitle = styled.Text`
@@ -24,7 +17,7 @@ export const InputTitle = styled.Text`
   font-size: ${props => `${props.screenHeight / 50}px`};
   position: absolute;
   left: 0;
-  top: 0;
+  top: -5px;
   color: ${props => props.color};
 `;
 

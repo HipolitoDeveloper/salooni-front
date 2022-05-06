@@ -1,7 +1,7 @@
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import {useNavigation} from "@react-navigation/native";
 import moment from "moment";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Dimensions, Text} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 
@@ -21,12 +21,13 @@ import {scheduleValidationSchema} from "../../../../../common/validators/Schemas
 import {useLayout} from "../../../../../hooks/Layout";
 import DatePicker from "../../../../components/small/DatePicker";
 import {xorBy} from "lodash";
+import Constants from "../../../../../common/Constants";
+import Errors from "../../../../../common/Errors";
+import {currentDate} from "../../../../../factory/ScheduleFactory";
 
 const defaultValues = {
-    client: "",
-    employee: {},
     procedures: [],
-    scheduleDate: new Date(),
+    scheduleDate: currentDate,
 };
 
 const ScheduleRegister = ({route}) => {
@@ -35,112 +36,140 @@ const ScheduleRegister = ({route}) => {
         resolver: yupResolver(scheduleValidationSchema),
     });
 
-    const {control, reset, getValues, handleSubmit, setValue} = methods;
+    const {control, reset, getValues, handleSubmit, setValue, setError, clearErrors} = methods;
+
     const {handleModal, modal, handleLoading} = useLayout();
 
     const {
         saveSchedule,
-        registeredSchedules,
-        updateScheduleInView,
-        cleanRegisteredSchedules,
-        editSchedule,
-        addSchedule,
         updateSchedule,
         deleteSchedule,
-        deleteScheduleInView,
-        sortScheduleList,
         schedules,
     } = useSchedule();
     const screenHeight = Dimensions.get("screen").height;
 
-    const {employees} = useEmployee();
+    const {employees, currentEmployee} = useEmployee();
     const {clients} = useClient();
     const {procedures} = useProcedure();
     const {currentUser, isOwner} = useUser();
 
-    const [errors, setErrors] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
-
-    const currentEmployee =
-        employees.find(employees => employees.id === currentUser.idFunc) !== undefined
-            ? employees.find(employees => employees.id === currentUser.idFunc)
-            : {};
-
-    // const [schedule, setSchedule] = useState({
-    //   client: "",
-    //   employee: currentEmployee,
-    //   procedures: [],
-    //   scheduleDate: new Date(route.params?.date),
-    // });
+    const [procedureOptions, setProcedureOptions] = useState([]);
 
     const navigate = useNavigation();
 
-    // navigate.addListener('beforeRemove', () => {
-    //   sortSchedules();
-    // });
-    //
-    // navigate.addListener("focus", () => {
-    //   const scheduleInView = route.params?.schedule ? route.params?.schedule : {};
+    useEffect(() => {
+        setValue("employee",
+            currentEmployee ??
+            {})
 
-    //   if (Object.keys(scheduleInView).length !== 0) {
-    //     setSchedule({
-    //       ...scheduleInView,
-    //       procedureListWithoutChanges: scheduleInView.procedures,
-    //     });
-    //     setIsEditing(true);
-    //   }
-    // });
+        setProcedureOptions(currentEmployee?.procedures?.map(employeeProcedure => {
+            const availableProcedure = procedures.find(procedure => employeeProcedure.id === procedure.id)
+            return {id: availableProcedure?.id, name: availableProcedure?.name, time: availableProcedure?.time}
+        }))
+    }, [employees])
+
+    useEffect(() => {
+        const scheduleInView = route.params?.schedule;
+
+        if (Object.keys(scheduleInView).length !== 0) {
+            setIsEditing(true)
+            const {id, client, employee, procedures: scheduleProcedures, scheduleDate} = scheduleInView
+            console.log("scheduleInView", scheduleInView)
+            setValue("id", id)
+            setValue("client", client)
+            setValue("employee", employee)
+            setValue("scheduleDate", scheduleDate)
+            setValue("procedures", scheduleProcedures?.map(employeeProcedure => {
+                const availableProcedure = procedures.find(procedure => employeeProcedure.id === procedure.id)
+                return {id: availableProcedure?.id, name: availableProcedure?.name, time: availableProcedure?.time}
+            }))
+
+            setProcedureOptions(employee?.procedures?.map(procedure => {
+                return {
+                    ...procedure,
+                    selected: scheduleProcedures.some(scheduleProcedure => scheduleProcedure.id === procedure.id)
+                }
+            }))
+
+        }
+    }, [procedures, route])
+
+    const setProcedures = () => {
+        setValue("procedures", [])
+
+        setProcedureOptions(currentUser.idFunc === getValues("employee").id
+            ? procedures
+            : getValues("employee")?.procedures?.map(procedureOption => {
+                const availableProcedure = procedures.find(procedure => procedureOption.id === procedure.id)
+                return {id: availableProcedure.id, name: availableProcedure.name}
+            }))
+    }
 
     const handleMultiSelect = (items, handleCallback) => {
-        let selectedItems = xorBy(getValues("procedures"), [items], "name");
+        let selectedItems = xorBy(getValues("procedures"), [items], "id");
         handleCallback(selectedItems)
     };
 
 
-    const saveSchedules = (data) => {
-        console.log("data", data)
-        // schedule.salonId = currentUser.idSalon;
-        // setIsLoading(true);
-        // saveSchedule(schedule).then(
-        //   () => {
-        //     sortScheduleList();
-        //     cleanRegisteredSchedules();
-        //     handleErrorMessage([""]);
-        //     clearSchedule();
-        //     handleModal(true, "Gostaria de marcar mais algum agendamento? ");
-        //     setIsLoading(false);
-        //   },
-        //   error => {
-        //     setIsLoading(false);
-        //     console.error(error);
-        //   },
-        // );
+    const  saveSchedules = async (data) => {
+        data.salonId = currentUser.idSalon;
+        handleLoading(true);
+        try {
+            await saveSchedule(data);
+            handleLoading(false);
+            handleModal({
+                ...modal,
+                visible: true,
+                variant: "confirm",
+                title: Constants.ATTENTION,
+                text: Constants.MORE_SCHEDULE_REGISTER,
+                onOk: () => {
+                    reset();
+                },
+                onClose: () => {
+                    navigate.push('TabStack', {screen: 'Schedules'})
+                },
+            });
+        } catch (err) {
+            console.error("SaveSchedulesError", err);
+            handleLoading(false);
+            handleModal({
+                ...modal,
+                visible: true,
+                variant: "alert",
+                errors: Errors.ERROR_MESSAGE,
+            });
+        }
     };
 
-    const updateSchedules = () => {
-        // setIsLoading(true);
-        // updateSchedule(schedule).then(
-        //   () => {
-        //     sortScheduleList();
-        //     setIsLoading(false);
-        //     navigate.replace("TabStack", {
-        //       screen: "Schedules",
-        //       params: {
-        //         isToShowAgenda: false,
-        //       },
-        //     });
-        //     setIsLoading(false);
-        //     handleErrorMessage([""]);
-        //
-        //     clearSchedule();
-        //   },
-        //
-        //   error => {
-        //     setIsLoading(false);
-        //     console.error(error);
-        //   },
-        // );
+    const updateSchedules = async (data) => {
+        handleLoading(true);
+
+        try {
+            await updateSchedule(data)
+            handleLoading(false);
+            navigate.push('TabStack', {screen: 'Schedules'})
+        } catch (error) {
+            handleLoading(false);
+            console.error(error)
+
+        }
     };
+
+    const setScheduleDate = (value, onChange) => {
+        if (verifyHourBeforeSet(value)) {
+            onChange(value)
+            clearErrors("scheduleDate")
+        } else {
+            setError("scheduleDate", {type: "custom", message: Errors.SCHEDULE_DATE_ERROR})
+        }
+    }
+
+    const clearProcedures = () => {
+        setValue("procedures", []);
+    };
+
 
     const verifyHourBeforeSet = (selectedDate) => {
         let ableToSet = true;
@@ -151,7 +180,7 @@ const ScheduleRegister = ({route}) => {
         }
 
         schedules.forEach(({procedures}) => {
-            procedures.forEach(({startDate, endDate}) => {
+            procedures.forEach(({procedure_start_date: startDate, procedure_end_date: endDate}) => {
                 const formattedStartDate = convertStringDateToDate(startDate);
                 const formattedEndDate = convertStringDateToDate(endDate);
                 const formattedTestDate = convertStringDateToDate(formattedSelectDateHour);
@@ -166,38 +195,7 @@ const ScheduleRegister = ({route}) => {
         return ableToSet;
     };
 
-    // const validForm = () => {
-    //   let ableToSubmit = true;
-    //   let messages = [];
-    //   if (
-    //     schedule === {} ||
-    //     schedule.client === undefined ||
-    //     Object.keys(schedule.client).length === 0 ||
-    //     typeof schedule.client === "string" ||
-    //     schedule.employee === undefined ||
-    //     Object.keys(schedule.employee).length === 0 ||
-    //     typeof schedule.employee === "string" ||
-    //     schedule.procedures === undefined ||
-    //     schedule.procedures.length === 0
-    //   ) {
-    //     ableToSubmit = false;
-    //     // messages.push(errorMessages.scheduleRegisterMessage);
-    //   }
-    //
-    //   if (!verifyHourBeforeSet(schedule.scheduleDate)) {
-    //     ableToSubmit = false;
-    //     // messages.push(errorMessages.scheduleDateMessage);
-    //   }
-    //
-    //   handleErrorMessage(messages);
-    //
-    //   return ableToSubmit;
-    // };
 
-
-    const clearProcedures = () => {
-        setValue("procedures", []);
-    };
 
     return (
         <FormProvider {...methods}>
@@ -206,7 +204,6 @@ const ScheduleRegister = ({route}) => {
                     navigate.goBack()
                 }
                 color={Colors.PURPLE}
-                preRegisteredItems={registeredSchedules}
                 onConfirm={isEditing ? updateSchedules : handleSubmit(saveSchedules)}
                 isEditing={isEditing}
                 registeredItemRightInformation={"procedures"}
@@ -224,10 +221,16 @@ const ScheduleRegister = ({route}) => {
                                      field: {onChange, value, name},
                                      fieldState: {error},
                                  }) => (
-                            <DatePicker screenHeight={screenHeight}
+                            <DatePicker
+                                        mode="datetime"
                                         color={Colors.PURPLE}
                                         value={value}
-                                        onChange={onChange}
+                                        onChange={(value) => setScheduleDate(value, onChange)}
+                                        error={error}
+                                        width={"90%"}
+                                        fontSize={50}
+                                        label={"Data de Agendamento"}
+                                        // icon={'calendar-alt'}
                             />
                         )}/>
 
@@ -241,7 +244,7 @@ const ScheduleRegister = ({route}) => {
                             <AutoComplete
                                 inputText={"Cliente*"}
                                 placeholder={"Procure por um cliente"}
-                                iconName={"user"}
+                                // iconName={"user"}
                                 textColor={Colors.DARK_GREY}
                                 iconColor={Colors.PURPLE}
                                 searchLengthToSuggest={2}
@@ -250,6 +253,7 @@ const ScheduleRegister = ({route}) => {
                                 value={value}
                                 handleChange={onChange}
                                 error={error}
+                                fontSize={50}
                             />
                         )}/>
 
@@ -265,7 +269,7 @@ const ScheduleRegister = ({route}) => {
                                 editable={isOwner}
                                 placeholder={"Procure por um parceiro"}
                                 textColor={Colors.DARK_GREY}
-                                iconName={"cut"}
+                                // iconName={"cut"}
                                 iconColor={Colors.PURPLE}
                                 searchLengthToSuggest={2}
                                 options={
@@ -275,11 +279,13 @@ const ScheduleRegister = ({route}) => {
                                 }
                                 name={name}
                                 value={value}
-                                handleChange={onChange}
+                                handleChange={(suggestion) => {
+                                    onChange(suggestion);
+                                    setProcedures()
+                                }}
                                 error={error}
+                                fontSize={50}
                             />)}/>
-
-                    <Text>{JSON.stringify(getValues("employee"))}</Text>
 
                     <Controller
                         name="procedures"
@@ -290,22 +296,19 @@ const ScheduleRegister = ({route}) => {
                                  }) => (
                             <MultipleSelect
                                 inputText={"Procedimentos*"}
-                                disabled={Object.keys(getValues("employee")).length > 5}
+                                // disabled={Object.keys(getValues("employee")).length > 5}
                                 iconColor={Colors.PURPLE}
                                 plusIconColor={Colors.PURPLE}
                                 modalHeaderText={"Escolha os procedimentos"}
-                                options={
-                                    currentUser.idFunc === getValues("employee").id
-                                        ? procedures
-                                        : getValues("employee").procedures
-                                }
+                                options={procedureOptions}
                                 selectTextColor={Colors.DARK_GREY}
                                 selectedItemBorderColor={Colors.PURPLE}
                                 value={value}
                                 handleMultiSelect={(items) => handleMultiSelect(items, onChange)}
                                 placeholderText={"Procedimentos"}
                                 clearValue={clearProcedures}
-                            /> )} />
+                            />
+                        )}/>
                 </S.BodyContent>
 
             </RegisterComponent>

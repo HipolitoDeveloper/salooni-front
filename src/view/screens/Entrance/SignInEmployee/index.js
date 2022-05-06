@@ -22,9 +22,9 @@ import {getEmployeeByEmail} from "../../../../services/EmployeeService";
 import Errors from "../../../../common/Errors";
 
 const defaultValues = {
-    email: "gabriel@gmail.com",
+    email: "parceiro1@gmail.com",
     password: "",
-    cnpj: "09509531001070"
+    cnpj: "62541680000108"
 };
 
 
@@ -46,10 +46,11 @@ const SignInEmployee = () => {
     const verifyIfAlreadyEntered = async () => {
         try {
             const {employeeType, firstAccess, ...employeeData} = await getEmployeeByEmail(getValues("email").trim());
+
             setEmployee(employeeData)
             setValue("employee", employeeData)
 
-            if (employeeType !== "PRC") {
+            if (employeeType !== "FNC") {
                 throw Errors.NOT_A_EMAIL_EMPLOYEE_ERROR;
             }
 
@@ -62,7 +63,7 @@ const SignInEmployee = () => {
                     text: Constants.FOUND_EMAIL_EMPLOYEE,
                     okTitle: 'Ok',
                     onOk: () => {
-                        setHasRegister(true)
+                        setStep(1)
                         clearModal()
                     },
                 });
@@ -75,25 +76,27 @@ const SignInEmployee = () => {
                     text: Constants.FIRST_ACCESS_EMPLOYEE_ALERT,
                     okTitle: 'Ok',
                     onOk: () => {
-                        setStep(1)
+                        setHasRegister(true)
                         clearModal()
                     },
                 });
             }
         } catch (error) {
-            handleModal({...modal, title: Constants.ATTENTION, visible: true, variant: "alert", errors: error});
+            console.error("verifyIfAlreadyEnteredErrors", error)
+            handleModal({...modal, title: Constants.ATTENTION, visible: true, variant: "alert", errors: [{message: error}]});
         }
     }
 
     const verifyCNPJ = async () => {
+        const {salon: {cnpj}} = employee
         try {
-            if (getValues("cnpj") !== employee.cnpj) {
+            if (getValues("cnpj") !== cnpj) {
                 handleModal({
                     ...modal,
                     title: Constants.ATTENTION,
                     visible: true,
                     variant: "alert",
-                    errors:  Errors.NOT_A_CNPJ_EMPLOYEE_ERROR
+                    errors: [{message: Errors.NOT_A_CNPJ_EMPLOYEE_ERROR}]
                 });
             } else {
                 handleModal({
@@ -110,7 +113,7 @@ const SignInEmployee = () => {
                 });
             }
         } catch (error) {
-            handleModal({...modal,  title: Constants.ATTENTION, visible: true, variant: "alert", errors:  Errors.ERROR_MESSAGE});
+            handleModal({...modal,  title: Constants.ATTENTION, visible: true, variant: "alert", errors: [{message: Errors.ERROR_MESSAGE}]});
         }
     };
 
@@ -121,7 +124,7 @@ const SignInEmployee = () => {
             await onSignup(data);
             handleLoading(false);
         } catch (error) {
-            handleModal({...modal,  title: Constants.ATTENTION,visible: true, variant: "alert", errors: Errors.ERROR_MESSAGE});
+            handleModal({...modal,  title: Constants.ATTENTION,visible: true, variant: "alert", errors: [{message: Errors.ERROR_MESSAGE}]});
             handleLoading(false);
         }
     };
@@ -132,7 +135,7 @@ const SignInEmployee = () => {
             await onLogin(data)
             handleLoading(false);
         } catch (error) {
-            handleModal({...modal, visible: true, variant: "alert", errors: error});
+            handleModal({...modal, visible: true, variant: "alert", errors: [{message: Errors.ERROR_MESSAGE}]});
             handleLoading(false);
         }
     };

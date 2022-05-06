@@ -1,264 +1,294 @@
 import Parse from "parse/react-native";
-import { EmployeeObject } from "./EmployeeService";
-import { ClientObject } from "./ClientService";
-import { buildSchedule, buildScheduleList } from "../factory/ScheduleFactory";
-import { ProcedureObject } from "./ProcedureService";
+import {EmployeeObject} from "./EmployeeService";
+import {ClientObject} from "./ClientService";
+import {buildSchedule, buildScheduleList} from "../factory/ScheduleFactory";
+import {ProcedureObject} from "./ProcedureService";
 import {
-  confirmScheduleProcedure,
-  deleteScheduleProcedureById,
-  saveScheduleProcedure,
+    confirmScheduleProcedure,
+    deleteScheduleProcedureById,
+    saveScheduleProcedure,
 } from "./ScheduleProcedureService";
-import { SalonObject } from "./SalonService";
+import {SalonObject} from "./SalonService";
 import moment from "moment";
-import { convertToObj } from "../common/converters/GenericConverter";
+import {convertToObj} from "../common/converters/GenericConverter";
+import {buildEmployeeList} from "../factory/EmployeeFactory";
 
 export const ScheduleObject = Parse.Object.extend("schedule");
 
 export const getAllSchedulesBySalon = async (
-  employeeId,
-  salonId,
-  employeeType,
+    employeeId,
+    salonId,
+    employeeType,
 ) => {
-  const ScheduleQuery = new Parse.Query(ScheduleObject);
-  ScheduleQuery.equalTo("salon_id", new SalonObject({ objectId: salonId }));
-  if (employeeType === "PRC") {
-    ScheduleQuery.equalTo(
-      "employee_id",
-      new EmployeeObject({ objectId: employeeId }),
-    );
-  }
-  ScheduleQuery.include("employee_id");
-  ScheduleQuery.include("client_id");
+    const ScheduleQuery = new Parse.Query(ScheduleObject);
+    ScheduleQuery.equalTo("salon_id", new SalonObject({objectId: salonId}));
+    if (employeeType === "FNC") {
+        ScheduleQuery.equalTo(
+            "employee_id",
+            new EmployeeObject({objectId: employeeId}),
+        );
+    }
+    ScheduleQuery.include("employee_id");
+    ScheduleQuery.include("client_id");
 
-  try {
-    const schedules = await ScheduleQuery.find();
-    return schedules.length ? await buildScheduleList(convertToObj(schedules)) : [];
-  } catch (e) {
-    throw e;
-  }
+    try {
+        const schedules = await ScheduleQuery.find();
+        return schedules.length ? await buildScheduleList(convertToObj(schedules)) : [];
+    } catch (e) {
+        throw e;
+    }
 };
 
 
 export const saveScheduleParse = async (schedule) => {
-  const {
-    client,
-    employee,
-    procedures,
-    scheduleDate,
-    analyzedSchedule,
-    salonId,
-  } = schedule;
-  const ScheduleParse = new ScheduleObject();
-  ScheduleParse.set("employee_id", new EmployeeObject({ objectId: employee.id }));
-  ScheduleParse.set("client_id", new ClientObject({ objectId: client.id }));
-  ScheduleParse.set("salon_id", new SalonObject({ objectId: salonId }));
-  // schedule.set('Observacao', 'Teste');
-  ScheduleParse.set("schedule_date", moment(scheduleDate.toString()).format("DD/MM/YYYY - HH:mm"));
-  // schedule.set('analyzed_schedule', analyzedSchedule);
+    const {
+        client,
+        employee,
+        procedures,
+        scheduleDate,
+        analyzedSchedule,
+        salonId,
+    } = schedule;
+    const ScheduleParse = new ScheduleObject();
+    ScheduleParse.set("employee_id", new EmployeeObject({objectId: employee.id}));
+    ScheduleParse.set("client_id", new ClientObject({objectId: client.id}));
+    ScheduleParse.set("salon_id", new SalonObject({objectId: salonId}));
+    // schedule.set('Observacao', 'Teste');
+    ScheduleParse.set("schedule_date", scheduleDate.toString());
+    ScheduleParse.set("procedures", JSON.stringify(procedures.map(procedure => {
+        const procedureEndDate = moment(scheduleDate).add(procedure.time, "minutes").format("DD/MM/YYYY - HH:mm");
+        const procedureStartDate = moment(scheduleDate.toString()).format("DD/MM/YYYY - HH:mm");
+        return {
+            procedure_start_date: procedureStartDate,
+            procedure_end_date: procedureEndDate,
+            id: procedure.id,
+            // accomplished_procedure: false //TODO: Verificação especifica de procedimento por procedimento
+        }
+    })));
+    ScheduleParse.set('analyzed_schedule', false);
+    ScheduleParse.set('accomplished_schedule', false);
 
-  try {
-    const savedSchedule = await ScheduleParse.save();
+    try {
+        const savedSchedule = await ScheduleParse.save();
 
-    for (const procedure of procedures) {
-      const procedureEndDate = moment(scheduleDate).add(procedure.time, "minutes").format("DD/MM/YYYY - HH:mm");
-      const procedureStartDate = moment(scheduleDate.toString()).format("DD/MM/YYYY - HH:mm");
+        return buildSchedule(convertToObj(savedSchedule));
 
-      const scheduleProcedure = await saveScheduleProcedure(
-        {
-          procedureId: new ProcedureObject({ objectId: procedure.id }),
-          scheduleId: new ScheduleObject({ objectId: schedule.id }),
-        },
-        false,
-        procedureEndDate,
-        procedureStartDate,
-      );
-
-      procedures.scheduleProcedureId = scheduleProcedure.objectId;
+    } catch (e) {
+        throw e;
     }
-
-    return buildSchedule(convertToObj(savedSchedule), procedures);
-
-  } catch (e) {
-    throw e;
-  }
 };
 
 export const updateSchedulePase = async (scheduleObj) => {
-  const {
-    id,
-    client,
-    employee,
-    procedures,
-    procedureListWithoutChanges,
-    scheduleDate,
-  } = scheduleObj;
-  const schedule = new ScheduleObject({ objectId: id });
-  schedule.set("employee_id", new EmployeeObject({ objectId: employee.id }));
-  schedule.set("client_id", new ClientObject({ objectId: client.id }));
-  // schedule.set('Observacao', 'Teste');
-  schedule.set("schedule_date", moment(scheduleDate.toString()).format("DD/MM/YYYY - HH:mm"));
-
-  try {
-    const updatedSchedule = await schedule.save();
-
-    for (const procedure of procedureListWithoutChanges) {
-      if (!procedures.some(p => p.name === procedure.name)) {
-        await deleteScheduleProcedureById(procedure.scheduleProcedureId);
-      }
-    }
-
-    for (const procedure of procedures) {
-      if (
-        !procedureListWithoutChanges.some(pl => pl.id === procedure.id)
-      ) {
-
+    const {
+        id,
+        client,
+        employee,
+        procedures,
+        analyzedSchedule,
+        marked,
+        scheduleDate,
+    } = scheduleObj;
+    const schedule = new ScheduleObject({objectId: id});
+    schedule.set("employee_id", new EmployeeObject({objectId: employee.id}));
+    schedule.set("client_id", new ClientObject({objectId: client.id}));
+    // schedule.set('Observacao', 'Teste');
+    schedule.set("procedures", JSON.stringify(procedures.map(procedure => {
         const procedureEndDate = moment(scheduleDate).add(procedure.time, "minutes").format("DD/MM/YYYY - HH:mm");
         const procedureStartDate = moment(scheduleDate.toString()).format("DD/MM/YYYY - HH:mm");
+        return {
+            procedure_start_date: procedureStartDate,
+            procedure_end_date: procedureEndDate,
+            id: procedure.id,
+            // accomplished_procedure: false
+        }
+    })));
+    schedule.set("schedule_date", scheduleDate.toString());
+    schedule.set('analyzed_schedule', analyzedSchedule);
+    schedule.set('accomplished_schedule', marked);
 
-        const scheduleProcedure = await saveScheduleProcedure(
-          {
-            procedureId: new ProcedureObject({ objectId: procedure.id }),
-            scheduleId: schedule,
-          },
-          false,
-          procedureEndDate,
-          procedureStartDate,
-        );
+    console.log("marked", marked)
+    try {
+        const updatedSchedule = await schedule.save();
 
-        procedure.scheduleProcedureId = scheduleProcedure.objectId;
-      }
+        return buildSchedule(convertToObj(updatedSchedule));
+    } catch (e) {
+        throw e;
     }
-
-  } catch (e) {
-    throw e;
-  }
 };
 
-export const deleteScheduleParse = async (schedule) => {
-  const { id, procedures } = schedule;
+export const updateSchedulesParse = async (schedules) => {
+    const schedulesParse = schedules.map(({
+                                              id,
+                                              client,
+                                              employee,
+                                              procedures,
+                                              analyzedSchedule,
+                                              scheduleDate,
+                                              marked
+                                          }) => {
+        const schedule = new ScheduleObject({objectId: id});
+        schedule.set("employee_id", new EmployeeObject({objectId: employee.id}));
+        schedule.set("client_id", new ClientObject({objectId: client.id}));
+        // schedule.set('Observacao', 'Teste');
+        schedule.set("procedures", JSON.stringify(procedures.map(procedure => {
+            const procedureEndDate = moment(scheduleDate).add(procedure.time, "minutes").format("DD/MM/YYYY - HH:mm");
+            const procedureStartDate = moment(scheduleDate.toString()).format("DD/MM/YYYY - HH:mm");
+            return {
+                procedure_start_date: procedureStartDate,
+                procedure_end_date: procedureEndDate,
+                id: procedure.id,
+                // accomplished_procedure: false
+            }
+        })));
+        schedule.set("schedule_date", scheduleDate.toString());
+        schedule.set('analyzed_schedule', analyzedSchedule);
+        schedule.set('accomplished_schedule', marked);
 
-  const ScheduleParse = new ScheduleObject({ objectId: id });
+        return schedule
+    })
 
-  try {
-    const deletedSchedule = await ScheduleParse.destroy();
-
-    for (const procedure of procedures) {
-      await deleteScheduleProcedureById(procedure.scheduleProcedureId);
+    try {
+        const savedSchedules = await Parse.Object.saveAll(schedulesParse);
+        return buildScheduleList(convertToObj(savedSchedules));
+    } catch (e) {
+        throw e;
     }
-    return buildSchedule(convertToObj(deletedSchedule), []);
-
-  } catch (e) {
-    throw e;
-  }
 };
 
-export const deleteSchedulesParse = async (schedules) => {
-  try {
-    for (const schedule of schedules) {
-      const { id, procedures } = schedule;
-      const ScheduleParse = new ScheduleObject({ objectId: id });
-      await ScheduleParse.destroy();
-      for (const procedure of procedures) {
-        await deleteScheduleProcedureById(procedure.scheduleProcedureId);
-      }
+export const deleteScheduleParse = async (schedules) => {
+    const schedulesToDelete = []
+
+    schedules.forEach(({id}) => {
+        schedulesToDelete.push(new ScheduleObject({objectId: id}))
+    })
+
+    try {
+        await Parse.Object.destroyAll(schedulesToDelete);
+
+    } catch (e) {
+        throw e;
     }
-  } catch (e) {
-    throw e;
-  }
 };
 
-export const deleteSchedulesByClientId = async (clientId) => {
-  const schedules = await getSchedulesByClientId(clientId, true);
-  try {
-    for (const schedule of schedules) {
-      await schedule.destroy();
+
+export const deleteSchedulesByClients = async (clientsId) => {
+    const ScheduleQuery = new Parse.Query(ScheduleObject);
+    ScheduleQuery.containedIn(
+        "client_id",
+        clientsId,
+    );
+
+    try {
+        const schedules = await ScheduleQuery.find()
+        await Parse.Object.destroyAll(schedules)
+    } catch (e) {
+        throw e;
     }
-  } catch (e) {
-    throw e;
-  }
 };
 
-export const deleteSchedulesByEmployeeId = async employeeId => {
-  const schedules = await getSchedulesByEmployeeId(employeeId, true);
-  try {
-    for (const schedule of schedules) {
-      await schedule.destroy();
+export const deleteSchedulesByEmployees = async employeesId => {
+    const ScheduleQuery = new Parse.Query(ScheduleObject);
+    ScheduleQuery.containedIn(
+        "employee_id",
+        employeesId,
+    );
+
+    try {
+        const schedules = await ScheduleQuery.find()
+        await Parse.Object.destroyAll(schedules)
+    } catch (e) {
+        throw e;
     }
-  } catch (e) {
-    throw e;
-  }
 };
+
 
 export const getSchedulesByClientId = async (clientId) => {
-  const ScheduleQuery = new Parse.Query(ScheduleObject);
-  ScheduleQuery.equalTo(
-    "client_id",
-    new ClientObject({ objectId: clientId }),
-  );
-  // ScheduleQuery.include('procedure_id');
-  // ScheduleQuery.include('client_id');
-
-  try {
-    const schedules = await ScheduleQuery.find();
-
-    return schedules.length ? await buildScheduleList(convertToObj(await ScheduleQuery.find())) : [];
-
-  } catch (e) {
-    throw e;
-  }
-};
-
-export const getScheduleByProcedureId = async (procedureId) => {
-  const ScheduleQuery = new Parse.Query(ScheduleObject);
-  ScheduleQuery.equalTo(
-    "client_id",
-    new ProcedureObject({ objectId: procedureId }),
-  );
-  // ScheduleQuery.include('procedure_id');
-  // ScheduleQuery.include('client_id');
-
-  try {
-    const schedules = await ScheduleQuery.find();
-
-    return schedules.length ? await buildScheduleList(convertToObj(await ScheduleQuery.find())) : [];
-
-  } catch (e) {
-    throw e;
-  }
-};
-
-export const getSchedulesByEmployeeId = async (employeeId) => {
     const ScheduleQuery = new Parse.Query(ScheduleObject);
     ScheduleQuery.equalTo(
-      "employee_id",
-      new EmployeeObject({ objectId: employeeId }),
+        "client_id",
+        new ClientObject({objectId: clientId}),
     );
     // ScheduleQuery.include('procedure_id');
     // ScheduleQuery.include('client_id');
 
     try {
-      const schedules = await ScheduleQuery.find();
+        const schedules = await ScheduleQuery.find();
 
-      return schedules.length ? await buildScheduleList(convertToObj(await ScheduleQuery.find())) : [];
+        return schedules.length ? await buildScheduleList(convertToObj(await ScheduleQuery.find())) : [];
 
     } catch (e) {
-      throw e;
+        throw e;
     }
-  }
-;
+};
 
-export const confirmSchedulesList = async (scheduleId, procedures, checked) => {
-    const schedule = new ScheduleObject({ objectId: scheduleId });
-    schedule.set("analyzed_schedule", true);
+export const getScheduleByProcedureId = async (procedureId) => {
+    const ScheduleQuery = new Parse.Query(ScheduleObject);
+    ScheduleQuery.equalTo(
+        "client_id",
+        new ProcedureObject({objectId: procedureId}),
+    );
+    // ScheduleQuery.include('procedure_id');
+    // ScheduleQuery.include('client_id');
 
     try {
-      const confirmedSchedule = await schedule.save();
-      await confirmScheduleProcedure(procedures, checked);
-      procedures.forEach(procedure => {
-        procedure.accomplishedSchedule = checked;
-      });
-      return buildSchedule(convertToObj(confirmedSchedule), procedures);
+        const schedules = await ScheduleQuery.find();
+
+        return schedules.length ? await buildScheduleList(convertToObj(await ScheduleQuery.find())) : [];
+
     } catch (e) {
-      throw e;
+        throw e;
     }
-  }
+};
+
+export const getSchedulesByEmployeeId = async (employeeId) => {
+        const ScheduleQuery = new Parse.Query(ScheduleObject);
+        ScheduleQuery.equalTo(
+            "employee_id",
+            new EmployeeObject({objectId: employeeId}),
+        );
+        // ScheduleQuery.include('procedure_id');
+        // ScheduleQuery.include('client_id');
+
+        try {
+            const schedules = await ScheduleQuery.find();
+
+            return schedules.length ? await buildScheduleList(convertToObj(await ScheduleQuery.find())) : [];
+
+        } catch (e) {
+            throw e;
+        }
+    }
+;
+
+export const analyzeSchedulesParse = async (analyzedSchedules) => {
+    // const ScheduleQuery = new Parse.Query(ScheduleObject);
+    // ScheduleQuery.containedIn(
+    //     "objectId",
+    //     analyzedSchedules.map(schedule => {return schedule.id}),
+    // );
+
+    const schedulesParse = analyzedSchedules.map(schedule => {
+        const updatedSchedule = new ScheduleObject({
+            objectId: schedule.id
+        })
+        updatedSchedule.set("analyzed_schedule", true)
+        updatedSchedule.set("procedures", JSON.stringify(schedule.procedures.map(procedure => {
+            return {
+                ...procedure,
+                created_at: new Date(),
+            }
+        })))
+        updatedSchedule.set('accomplished_schedule', schedule.marked);
+
+
+        return updatedSchedule
+    })
+    try {
+        const newSchedules = await Parse.Object.saveAll(schedulesParse)
+
+        return newSchedules.length ? await buildScheduleList(convertToObj(newSchedules)) : [];
+
+    } catch (e) {
+        throw e;
+    }
+}

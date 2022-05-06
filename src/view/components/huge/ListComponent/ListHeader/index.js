@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import * as S from "./styled";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import Salooni from "../../../../../assets/svg/salooniSVG.svg";
 import Search from "../../../../../assets/svg/searchSVG.svg";
@@ -13,7 +13,7 @@ import Colors from "../../../../../common/style/Colors";
 
 const ListHeader = ({
                       backButtonHeader,
-                      searchItems,
+                      onSearch,
                       headerTitle,
                       headerSubTitle,
                       headerColor,
@@ -21,13 +21,12 @@ const ListHeader = ({
                       showProfileIcon,
                       isDeleting,
                       selectedItemsLength,
-                      cancelDelete,
+                      onCancel,
                       handleAgenda,
                       headerHeight,
                       searchPlaceHolder,
                       scrolling,
                       showBackButton,
-                      onBack,
                       showCloseButton
                     }) => {
   const screenHeight = Dimensions.get("screen").height;
@@ -57,7 +56,6 @@ const ListHeader = ({
             positionLeft={"20px"}
             positionTop={"60px"}
             onPress={() => {
-              onBack(-1);
               navigation.push("TabStack", { screen: "Schedules" });
             }}
             buttonColor={Colors.PURPLE}
@@ -91,7 +89,7 @@ const ListHeader = ({
             {isDeleting ? (
               <S.DeleteContent headerColor={headerColor}>
                 <S.DeleteText>{`Deseja apagar os ${selectedItemsLength} itens?`}</S.DeleteText>
-                <S.DeleteCancelIcon onPress={cancelDelete}>
+                <S.DeleteCancelIcon onPress={onCancel}>
                   <Times
                     fill={"#fff"}
                     borderFill={"#fff"}
@@ -119,13 +117,13 @@ const ListHeader = ({
                     screenWidth={screenWidth}
                     onPress={handleAgenda}
                     backgroundColor={headerColor}>
-                    <Icon name={"calendar"} size={14} color={"black"} />
+                    <Icon name={"calendar"} size={14} color={"white"} />
                   </S.CalendarIcon>
                 )}
 
                 {showCloseButton && (
                   <S.CloseButton onPress={() => navigation.pop()}>
-                    <Icon name={"window-close"} size={25} color={'black'}/>
+                    <Icon name={"close-circle"} size={25} color={'black'}/>
                   </S.CloseButton>
                 )}
 
@@ -149,36 +147,30 @@ const ListHeader = ({
           <S.SubHeader>
             <S.SearchContainer>
               <S.SearchIcon>
-                <Search
-                  fill={"#fff"}
-                  borderFill={"black"}
-                  width={20}
-                  height={20}
+                <Icon
+                  name={"search"}
+                  size={25}
+                  color={"black"}
                 />
               </S.SearchIcon>
               <S.SearchInput
                 screenHeight={screenHeight}
-                value={search.text}
-                onChangeText={text => {
-                  searchItems(text);
-                  setSearch({ text: text, isSearching: true });
-                }}
+                // value={search}
+                onChangeText={onSearch}
                 placeholder={searchPlaceHolder}
                 placeholderTextColor={"black"}
               />
 
               <S.CancelInput
                 onPress={() => {
-                  setSearch({ text: "", isSearching: false });
-                  searchItems("");
+                    onSearch("");
                 }}
                 hitSlop={{ top: 12, left: 12, right: 12, bottom: 12 }}>
-                <Times
-                  fill={"#fff"}
-                  borderFill={"black"}
-                  width={10}
-                  height={10}
-                />
+                  <Icon
+                      name={"close"}
+                      size={18}
+                      color={"black"}
+                  />
               </S.CancelInput>
             </S.SearchContainer>
           </S.SubHeader>

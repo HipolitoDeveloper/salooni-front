@@ -5,18 +5,23 @@ import * as S from "./styled";
 import { ClientScheduleTime } from "./styled";
 import moment from "moment";
 import Colors from "../../../../../common/style/Colors";
+import {Text} from "react-native";
 
 const ListContent = ({
                        color,
                        item,
                        itemType,
-                       selectItem,
-                       changeListState,
+                       onSelect,
                        onPressItem,
                        isDeleting,
-                       checkItem,
                        showMenu,
+                       selectedItems,
+                       onMarkItem
                      }) => {
+
+
+  const selected = selectedItems.some(selected => selected.id === item.id)
+
   const showInformationContent = () => {
     switch (itemType) {
       case "schedule":
@@ -33,19 +38,19 @@ const ListContent = ({
         );
 
       case "clientSchedule":
-        const subDays = parseInt(moment.duration(moment(new Date()).diff(moment(new Date(item.schedule.scheduleDate)))).asDays().toString());
+        const subDays = parseInt(moment.duration(moment(new Date()).diff(moment(new Date(item.scheduleDate)))).asDays().toString());
         return (
           <>
             {subDays <= 0
               ? (<S.ClientScheduleTime>
-                Agendado para <S.Bold>{item.schedule.formattedDateHour}</S.Bold>
+                Agendado para <S.Bold>{item.formattedDateHour}</S.Bold>
               </S.ClientScheduleTime>)
               : (<S.ClientScheduleTime>
                 Última visita há {subDays} dias
               </S.ClientScheduleTime>)}
 
-            <S.NameText textColor={Colors.PURPLE}>{item.procedure.name}</S.NameText>
-            <S.EmployeeNameText>Responsável: {item.schedule.employee.name}</S.EmployeeNameText>
+            <S.NameText textColor={Colors.PURPLE}>{item.name}</S.NameText>
+            <S.EmployeeNameText>Responsável: {item.employee.name}</S.EmployeeNameText>
           </>
         );
 
@@ -54,8 +59,8 @@ const ListContent = ({
           <>
             <S.NameText textColor={'black'}>{item.name}</S.NameText>
             <S.InlineInformationContent>
-              <S.GenericText>{item.time} min </S.GenericText>
-              <S.GenericText>R$ {item.value}</S.GenericText>
+              <S.GenericText>{item.duration} min </S.GenericText>
+              <S.GenericText>R$ {item.cost}</S.GenericText>
             </S.InlineInformationContent>
           </>
         );
@@ -72,42 +77,41 @@ const ListContent = ({
 
   return (
     <S.Container
-      onLongPress={() => changeListState(item.id)}
-      onPress={() => selectItem(item.id, false)}
+      onPress={() => onSelect(item.id, false)}
       style={({ pressed }) => [
         {
-          backgroundColor: item.selected
+          backgroundColor: selected
             ? color
             : pressed
               ? `${Colors.LIGHT_GREY}`
               : `${Colors.BACKGROUND_COLOR}`,
         },
-      ]}>
-      {isDeleting && (
-        <S.DeleteIconContent color={color} selected={item.selected}>
-          {item.selected && <Icon name="trash" size={10} color={"black"} />}
+      ]}
+    >
+
+        {isDeleting && (
+        <S.DeleteIconContent color={color} selected={selected}>
+          {selected && <Icon name="trash" size={10} color={"black"} />}
         </S.DeleteIconContent>
       )}
-
-      <S.Content itemSelected={item.selected}>
+      <S.Content itemSelected={selected}>
         <S.LeftContent>
-          <S.InformationContent selected={item.selected}>
-            {showInformationContent()}
+          <S.InformationContent selected={selected}>
+              {showInformationContent()}
           </S.InformationContent>
         </S.LeftContent>
         {itemType !== "clientSchedule" && (
 
-
           <S.RightContent>
             {itemType === "schedule" && !isDeleting && item.passedHour && (
-              <S.CheckContent selected={item.selected}>
+              <S.CheckContent selected={selected}>
                 <S.ConfirmQuestionText>
                   Procedimentos realizados?
                 </S.ConfirmQuestionText>
                 <BouncyCheckbox
                   style={{ borderColor: Colors.PURPLE }}
-                  isChecked={item.checked}
-                  onPress={isChecked => checkItem(item.id)}
+                  isChecked={item.marked}
+                  onPress={isChecked => onMarkItem(item.id)}
                   fillColor={Colors.PURPLE}
                   disableBuiltInState={true}
                   disableText={true}

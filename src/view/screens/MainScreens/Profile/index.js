@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Dimensions } from "react-native";
 import Times from "../../../../assets/svg/timesSVG.svg";
@@ -17,22 +17,19 @@ import { profileUpdateValidationSchema } from "../../../../common/validators/Sch
 
 const Profile = () => {
   const { currentUser, updateProfile } = useUser();
-  const { handleModal, modal } = useLayout();
+  const { handleModal, modal, handleLoading } = useLayout();
 
-  const defaultValues = currentUser;
   const {
     setValue,
     formState: { isDirty, isValid },
     getValues,
     control,
     handleSubmit,
+      reset
   } = useForm({
-    defaultValues,
+    defaultValues: currentUser,
     resolver: yupResolver(profileUpdateValidationSchema),
   });
-
-  const [isEditting, setIsEditting] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigation();
 
@@ -40,27 +37,29 @@ const Profile = () => {
   const screenWidth = Dimensions.get("screen").width;
   const isSmallerScreen = screenHeight < 650;
 
-  const cancelEditting = () => {
-    setIsEditting(false);
+  const cancelEditing = () => {
+    reset()
   };
 
   const updateInformation = async (data) => {
-    setIsLoading(true);
+    handleLoading(true);
     const newProfile = buildProfile(data);
-    
+
     try {
       await verifyBeforeUpdateProfile(newProfile);
-      await updateProfile(newProfile);
-      cancelEditting();
-      setIsLoading(false);
+      const newCurrentUser = await updateProfile(newProfile);
+      handleLoading(false);
+
+      reset(newCurrentUser);
+
     } catch (error) {
-      console.error("Error", error);
-      setIsLoading(false);
+      console.error("updateInformationError", error);
+      handleLoading(false);
       handleModal({
         ...modal,
         visible: true,
         variant: "alert",
-        errors: Errors.PROFILE_FORM_ERROR,
+        errors: [{message: Errors.PROFILE_FORM_ERROR}],
       });
     }
   };
@@ -68,7 +67,6 @@ const Profile = () => {
   return (
     <S.Container>
       <S.BodyContent>
-        {/* <Loading isLoading={isLoading} color={`${Colors.PURPLE}`} /> */}
         <S.ProcedureContent isSmallerScreen={isSmallerScreen}>
           <Button
             disabled={false}
@@ -97,7 +95,7 @@ const Profile = () => {
         </S.ProcedureContent>
 
         <Controller
-          name="userName"
+          name="name"
           control={control}
           render={({
             field: { onChange, value, name },
@@ -134,7 +132,7 @@ const Profile = () => {
               keyboard={"default"}
               fontSize={40}
               color={Colors.PURPLE}
-              label={"Nome do Usuário"}
+              label={"Nome do Salão"}
               error={error}
             />
           )}
@@ -204,7 +202,7 @@ const Profile = () => {
         {/*/> */}
       </S.BodyContent>
       <S.FooterContainer>
-        {isDirty && (
+        {isDirty  && (
           <S.FooterContent>
             <Button
               marginBottom={"20px"}
@@ -226,9 +224,9 @@ const Profile = () => {
                 borderRadius: "20px",
                 iconSize: 13,
               }}
-              disabled={isValid}
+              disabled={!isValid}
             />
-            <S.CancelButton onPress={cancelEditting}>
+            <S.CancelButton onPress={cancelEditing}>
               <Times
                 fill={"black"}
                 borderFill={"black"}

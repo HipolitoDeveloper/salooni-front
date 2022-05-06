@@ -1,6 +1,7 @@
 import React from "react";
-
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import * as S from "./styled";
+import Colors from "../../../../../common/style/Colors";
 
 const AlertModal = ({
                         title,
@@ -8,22 +9,27 @@ const AlertModal = ({
                         onClose,
                     }) => {
 
+
     return (
         <S.Content>
             <S.HeaderContent>
                 <S.HeaderTitle>{title}</S.HeaderTitle>
+                <S.HeaderDescription>
+                    Não foi possível concluir o cadastro, pois:
+                </S.HeaderDescription>
             </S.HeaderContent>
             <S.BodyContent>
-                {typeof errors === "string"
-                    ? (
-                        <S.BodyText>{errors}</S.BodyText>
-                    )
-                    : (
-                        errors?.map(error => (
+                {errors && (
+                    errors?.map((error, index) => (
+                        <S.BodyError key={index}>
+                            <Icon name={"exclamation-triangle"}
+                                  size={20}
+                                  style={{ marginRight: 10}}
+                                  color={Colors.PURPLE} />
                             <S.BodyText>{error.message}</S.BodyText>
-                        ))
-                    )
-                }
+                        </S.BodyError>
+                    )))}
+
             </S.BodyContent>
             <S.FooterContent>
                 {onClose && (
