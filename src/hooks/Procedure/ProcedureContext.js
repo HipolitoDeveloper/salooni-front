@@ -1,115 +1,131 @@
 import React, {createContext, useContext, useEffect, useReducer} from "react";
 import {
-  deleteProcedureParse,
-  deleteProceduresParse,
-  getAllProceduresBySalonId,
-  saveProcedureParse,
-  updateProcedureParse,
+    deleteProcedureParse,
+    getAllProceduresBySalonId,
+    saveProcedureParse,
+    updateProcedureParse,
 } from "../../services/ProcedureService";
-import { ProcedureReducer } from "./ProcedureReducer";
-import { handleError } from "../../common/HandleError";
-import { EmployeeContext } from "../Employee/EmployeeContext";
+import {ProcedureReducer} from "./ProcedureReducer";
+import {handleError} from "../../common/HandleError";
+import {useEmployee} from "../Employee/EmployeeContext";
 import {useUser} from "../User/UserContext";
+import {useSchedule} from "../Schedule/ScheduleContext";
 
 export const ProcedureContext = createContext();
 
 const initialState = {
-  procedures: [],
+    procedures: [],
 };
 
-const ProcedureProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(ProcedureReducer, initialState);
-  const {currentUser} = useUser()
-
-  useEffect(() => {
-    (async () => {
-      const {idSalon} = currentUser
-      try {
-        await loadAllProcedures(idSalon)
-      } catch (e) {
-        console.error("loadAllProceduresError", e)
-      }
-    })();
-  }, []);
-
-  const loadAllProcedures = async payload => {
-    let procedures = [];
-    try {
-      procedures = await getAllProceduresBySalonId(payload);
-    } catch (e) {
-      handleError(e, "procedure");
-    }
-    dispatch({ type: "LOAD_PROCEDURES", procedures });
-  };
-
-  const saveProcedures = async payload => {
-    let procedures = payload;
-    let newProcedures = [];
-    try {
-      for (const procedure of procedures) {
-        newProcedures.push(await saveProcedureParse(procedure));
-      }
-    } catch (e) {
-      handleError(e, "procedure");
-    }
-    dispatch({ type: "SAVE_PROCEDURES", newProcedures });
-  };
-
-  const updateProcedure = async payload => {
-    let updatedProcedure = {};
-    try {
-      updatedProcedure = await updateProcedureParse(payload);
-    } catch (e) {
-      handleError(e, "procedure");
-    }
-    dispatch({ type: "UPDATE_PROCEDURE", updatedProcedure });
-  };
+const ProcedureProvider = ({children}) => {
+    const [state, dispatch] = useReducer(ProcedureReducer, initialState);
+    const {currentUser} = useUser()
+    const {updateEmployees, updateEmployee, employees, currentEmployee} = useEmployee()
+    const {schedules, updateSchedules} = useSchedule()
 
 
-  const deleteUniqueProcedure = async payload => {
-    const { id } = payload;
-    let deletedProcedures = {};
-    try {
-      deletedProcedures = await deleteProcedureParse(id);
-    } catch (e) {
-      handleError(e, "procedure");
-    }
-    dispatch({ type: "DELETE_PROCEDURE", deletedProcedures });
-  };
+    useEffect(() => {
+        (async () => {
+            const {idSalon} = currentUser
+            try {
+                await loadAllProcedures(idSalon)
+            } catch (e) {
+                console.error("loadAllProceduresError", e)
+            }
+        })();
+    }, []);
 
-  const deleteProcedureList = async payload => {
-      const procedures = payload;
-      try {
-        await deleteProceduresParse(procedures);
-      } catch (e) {
-        handleError(e, "procedure");
-      }
-    dispatch({ type: "DELETE_PROCEDURES", procedures })
-  };
+    const loadAllProcedures = async payload => {
+        let procedures = [];
+        try {
+            procedures = await getAllProceduresBySalonId(payload);
+        } catch (e) {
+            handleError(e, "procedure");
+        }
+        dispatch({type: "LOAD_PROCEDURES", procedures});
+    };
 
-  const clearProcedures = payload => {
-    dispatch({ type: "CLEAR_PROCEDURES", payload });
-  };
+    const saveProcedures = async payload => {
+        let procedures = payload;
+        try {
+            const newProcedures = await saveProcedureParse(procedures);
+            dispatch({type: "SAVE_PROCEDURES", newProcedures});
 
-  const contextValues = {
-    loadAllProcedures,
-    saveProcedures,
-    updateProcedure,
-    deleteProcedureList,
-    deleteUniqueProcedure,
-    clearProcedures,
-    ...state,
-  };
+            currentEmployee.procedures.push(...newProcedures)
 
-  return (
-    <ProcedureContext.Provider value={contextValues}>
-      {children}
-    </ProcedureContext.Provider>
-  );
+            await updateEmployee(currentEmployee)
+
+        } catch (e) {
+            handleError(e, "procedure");
+        }
+    };
+
+    const updateProcedure = async payload => {
+        let updatedProcedure = {};
+        try {
+            updatedProcedure = await updateProcedureParse(payload);
+            dispatch({type: "UPDATE_PROCEDURE", updatedProcedure});
+
+        } catch (e) {
+            handleError(e, "procedure");
+        }
+    };
+
+    const deleteProcedure = async payload => {
+        const deletedProcedures = payload;
+        try {
+            await deleteProcedureParse(deletedProcedures);
+            dispatch({type: "DELETE_PROCEDURE", deletedProcedures})
+
+            employees.map((employee) => {
+                employee.procedures.forEach((procedure, index) => {
+                    if (deletedProcedures.some(deletedProcedure => deletedProcedure.id = procedure.id)) {
+                        employee.procedures.splice(index, 1)
+                    }
+                })
+
+                return employee
+            })
+
+            schedules.map((schedule) => {
+                schedule.procedures.forEach((procedure, index) => {
+                    if (deletedProcedures.some(deletedProcedure => deletedProcedure.id = procedure.id)) {
+                        schedule.procedures.splice(index, 1)
+                    }
+                })
+
+                return schedule
+            })
+
+            await updateEmployees(employees)
+            await updateSchedules(schedules)
+        } catch (e) {
+            handleError(e, "procedure");
+        }
+    };
+
+    const clearProcedures = payload => {
+        dispatch({type: "CLEAR_PROCEDURES", payload});
+    };
+
+    const contextValues = {
+        loadAllProcedures,
+        saveProcedures,
+        updateProcedure,
+        deleteProcedure,
+        clearProcedures,
+        ...state,
+    };
+
+    return (
+        <ProcedureContext.Provider value={contextValues}>
+            {children}
+        </ProcedureContext.Provider>
+    );
 };
 
 const useProcedure = () => {
-  return useContext(ProcedureContext)
+    return useContext(ProcedureContext)
 }
 
 export {useProcedure, ProcedureProvider};

@@ -19,7 +19,11 @@ export const Content = styled.View`
   elevation: 10;
 `;
 
-export const HeaderContent = styled.View``;
+export const HeaderContent = styled.View`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 export const HeaderTitle = styled.Text`
   font-size: 18px;
@@ -27,12 +31,26 @@ export const HeaderTitle = styled.Text`
   font-family: ${Fonts.AUXILIAR};
 `;
 
+export const HeaderDescription = styled.Text`
+  font-family: ${Fonts.AUXILIAR};
+  color: ${Colors.RED};
+  margin: 10px 0;
+`
+
 export const BodyContent = styled.View``;
 
 export const BodyText = styled.Text`
   font-family: ${Fonts.AUXILIAR};
-  color: ${Colors.RED};
-  margin: 10px 0;
+  color: black;
+  font-size: 14px;
+`;
+
+export const BodyError = styled.View`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 90%;
+  margin-bottom: 10px;
 `;
 
 export const FooterContent = styled.View`

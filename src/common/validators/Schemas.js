@@ -25,7 +25,7 @@ export const signupValidationSchema = yup.object().shape({
         .required(Errors.CNPJ_REQUIRED_ALERT)
         .length(14, Errors.CNPJ_VALIDATOR_ALERT)
         .cnpjValidator(Errors.CNPJ_VALIDATOR_ALERT),
-    userName: yup.string().required(Errors.OWNER_REQUIRED_ALERT),
+    name: yup.string().required(Errors.OWNER_REQUIRED_ALERT),
     tel: yup
         .string()
         .required(Errors.TEL_REQUIRED_ALERT)
@@ -39,6 +39,7 @@ export const signupValidationSchema = yup.object().shape({
         .required(Errors.PASSWORD_REQUIRED_ALERT)
         .passwordValidator(),
     procedures: yup.array(),
+    employees: yup.array(),
 });
 
 export const procedureValidationSchema = yup.object().shape({
@@ -61,7 +62,7 @@ export const procedureValidationSchema = yup.object().shape({
 });
 
 export const employeeValidationSchema = yup.object().shape({
-    userName: yup.string().required(Errors.EMPLOYEENAME_REQUIRED_ALERT),
+    name: yup.string().required(Errors.EMPLOYEENAME_REQUIRED_ALERT),
     email: yup.string().email().required(Errors.EMAIL_REQUIRED_ALERT),
     tel: yup.string().required(Errors.TEL_REQUIRED_ALERT),
     cnpj: yup
@@ -71,8 +72,8 @@ export const employeeValidationSchema = yup.object().shape({
 });
 
 export const signinValidationSchema = yup.object().shape({
-    email: yup.string().required().email().ownerValidator(),
-    password: yup.string().required(),
+    email: yup.string().required(Errors.EMAIL_FORMAT_ERROR).email().ownerValidator(),
+    password: yup.string(Errors.PASSWORD_REQUIRED_ALERT).required(),
 });
 
 export const employeeSigninValidationSchema = yup.object().shape({
@@ -86,7 +87,7 @@ export const employeeSignupValidationSchema = yup.object().shape({
 });
 
 export const profileUpdateValidationSchema = yup.object().shape({
-    userName: yup.string().required(),
+    name: yup.string().required(),
     salonName: yup.string().required(),
     cnpj: yup
         .string()
@@ -99,7 +100,7 @@ export const profileUpdateValidationSchema = yup.object().shape({
 export const clientValidationSchema = yup.object().shape({
     name: yup.string().required(Errors.NAME_REQUIRED_ALERT),
     email: yup.string().required(Errors.EMAIL_REQUIRED_ALERT),
-    cpf: yup.string().required(Errors.CPF_REQUIRED_ALERT).cpfValidator(Errors.CPF_VALIDATOR_ALERT),
+    cpf: yup.string().cpfValidator(Errors.CPF_VALIDATOR_ALERT),
     bornDate: yup.string(),
     tel: yup.string().required(Errors.TEL_REQUIRED_ALERT),
     tel2: yup.string(),
@@ -108,7 +109,7 @@ export const clientValidationSchema = yup.object().shape({
 export const scheduleValidationSchema = yup.object().shape({
     client: yup.object().required(Errors.CLIENT_REQUIRED_ALERT),
     employee: yup.object().required(Errors.EMPLOYEE_REQUIRED_ALERT),
-    procedures: yup.array().required(Errors.PROCEDURES_REQUIRED_ALERT),
+    procedures: yup.array(),
     scheduleDate: yup.string(),
 
 })

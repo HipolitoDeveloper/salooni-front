@@ -10,86 +10,81 @@ import {getAllSchedulesBySalon} from "../../../../../services/ScheduleService";
 import {useLayout} from "../../../../../hooks/Layout";
 import Errors from "../../../../../common/Errors";
 import Loading from "../../../../components/small/Loading";
+import {buildAgenda} from "../../../../../factory/ScheduleFactory";
 
 const Employees = () => {
         const {
             loadAllEmployees,
             employees,
-            deleteUniqueEmployee,
-            deleteEmployees,
-            deleteEmployeeProcedure,
+            deleteEmployee,
+            updateEmployee
+
         } = useEmployee()
         const {currentUser, isOwner} = useUser()
-        const {handleModal, modal} = useLayout();
+        const {handleModal, modal, handleLoading, loading} = useLayout();
 
-        const items = employees.filter(({employeeType}) => employeeType === 'PRC');
-        const [isLoading, setIsLoading] = useState(false);
         const [stateAgenda, setStateAgenda] = useState({isShowing: false, item: {}});
+        const [refreshing, setRefresing] = useState(false)
+
+        const items = employees.filter(({employeeType}) => employeeType === 'FNC');
+
+
         const navigate = useNavigation();
 
-        const navigateToEmployeeCalendar = employee => {
-            setIsLoading(true);
-            getAllSchedulesBySalon(
-                currentUser.idSalon,
-                employee.id,
-                employee.employeeType,
-                false
-            ).then(
-                calendarSchedule => {
-                    setIsLoading(false);
-                    handleAgenda(calendarSchedule);
-                    // navigate.push('ApplicationStack', {
-                    //   screen: 'Schedules',
-                    //   params: {
-                    //     calendarViewState: true,
-                    //     employeeView: true,
-                    //     employee: employee,
-                    //   },
-                    // });
-                },
-                error => {
-                    console.log(error);
-                    setIsLoading(false);
-                },
-            );
+        const navigateToEmployeeCalendar = async employee => {
+            handleLoading(true);
+
+            try {
+                const calendarSchedules = await getAllSchedulesBySalon(
+                    employee.id,
+                    currentUser.idSalon,
+                    employee.employeeType,
+                )
+
+                console.log("JSON", JSON.stringify((buildAgenda(calendarSchedules))))
+                handleAgenda(buildAgenda(calendarSchedules))
+                handleLoading(false);
+            } catch (error) {
+                console.error(error);
+                handleLoading(false);
+            }
+
         };
 
-        const deletePartner = partnerToDelete => {
-            setIsLoading(true);
-            deleteUniqueEmployee(partnerToDelete).then(
-                () => {
-                    setIsLoading(false);
-                },
-                error => {
-                    setIsLoading(false);
-                    console.log(error);
-                },
-            );
+        const onDeleteEmployee = async employeeToDelete => {
+            handleLoading(true);
+            try {
+                await deleteEmployee(employeeToDelete)
+                handleLoading(false);
+            } catch (error) {
+                handleLoading(false);
+                console.error(JSON.stringify(error));
+            }
         };
 
-        const deletePartners = partnersToDelete => {
-            setIsLoading(true);
-            deleteEmployees(partnersToDelete).then(
-                () => {
-                    setIsLoading(false);
-                },
-                error => {
-                    setIsLoading(false);
-                    console.log(error);
-                },
-            );
+        const onUpdateEmployee = async (data) => {
+            handleLoading(true);
+            try {
+                await updateEmployee(data)
+                handleLoading(false);
+
+            } catch (error) {
+                console.error(error)
+                handleLoading(false);
+            }
         };
+
 
         const fetchData = async (skip, limit) => {
-            setIsLoading(true);
+            setRefresing(true);
             try {
                 await loadAllEmployees(currentUser.idSalon)
-                setIsLoading(false);
+                setRefresing(false);
 
-                return employees.filter(employee => employee.employeeType === 'PRC')
+                return employees.filter(employee => employee.employeeType === 'FNC')
             } catch (e) {
                 console.error(e)
-                setIsLoading(false);
+                setRefresing(false);
                 handleModal({
                     ...modal,
                     visible: true,
@@ -97,17 +92,15 @@ const Employees = () => {
                     errors: Errors.LOAD_MORE_ERROR,
                 });
             }
-
-
         };
         const handleAgenda = item => {
+            console.log("item", item)
             setStateAgenda({isShowing: !stateAgenda.isShowing, item: item});
         };
 
         return (
 
             <S.Container>
-                <Notification/>
 
                 {stateAgenda.isShowing && (
                     <Calendar
@@ -118,43 +111,36 @@ const Employees = () => {
                     />
                 )}
 
-                {items.length === 0
-                    ? (
-                        <Loading isLoading={isLoading} color={Colors.PURPLE}/>
-                    ) : (
-                        <List
-                            showMenu={true}
-                            showAddButton={true}
-                            fetchData={fetchData}
-                            refreshing={isLoading}
-                            searchPlaceHolder={'Procure pelos seus parceiros'}
-                            navigateToCalendar={navigateToEmployeeCalendar}
-                            isOwner={isOwner}
-                            showCalendarButton={true}
-                            showHeader={true}
-                            itemType={"employee"}
-                            headerText={'Parceiros'}
-                            color={Colors.GREEN}
-                            itemList={items}
-                            menuItems={['name', 'tel', 'email', 'procedures']}
-                            deleteItemList={deletePartners}
-                            deleteUniqueItem={deletePartner}
-                            deleteProcedure={deleteEmployeeProcedure}
-                            isLoading={isLoading}
-                            onAddNavigateTo={() =>
-                                navigate.push('ApplicationStack', {
-                                    screen: 'EmployeeRegister',
-                                    params: {employee: []},
-                                })
-                            }
-                            onEditNavigateTo={employee =>
-                                navigate.push('ApplicationStack', {
-                                    screen: 'EmployeeRegister',
-                                    params: {employee: employee},
-                                })
-                            }
-                        />
-                    )}
+                <List
+                    showMenu={true}
+                    showAddButton={true}
+                    fetchData={fetchData}
+                    refreshing={refreshing}
+                    searchPlaceHolder={'Procure pelos seus parceiros'}
+                    navigateToCalendar={navigateToEmployeeCalendar}
+                    isOwner={isOwner}
+                    showCalendarButton={true}
+                    showHeader={true}
+                    itemType={"employee"}
+                    headerText={'Parceiros'}
+                    color={Colors.GREEN}
+                    items={items}
+                    menuItems={['name', 'tel', 'email', 'procedures']}
+                    onDeleteItem={onDeleteEmployee}
+                    onUpdateItem={onUpdateEmployee}
+                    onAddNavigateTo={() =>
+                        navigate.push('ApplicationStack', {
+                            screen: 'EmployeeRegister',
+                            params: {employee: []},
+                        })
+                    }
+                    onEditNavigateTo={employee =>
+                        navigate.push('ApplicationStack', {
+                            screen: 'EmployeeRegister',
+                            params: {employee: employee},
+                        })
+                    }
+                />
             </S.Container>
         );
     }

@@ -28,10 +28,13 @@ const UserProvider = ({ children }) => {
   useEffect(() => {
     (async () => {
       const currentUser = convertToObj(await Parse.User.currentAsync());
+
       await setCurrentUser(currentUser);
-      changeStack(
-        currentUser ? Constants.IN_ROUTE_STACK : Constants.OUT_ROUTE_STACK
-      );
+
+      setTimeout(() => {
+          changeStack(currentUser? Constants.IN_ROUTE_STACK : Constants.OUT_ROUTE_STACK)
+      }, 3000)
+
     })();
   }, []);
 
@@ -54,10 +57,14 @@ const UserProvider = ({ children }) => {
         } = user;
         salon = await getSalonById(salonId);
       }
+
+      const newCurrentUser = buildCurrentUser(user, salon)
       dispatch({
         type: "SET_CURRENT_USER",
-        currentUser: buildCurrentUser(user, salon),
+        currentUser: newCurrentUser,
       });
+
+      return newCurrentUser
     } catch (e) {
       handleError(e, "user");
     }
@@ -94,14 +101,13 @@ const UserProvider = ({ children }) => {
   };
 
   const updateProfile = async (payload) => {
-    try {  
+    try {
       const {user, employee, salon} = payload;
-      await updateEmployeeParse(employee, false);
+      await updateEmployeeParse(employee);
       const newUser = await updateUser(user);
       await updateSalonParse(salon);
 
-      console.log("newUser", newUser)
-      await setCurrentUser(newUser);
+      return await setCurrentUser(newUser);
 
     } catch (e) {
       handleError(e, "user");

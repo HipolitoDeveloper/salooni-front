@@ -19,6 +19,7 @@
     "@react-navigation/native": "^6.0.8",
     "@react-navigation/stack": "^6.1.1",
     "cjs-loader": "^0.1.0",
+    "intl": "^1.2.5",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "parse": "^3.4.1",

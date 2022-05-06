@@ -62,9 +62,9 @@ export const InputText = styled.Text`
 
 export const InputTitle = styled.Text`
   font-family: ${Fonts.MAIN};
-  font-size: 12px;
+  font-size: ${props => props.screenHeight / props.fontSize}px;
   position: absolute;
-  left: 35px;
+  left: 20px;
   top: 0;
   color: ${props => props.color};
 `;

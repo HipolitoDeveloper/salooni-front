@@ -41,7 +41,7 @@ export const HeaderText = styled.Text`
   margin-top: 10px;
 `;
 
-export const BodyContent = styled.View`
+export const  BodyContent = styled.View`
   height: 68%;
   display: flex;
   justify-content: space-evenly;

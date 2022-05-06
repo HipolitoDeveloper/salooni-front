@@ -11,7 +11,7 @@ export const EmployeeReducer = (state, action) => {
         ...state,
         employees: [...state.employees, action.newEmployee],
       };
-    case 'UPDATE_EMPLOYEES':
+    case 'UPDATE_EMPLOYEE':
       return {
         ...state,
         employees: state.employees.map(employee => {
@@ -22,20 +22,8 @@ export const EmployeeReducer = (state, action) => {
           return employee;
         })
       };
+
     case 'DELETE_EMPLOYEE':
-      const deletedPartnerId = action.id;
-      state.employees.forEach((employee, index) => {
-        if (employee.id === deletedPartnerId) {
-          state.employees.splice(index, 1);
-        }
-      });
-
-      return {
-        ...state,
-        employees: state.employees,
-      };
-
-    case 'DELETE_EMPLOYEES':
       const employees = action.employees;
       employees.forEach(deletedEmployee => {
         state.employees.forEach((employee, index) => {
@@ -43,23 +31,6 @@ export const EmployeeReducer = (state, action) => {
             state.employees.splice(index, 1);
           }
         });
-      });
-
-      return {
-        ...state,
-        employees: state.employees,
-      };
-
-    case 'DELETE_EMPLOYEE_PROCEDURE':
-      const {employeeId, id} = action.deletedProcedureEmployee;
-      state.employees.forEach(employee => {
-        if (employee.id === employeeId) {
-          employee.procedures.forEach((procedure, index) => {
-            if (procedure.id === id) {
-              employee.procedures.splice(index, 1);
-            }
-          });
-        }
       });
 
       return {

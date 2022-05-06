@@ -37,14 +37,15 @@ export const InputsContainer = styled.View`
   margin: auto auto;
   border-radius: 40px;
   background-color: white;
+  min-height: 230px;
   width: ${props =>
-    props.isSmallerScreen
-      ? `${props.screenWidth / 1.25}px}`
-      : `${props.screenWidth / 1.3}px}`};
+          props.isSmallerScreen
+                  ? `${props.screenWidth / 1.25}px}`
+                  : `${props.screenWidth / 1.3}px}`};
   height: ${props =>
-    props.isSmallerScreen
-      ? `${props.screenHeight / 3}px}`
-      : `${props.screenHeight / 4}px}`};
+          props.isSmallerScreen
+                  ? `${props.screenHeight / 3}px}`
+                  : `${props.screenHeight / 4}px}`};
   elevation: 5;
 `;
 
@@ -66,7 +67,7 @@ export const CloseButtonContent = styled.TouchableOpacity`
   position: absolute;
   top: 0;
   left: ${props =>
-    Platform.OS === 'ios' ? '252px' : props.screenWidth / 1.63}px;
+          Platform.OS === 'ios' ? '252px' : props.screenWidth / 1.60}px;
   display: flex;
   align-items: center;
   justify-content: center;

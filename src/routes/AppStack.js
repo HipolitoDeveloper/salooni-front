@@ -27,9 +27,10 @@ const AppStack = () => {
 
     return (
         <ScheduleProvider>
-            <ProcedureProvider>
-                <ClientProvider>
-                    <EmployeeProvider>
+            <EmployeeProvider>
+                <ProcedureProvider>
+
+                    <ClientProvider>
 
                         <Stack.Navigator
                             screenOptions={{
@@ -51,9 +52,10 @@ const AppStack = () => {
 
                             </Stack.Group>
                         </Stack.Navigator>
-                    </EmployeeProvider>
-                </ClientProvider>
-            </ProcedureProvider>
+                    </ClientProvider>
+                </ProcedureProvider>
+
+            </EmployeeProvider>
         </ScheduleProvider>
 
     );

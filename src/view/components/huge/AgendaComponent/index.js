@@ -9,9 +9,10 @@ import Loading from "../../small/Loading";
 import * as S from "./styled";
 import Colors from "../../../../common/style/Colors";
 import Fonts from "../../../../common/style/Fonts";
+import {currentDate} from "../../../../factory/ScheduleFactory";
 
 const Agenda = ({ isVisible, handleModal, calendarSchedule }) => {
-  const INITIAL_DATE = moment(new Date()).format("YYYY-MM-DD");
+  const INITIAL_DATE = moment(currentDate).format("YYYY-MM-DD");
 
   const navigate = useNavigation();
   const [selected, setSelected] = useState(INITIAL_DATE);

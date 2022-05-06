@@ -1,4 +1,3 @@
-import {getEmployeeProcedureByEmployeeId} from '../services/ProcedureEmployeeService';
 import { buildSalonObject } from "./SalonFactory";
 import { buildProcedure } from "./ProcedureFactory";
 
@@ -13,12 +12,12 @@ export const buildEmployeeObject = (employee) => {
     email: employee.email,
     employeeType: employee.employee_type,
     firstAccess: employee.first_access,
-    procedures: employee.procedures,
+    procedures: JSON.parse(employee.procedures),
   };
 };
 
 export const buildEmployeeList = employees => {
-    return employees.map(employee => {
+  return employees.map(employee => {
       return {
         id: employee.objectId,
         cnpj: employee.cnpj,
@@ -29,7 +28,7 @@ export const buildEmployeeList = employees => {
         name: employee.name,
         email: employee.email,
         firstAccess: employee.first_access,
-        procedures: employee.procedures
+        procedures: JSON.parse(employee.procedures)
       };
     });
 };

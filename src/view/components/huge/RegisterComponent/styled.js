@@ -6,10 +6,10 @@ export const Content = styled.View`
   background-color: ${Colors.LIGHT_GREY};
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-evenly;
   align-items: center;
   width: 100%;
-  height: 100%;
+  flex: 5;
 `;
 
 export const ButtonsContent = styled.View``;
@@ -22,6 +22,13 @@ export const CancelButton = styled.TouchableOpacity`
   padding: 10px;
   border-radius: 30px;
 `;
+
+export const Footer = styled.View`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1
+`
 
 export const AddMessage = styled.Text`
   font-family: ${Fonts.MAIN};

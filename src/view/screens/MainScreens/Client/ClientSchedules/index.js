@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import moment from "moment";
 import Notification from "../../../../components/small/Notification";
 import List from "../../../../components/huge/ListComponent";
@@ -6,37 +6,93 @@ import { useNavigation } from "@react-navigation/native";
 import { getScheduleProceduresByClientId } from "../../../../../services/ScheduleProcedureService";
 import Colors from "../../../../../common/style/Colors";
 import { View } from "react-native";
+import {useLayout} from "../../../../../hooks/Layout";
+import {useProcedure, useSchedule} from "../../../../../hooks";
+import Errors from "../../../../../common/Errors";
+import {getSchedulesByClientId} from "../../../../../services/ScheduleService";
 
 const ClientSchedules = ({ route }) => {
-  const { schedules, client } = route.params;
+    const {
+        deleteSchedule,
+    } = useSchedule();
+    const {procedures} = useProcedure()
 
-  const [isLoading, setIsLoading] = useState(false);
+    const {handleModal, modal, handleLoading, loading} = useLayout();
 
-  const navigate = useNavigation();
+    const { client } = route.params;
+    const [clientSchedules, setClientSchedules] = useState([])
 
+    const navigate = useNavigation();
 
-  const onRefresh = () => {
-    return new Promise(resolve => {
-      setIsLoading(true);
-      getScheduleProceduresByClientId(
-        client.id,
-        false,
-      ).then(
-        newSchedules => {
-          setIsLoading(false);
-          resolve(newSchedules);
-        },
-        error => {
-          console.log(error);
-          setIsLoading(false);
-        },
-      );
-    });
-  };
+    useEffect(() => {
+        (async () => {
+            await fetchData()
+        })();
+    },[client])
+
+    const fetchData = async (skip, limit) => {
+        handleLoading(true);
+        try {
+            const schedules = await getSchedulesByClientId(client.id)
+            handleLoading(false);
+
+            const clientAgenda = []
+            schedules.forEach(({procedures:scheduleProcedures , scheduleDate, employee, formattedDateHour, analyzedSchedule, passedHour, marked, id}) => {
+                if(scheduleProcedures.length) {
+                    scheduleProcedures?.forEach(scheduleProcedure => {
+                        const {name} = procedures.find(procedure => scheduleProcedure.id === procedure.id)
+                        clientAgenda.push({
+                            ...scheduleProcedure,
+                            name,
+                            scheduleDate,
+                            employee,
+                            formattedDateHour,
+                            analyzedSchedule,
+                            passedHour,
+                            marked
+                        })
+                    })
+                } else {
+                    clientAgenda.push({
+                        name:"Agendamento sem procedimento",
+                        id,
+                        scheduleDate,
+                        employee,
+                        formattedDateHour,
+                        analyzedSchedule,
+                        passedHour,
+                        marked
+                    })
+                }
+            })
+
+            setClientSchedules(clientAgenda)
+        } catch (e) {
+            console.error(e)
+            handleLoading(false);
+            handleModal({
+                ...modal,
+                visible: true,
+                variant: "alert",
+                errors: Errors.LOAD_MORE_ERROR,
+            });
+        }
+    };
+
+    const onDeleteSchedule = async scheduleToDelete => {
+        handleLoading(true);
+        try {
+            await deleteSchedule(scheduleToDelete)
+            await fetchData()
+            handleLoading(false)
+        } catch (error) {
+            handleLoading(false);
+            console.log(error);
+        }
+    };
 
   return (
     <View style={{flex: 1}}>
-      <Notification />
       {/*<Agenda*/}
       {/*  isVisible={isShowingAgenda}*/}
       {/*  color={global.colors.purpleColor}*/}
@@ -44,24 +100,24 @@ const ClientSchedules = ({ route }) => {
       {/*  calendarSchedule={calendarSchedule}*/}
       {/*/>*/}
       <List
-        showMenu={false}
-        showAddButton={true}
-        showCloseButton={true}
-        onRefresh={onRefresh}
-        refreshing={isLoading}
+        showAddButton
+        showCloseButton
+        fetchData={fetchData}
+        onDeleteItem={onDeleteSchedule}
+        refreshing={loading}
         searchPlaceHolder={"Procure por procedimentos"}
-        isOwner={true}
-        showHeader={true}
+        isOwner
+        showHeader
         headerText={`Agendamentos`}
         subHeaderText={`${client.name}`}
         color={Colors.PURPLE}
-        itemList={schedules}
+        items={clientSchedules}
         menuItems={["name", "tel", "email", "procedures"]}
         objectMenuItems={["client", "client", "client"]}
         itemType={"clientSchedule"}
         listProperty={["name", "scheduleHour"]}
 
-        isLoading={false}
+        isLoading={loading}
         onAddNavigateTo={() =>
           navigate.push("ApplicationStack", {
             screen: "ScheduleRegister",

@@ -13,7 +13,7 @@ const RegisterHeader = ({
   onConfirm,
   onCancel,
   isEditing,
-  validForm,
+                          isConfirmDisabled
 }) => {
   const screenHeight = Dimensions.get('screen').height;
   const screenWidth = Dimensions.get('screen').width;
@@ -41,8 +41,7 @@ const RegisterHeader = ({
         />
         <S.ButtonContent>
           <S.ConfirmButton
-            disabled={isPreRegisteredEditing}
-            isEditing={isPreRegisteredEditing}
+            disabled={isConfirmDisabled}
             onPress={onConfirm}>
             <Confirm
               fill={color}

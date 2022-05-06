@@ -30,7 +30,7 @@ export const UserReducer = (state, action) => {
       state.owner = {
         salonName: '',
         cnpj: '',
-        userName: '',
+        name: '',
         tel: '',
         email: '',
         password: '',

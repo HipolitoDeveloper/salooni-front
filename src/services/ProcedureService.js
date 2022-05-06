@@ -1,10 +1,10 @@
 import Parse from "parse/react-native";
 import { SalonObject } from "./SalonService";
-import { deleteEmployeeProceduresByProcedureId } from "./ProcedureEmployeeService";
 import { deleteScheduleProcedureByProcedureId } from "./ScheduleProcedureService";
 import { EmployeeObject } from "./EmployeeService";
 import { buildProcedure, buildProcedureList } from "../factory/ProcedureFactory";
 import { convertToObj } from "../common/converters/GenericConverter";
+import {ScheduleObject} from "./ScheduleService";
 
 export const ProcedureObject = Parse.Object.extend("procedure");
 
@@ -50,97 +50,87 @@ export const getProcedureByName = async (procedureName) => {
   }
 };
 
-export const saveProcedureParse = async (procedure) => {
-  const {
-    maintenanceValue,
-    maintenanceDays,
-    name,
-    duration,
-    cost,
-    commissionValue,
-    commissionPercentage,
-    employeeId,
-    salonId,
-    hasMaintenance,
-    hasCommission,
-    isPercentage,
-    isFixedValue,
-  } = procedure;
+export const saveProcedureParse = async (procedures) => {
+  const proceduresParse = procedures.map(({
+                                            maintenanceValue,
+                                            maintenanceDays,
+                                            name,
+                                            duration,
+                                            cost,
+                                            commissionValue,
+                                            commissionPercentage,
+                                            employeeId,
+                                            salonId,
+                                            hasMaintenance,
+                                            hasCommission,
+                                            isPercentage,
+                                            isFixedValue,
+                                          }) => {
 
-  const ProcedureParse = new ProcedureObject();
-  //
-  ProcedureParse.set(
-    "maintenance_value",
-    hasMaintenance
-      ? parseFloat(maintenanceValue.replace(".", "").replace(",", "."))
-      : 0,
-  );
-  ProcedureParse.set(
-    "maintenance_days",
-    hasMaintenance ? parseInt(maintenanceDays) : 0,
-  );
-  //
-  ProcedureParse.set(
-    "commission_value",
-    parseFloat(
-      hasCommission && isFixedValue
-        ? commissionValue.replace(".", "").replace(",", ".")
-        : 0,
-    ),
-  );
-
-  ProcedureParse.set(
-    "commission_percentage",
-    hasCommission && isPercentage
-      ? parseFloat(commissionPercentage)
-      : 0,
-  );
-  ProcedureParse.set("name", name);
-  ProcedureParse.set("time", parseInt(duration));
-  ProcedureParse.set(
-    "value",
-    parseFloat(cost.replace(".", "").replace(",", ".")),
-  );
-
-  if(employeeId) {
+    const ProcedureParse = new ProcedureObject();
     ProcedureParse.set(
-        "employee_id",
-        new EmployeeObject({objectId: employeeId}),
+        "maintenance_value",
+        hasMaintenance
+            ? parseFloat(maintenanceValue.replace(".", "").replace(",", "."))
+            : 0,
     );
-  }
-  ProcedureParse.set("salon_id", new SalonObject({ objectId: salonId }));
+    ProcedureParse.set(
+        "maintenance_days",
+        hasMaintenance ? parseInt(maintenanceDays) : 0,
+    );
+    //
+    ProcedureParse.set(
+        "commission_value",
+        parseFloat(
+            hasCommission && isFixedValue
+                ? commissionValue.replace(".", "").replace(",", ".")
+                : 0,
+        ),
+    );
 
-  try {
-    const savedProcedure = await ProcedureParse.save();
-    return buildProcedure(convertToObj(savedProcedure));
-  } catch (e) {
-    throw e;
-  }
-};
+    ProcedureParse.set(
+        "commission_percentage",
+        hasCommission && isPercentage
+            ? parseFloat(commissionPercentage)
+            : 0,
+    );
+    ProcedureParse.set("name", name);
+    ProcedureParse.set("time", parseInt(duration));
+    ProcedureParse.set(
+        "value",
+        parseFloat(cost.replace(".", "").replace(",", ".")),
+    );
 
-export const deleteProcedureParse = async (procedureId) => {
-  const procedure = new ProcedureObject({ objectId: procedureId });
-
-  try {
-    const deletedProcedure = await procedure.destroy();
-    await deleteEmployeeProceduresByProcedureId(deletedProcedure.id);
-    await deleteScheduleProcedureByProcedureId(procedureId, false);
-
-    return buildProcedure(convertToObj(deletedProcedure));
-
-  } catch (e) {
-    throw e;
-  }
-};
-
-export const deleteProceduresParse = async procedures => {
-  try {
-    for (const procedure of procedures) {
-      const procedureToDelete = new ProcedureObject({ objectId: procedure.id });
-      await procedureToDelete.destroy();
-      await deleteEmployeeProceduresByProcedureId(procedure.id);
-      await deleteScheduleProcedureByProcedureId(procedure.id, false);
+    if(employeeId) {
+      ProcedureParse.set(
+          "employee_id",
+          new EmployeeObject({objectId: employeeId}),
+      );
     }
+    ProcedureParse.set("salon_id", new SalonObject({ objectId: salonId }));
+
+    return ProcedureParse
+  })
+
+  try {
+    const newProcedures = await Parse.Object.saveAll(proceduresParse)
+
+    return buildProcedureList(convertToObj(newProcedures));
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const deleteProcedureParse = async (procedures) => {
+  const proceduresToDelete = []
+
+  procedures.forEach(({id}) => {
+    proceduresToDelete.push(new ProcedureObject({objectId: id}))
+  })
+
+  try {
+    await Parse.Object.destroyAll(proceduresToDelete);
+
   } catch (e) {
     throw e;
   }
@@ -195,7 +185,7 @@ export const updateProcedureParse = async (procedure) => {
   ProcedureParse.set("name", name);
   ProcedureParse.set("time", parseInt(duration));
   ProcedureParse.set(
-    "cost",
+    "value",
     parseFloat(cost.replace(".", "").replace(",", ".")),
   );
 

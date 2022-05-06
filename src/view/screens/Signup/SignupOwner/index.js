@@ -58,7 +58,7 @@ const SignupOwners = () => {
             )} />
 
           <Controller
-            name="userName"
+            name="name"
             control={control}
             render={({
                        field: { onChange, value, name },

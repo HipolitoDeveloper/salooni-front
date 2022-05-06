@@ -12,40 +12,7 @@ const Stack = createStackNavigator();
 
 export const MainStack = () => {
     const {stackStatus} = useUser();
-    //TODO ADJUST INITIAL DATA OF APPLICATION
-
-    // if (loader === 0 && Object.keys(currentUser).length > 0) {
-    //   setLoader(loader + 1);
-    //
-    //   Promise.all([
-    //     loadAllProcedures(currentUser.idSalon),
-    //     loadAllClients(currentUser.idSalon),
-    //     loadAllPartners(currentUser.idSalon),
-    //     loadAllSchedules({
-    //       salonId: currentUser.idSalon,
-    //       employeeId: currentUser.idFunc,
-    //       employeeType: currentUser.employeeType,
-    //     }),
-    //   ]).then(data => {
-    //
-    //     const schedules = data[3];
-    //     // verifyNotification({
-    //     //   name: notificationsMessages.notifications[0].name,
-    //     //   verification: schedules.some(schedule => schedule.needsToBeNotified),
-    //     //   method: () =>
-    //     //     navigate.push('ApplicationStack', {
-    //     //       screen: 'UnconfirmedSchedules',
-    //     //     }),
-    //     // });
-    //     setStackStatus("IN");
-    //   }, error => {
-    //     setStackStatus("OUT");
-    //     console.error(error);
-    //
-    //   });
-    // }
-
-    return (
+      return (
         <Stack.Navigator
             initialRouteName={"SplashScreen"}
             screenOptions={{

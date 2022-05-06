@@ -23,20 +23,8 @@ export const ClientReducer = (state, action) => {
         }),
 
       };
+
     case 'DELETE_CLIENT':
-      const { id } = action.deletedClient;
-      // state.clients.forEach((client, index) => {
-      //   if (client.id === id) {
-      //     state.clients.splice(index, 1);
-      //   }
-      // });
-
-      return {
-        ...state,
-        clients: state.clients.filter(client => client.id !== id),
-      };
-
-    case 'DELETE_CLIENTS':
       const clients = action.clients;
       clients.forEach(deletedClient => {
         state.clients.forEach((client, index) => {

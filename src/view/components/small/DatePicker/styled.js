@@ -2,13 +2,14 @@ import styled from "styled-components/native";
 import Fonts from "../../../../common/style/Fonts";
 import {StyleSheet} from "react-native";
 
+
 export const DateTextContainer = styled.TouchableOpacity`
+  margin-top: 20px;
   height: 60px;
   display: flex;
-  margin: 20px;
   justify-content: flex-end;
   align-items: flex-start;
-  width: 100%;
+  width: ${props => (props.width ?? '100%')};
 `;
 
 export const DateTextContent = styled.View`
@@ -20,13 +21,15 @@ export const DateTextContent = styled.View`
 `;
 
 export const DateText = styled.Text`
-  margin-left: 10px;
+  margin-left: ${props => (props.hasIcon ? "10px" : "0px")};
   font-family: ${Fonts.AUXILIAR};
-  font-size: 18px;
+  font-size: ${props => (props.fontSize ?? '18px')};;
   color: ${props => (props.isInView ? 'red' : 'black')};
-  border-bottom-width: ${StyleSheet.hairlineWidth}px;
-  border-bottom-color: black;
-  width: 90%;
+  border-bottom-width: 1px;
+  border-bottom-color: ${props => (props.color ?? 'black')};
+  width: 100%;
+  padding-bottom: 10px;
+
 `;
 
 

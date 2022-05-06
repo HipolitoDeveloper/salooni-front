@@ -19,12 +19,13 @@ import Errors from "../../../../../common/Errors";
 import {useLayout} from "../../../../../hooks/Layout";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {clientValidationSchema} from "../../../../../common/validators/Schemas";
+import DatePicker from "../../../../components/small/DatePicker";
 
 const defaultValues = {
     name: "Gabriel",
     email: "parceiro@gmail.com",
     cpf: "47287935830",
-    bornDate: "",
+    birthDate: "",
     tel: "11999725749",
     tel2: "",
 };
@@ -32,7 +33,7 @@ const defaultValues = {
 
 const ClientRegister = ({route}) => {
     const methods = useForm({
-        defaultValues,
+        // defaultValues,
         resolver: yupResolver(clientValidationSchema),
     });
 
@@ -53,34 +54,27 @@ const ClientRegister = ({route}) => {
         isShowing: false,
         text: "",
     });
-    const [client, setClient] = useState({
-        name: "",
-        email: "",
-        cpf: "",
-        birthDate: new Date(),
-        errorProperties: [],
-    });
 
     const [showDate, setShowDate] = useState(false);
-
 
     const navigate = useNavigation();
     const screenHeight = Dimensions.get("screen").height;
 
     useEffect(() => {
-        navigate.addListener("focus", () => {
-            if (Object.keys(route.params?.client).length !== 0) {
-                const clientInView = route.params?.client;
+            const clientInView = route.params?.client;
 
-                setClient(clientInView);
-                setIsEditing(true);
+            if (Object.keys(clientInView).length !== 0) {
+                setIsEditing(true)
+                const {id, name, cpf, tel, email, birthDate, tel2} = clientInView
+                setValue("id", id)
+                setValue("name", name)
+                setValue("cpf", cpf)
+                setValue("tel", tel)
+                setValue("tel2", tel2)
+                setValue("email", email)
+                setValue("birthDate", birthDate)
             }
-        });
-    }, [navigate]);
-
-    useEffect(() => {
-        // registeredClients.forEach(client => (client.isInView = false));
-    }, []);
+    }, [route])
 
     const onChangeDate = (event, selectedDate) => {
         if (event.type === "neutralButtonPressed") {
@@ -111,7 +105,7 @@ const ClientRegister = ({route}) => {
                     reset();
                 },
                 onClose: () => {
-                    navigate.goBack();
+                    navigate.push("TabStack", {screen: "Clients"});
                 },
             });
         } catch (err) {
@@ -126,22 +120,16 @@ const ClientRegister = ({route}) => {
         }
     };
 
-    const updateClients = async () => {
-        // setIsLoading(true);
-        // await updateClient(client).then(
-        //   () => {
-        //     setTimeout(() => {
-        //       setIsLoading(false);
-        //       navigate.push("TabStack", { screen: "Clients" });
-        //       clearClient();
-        //     }, 500);
-        //     handleErrorMessage([""]);
-        //   },
-        //   error => {
-        //     setIsLoading(false);
-        //
-        //   },
-        // );
+    const updateClients = async (data) => {
+        handleLoading(true);
+        try {
+            await updateClient(data)
+            handleLoading(false);
+            navigate.push("TabStack", {screen: "Clients"});
+        } catch (e) {
+            handleLoading(false);
+            console.error(e)
+        }
     };
 
 
@@ -149,13 +137,11 @@ const ClientRegister = ({route}) => {
         <FormProvider {...methods}>
             <RegisterComponent
                 onCancel={() => {
-                    navigate.goBack();
+                    navigate.push("TabStack", {screen: "Clients"});
                 }}
                 color={Colors.BLUE}
                 onConfirm={isEditing ? updateClients : saveClients}
                 headerTitle={"Clientes"}
-                savedItems={clients}
-                item={client}
                 itemType={"client"}
                 isEditing={isEditing}
                 registeredItemRightInformation={"tel"}
@@ -209,7 +195,7 @@ const ClientRegister = ({route}) => {
                                 fontSize={50}
                                 mask="email"
                                 color={Colors.BLUE}
-                                label={"E-mail"}
+                                label={"E-mail*"}
                                 error={error}
                             />)}/>
 
@@ -235,40 +221,24 @@ const ClientRegister = ({route}) => {
                                 error={error}
                             />)}/>
 
-                    <S.DateTextContent
-                        borderBottomColor={Colors.BLUE}
-                        onPress={() => setShowDate(true)}>
-                        <InputTitle
-                            color={Colors.BLUE}
-                            screenHeight={screenHeight}>
-                            Data de Nascimento
-                        </InputTitle>
-                        {getValues("birthDate")
-                            ? (
-                                <S.DateText>
-                                    {moment(getValues("birthDate")).format("DD/MM/YYYY")}
-                                </S.DateText>)
-                            : (
-                                <InputPlaceholder>
-                                    Data de Nascimento
-                                </InputPlaceholder>
-                            )}
-
-                    </S.DateTextContent>
-                    {showDate && (
-
-                        <RNDateTimePicker
-                            neutralButtonLabel="LIMPAR"
-                            value={getValues("birthDate")}
-                            mode={"date"}
-                            is24Hour={true}
-                            display="default"
-                            minimumDate={new Date(1950, 0, 1)}
-                            maximumDate={new Date()}
-                            onChange={onChangeDate}
-                            locale="pt-BR"
-                        />
-                    )}
+                    <Controller
+                        name="birthDate"
+                        control={control}
+                        render={({
+                                     field: {onChange, value, name},
+                                     fieldState: {error},
+                                 }) => (
+                            <DatePicker color={Colors.BLUE}
+                                        value={value}
+                                        onChange={onChange}
+                                        error={error}
+                                        width={"80%"}
+                                        fontSize={50}
+                                        placeholder={"Data de Nascimento"}
+                                        label={"Data de Nascimento*"}
+                                        mode="date"
+                            />
+                        )}/>
 
                     <Controller
                         name="tel"
@@ -314,18 +284,7 @@ const ClientRegister = ({route}) => {
                             />)}/>
                 </S.BodyContent>
 
-                {/*<Modal*/}
-                {/*  text={showAlertModal.text}*/}
-                {/*  isVisible={showAlertModal.isShowing}*/}
-                {/*  onClose={() => {*/}
-                {/*    navigate.goBack();*/}
-                {/*  }}*/}
-                {/*  onOk={() => {*/}
-                {/*    handleModal(false, "");*/}
-                {/*  }}*/}
-                {/*  title={"Atenção."} okTitle={"SIM"}*/}
-                {/*  cancelTitle={"VER CLIENTES"}*/}
-                {/*/>*/}
+
             </RegisterComponent>
         </FormProvider>
     );

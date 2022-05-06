@@ -1,15 +1,15 @@
 import {yupResolver} from "@hookform/resolvers/yup";
-import React, {useState} from "react";
-import {Controller, FormProvider, useForm, useFormContext} from "react-hook-form";
+import React, {useEffect, useState} from "react";
+import {Controller, FormProvider, useFieldArray, useForm} from "react-hook-form";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Constants from "../../../../common/Errors";
-import {useProcedure, useUser} from "../../../../hooks";
 import Input from "../../small/Input";
 import {procedureValidationSchema} from "../../../../common/validators/Schemas";
 import {InputModal} from "../../small/InputModal";
 import Loading from "../../small/Loading";
 import RegisterComponent from "../RegisterComponent";
 import * as S from "./styled";
+import {useLayout} from "../../../../hooks/Layout";
 
 
 const defaultValues = {
@@ -21,7 +21,6 @@ const defaultValues = {
     maintenanceDays: "",
     commissionPercentage: "",
     commissionFixedValue: "",
-    indexInView: 0,
     isInView: false,
     salonId: "",
 };
@@ -33,92 +32,103 @@ const ProcedureForm = ({
                            isSigningUp,
                            navigate,
                            saveProcedures,
-                           updateProcedures
+                           updateProcedures,
+                           contextSetValue
                        }) => {
+        const methods = useForm({resolver: yupResolver(procedureValidationSchema)});
+        const {control, reset, setValue, formState: {errors}, resetField} = methods;
 
-
-        const {currentUser} = useUser();
-        const {setValue: contextSetValue, getValues: contextGetValues} = useFormContext();
-        const methods = useForm({defaultValues, resolver: yupResolver(procedureValidationSchema)});
-
-        const [isLoading, setIsLoading] = useState(false);
         const [isEditing, setIsEditing] = useState(false);
-        const [showAlertModal, setShowAlertModal] = useState({
-            isShowing: false,
-            text: "",
-        });
-        const [commissionCheckbox, setCommissionCheckbox] = useState({
-            isPercentage: false,
-            isFixedValue: false,
-        });
+        const [isPercentage, setIsPercentage] = useState(false);
+        const [isFixedValue, setIsFixedValue] = useState(false);
 
-        const {control, reset} = methods;
+        const {handleModal, modal, handleLoading, loading} = useLayout();
 
-        navigate.addListener("focus", () => {
+
+        useEffect(() => {
             if (!isSigningUp) {
-                const procedureInView = route.params?.procedure;
+                const employeeInView = route.params?.procedure;
 
-                if (Object.keys(procedureInView).length !== 0) {
-                    setIsEditing(true);
+                if (Object.keys(employeeInView).length !== 0) {
+                    setIsEditing(true)
+                    const {
+                        id,
+                        name,
+                        cost,
+                        duration,
+                        maintenanceDays,
+                        hasMaintenance,
+                        maintenanceValue,
+                        hasCommission,
+                        commissionPercentage,
+                        commissionValue,
+                        isFixedValue,
+                        isPercentage
+                    } = employeeInView
+                    setValue("id", id)
+                    setValue("name", name)
+                    setValue("cost", cost)
+                    setValue("duration", duration)
+                    setValue("hasMaintenance", hasMaintenance)
+                    setValue("maintenanceValue", maintenanceValue)
+                    setValue("maintenanceDays", maintenanceDays)
+                    setValue("hasCommission", hasCommission)
+                    setValue("commissionPercentage", commissionPercentage)
+                    setValue("commissionFixedValue", commissionValue)
+
+                    setIsFixedValue(isFixedValue)
+                    setIsPercentage(isPercentage)
+
+                    console.log("isFixedValue", commissionValue)
+
                 }
             }
-        });
+        }, [route])
 
-        const handleCommissionCheckbox = (state, property) => {
-            setCommissionCheckbox({
-                [Object.keys(commissionCheckbox).find(type => type !== property)]: false,
-                [property]: state,
-            });
-        };
-
-        const handleModal = (isShowing, text, isNavigating) => {
-            setShowAlertModal({isShowing: isShowing, text: text});
-
-            if (isNavigating) {
-                navigate.navigate("SignupPartners");
+        const handleCheckbox = (value, type) => {
+            const setType = {
+                "isPercentage": () => {
+                    setIsPercentage(value);
+                    setIsFixedValue(false)
+                    setValue("commissionFixedValue", "")
+                },
+                "isFixedValue": () => {
+                    setIsPercentage(false);
+                    setIsFixedValue(value);
+                    setValue("commissionPercentage", "")
+                }
             }
-        };
 
-        const onSave = (procedures) => {
-            setIsLoading(true);
+            setType[type]()
+        }
 
-            saveProcedures(procedures).then(
-                () => {
-                    setTimeout(() => {
-                        setIsLoading(false);
-                        navigate.goBack();
-                        reset();
-                    }, 3000);
-                    // handleErrorMessage([""]);
-                },
-                error => {
-                    setIsLoading(false);
-                    console.log(error);
-                },
-            );
-        };
+        const goBack = () => {
+            navigate.push('ApplicationStack', {screen: 'Procedures'})
+        }
 
-        const onUpdate = (data) => {
-            setIsLoading(true);
-            updateProcedures(data).then(
-                async () => {
-                    setTimeout(() => {
-                        setIsLoading(false);
-                        navigate.goBack();
-                        reset();
-                    }, 1000);
-                    // handleErrorMessage([""]);
-                },
-                error => {
-                    setIsLoading(false);
-                    console.log(error);
-                },
-            );
-        };
+        const onSave = async (procedures) => {
+            handleLoading(true);
+            try {
+                await saveProcedures(procedures)
+                handleLoading(false);
+                goBack()
+            } catch (error) {
+                handleLoading(false);
+                console.error(error);
+            }
+        }
 
-        const handleException = () => {
-            handleModal(true, Constants.NO_PROCEDURE_ALERT, false);
-        };
+        const onUpdate = async (procedure) => {
+            handleLoading(true);
+            try {
+                await updateProcedures(procedure)
+                handleLoading(false);
+                goBack()
+            } catch (error) {
+                handleLoading(false);
+                console.error(error);
+            }
+        }
 
         return (
             <FormProvider {...methods}>
@@ -133,12 +143,10 @@ const ProcedureForm = ({
                     headerTitle={"Procedimentos"}
                     clearItem={reset}
                     itemType={"procedure"}
-                    handleException={handleException}
                     persistInForm={(procedures) => contextSetValue('procedures', procedures)}
                 >
 
-                    <Loading isLoading={isLoading} color={color}/>
-                    <S.BodyContent isSigningUp={isSigningUp}>
+                    {/*<S.BodyContent isSigningUp={isSigningUp}>*/}
                         <Controller
                             name="name"
                             control={control}
@@ -284,15 +292,15 @@ const ProcedureForm = ({
                                 >
                                     <S.CheckboxContainer>
                                         <S.CheckboxContent>
-                                            <BouncyCheckbox
-                                                isChecked={commissionCheckbox.isPercentage}
-                                                onPress={() =>
-                                                    handleCommissionCheckbox(!commissionCheckbox.isPercentage, "isPercentage")
-                                                }
-                                                fillColor={color}
-                                                disableBuiltInState
-                                                disableText
-                                            />
+                                            {/*<BouncyCheckbox*/}
+                                            {/*    isChecked={isPercentage}*/}
+                                            {/*    onPress={() =>*/}
+                                            {/*        handleCheckbox(!isPercentage, "isPercentage")*/}
+                                            {/*    }*/}
+                                            {/*    fillColor={color}*/}
+                                            {/*    disableBuiltInState*/}
+                                            {/*    disableText*/}
+                                            {/*/>*/}
 
                                             <Controller
                                                 name="commissionPercentage"
@@ -301,12 +309,12 @@ const ProcedureForm = ({
                                                              field: {onChange, value, name},
                                                          }) => (
                                                     <Input
-                                                        handleChange={onChange}
+                                                        handleChange={(value) => {onChange(value); setValue("commissionFixedValue")}}
                                                         name={name}
                                                         value={value}
-                                                        width={"73%"}
+                                                        width={"100%"}
                                                         keyboardType={"numeric"}
-                                                        placeholder={"Porcentagem da Comissão"}
+                                                        placeholder={"0%"}
                                                         fontSize={38}
                                                         mask={"percentage"}
                                                         maxLength={3}
@@ -318,16 +326,16 @@ const ProcedureForm = ({
                                         </S.CheckboxContent>
 
                                         <S.CheckboxContent>
-                                            <BouncyCheckbox
-                                                style={{borderColor: color}}
-                                                isChecked={commissionCheckbox.isFixedValue}
-                                                onPress={() =>
-                                                    handleCommissionCheckbox(!commissionCheckbox.isFixedValue, "isFixedValue")
-                                                }
-                                                fillColor={color}
-                                                disableBuiltInState
-                                                disableText
-                                            />
+                                            {/*<BouncyCheckbox*/}
+                                            {/*    style={{borderColor: color}}*/}
+                                            {/*    isChecked={isFixedValue}*/}
+                                            {/*    onPress={() =>*/}
+                                            {/*        handleCheckbox(!isFixedValue, "isFixedValue")*/}
+                                            {/*    }*/}
+                                            {/*    fillColor={color}*/}
+                                            {/*    disableBuiltInState*/}
+                                            {/*    disableText*/}
+                                            {/*/>*/}
 
                                             <Controller
                                                 name="commissionFixedValue"
@@ -337,11 +345,11 @@ const ProcedureForm = ({
                                                              fieldState: {error},
                                                          }) => (
                                                     <Input
-                                                        handleChange={onChange}
+                                                        handleChange={(value) => {onChange(value); setValue("commissionPercentage")}}
                                                         name={name}
                                                         value={value}
-                                                        width={"73%"}
-                                                        placeholder={"Valor da Comissão."}
+                                                        width={"100%"}
+                                                        placeholder={"R$0,00"}
                                                         keyboardType={"numeric"}
                                                         fontSize={38}
                                                         mask={"brl"}
@@ -354,7 +362,7 @@ const ProcedureForm = ({
                                     </S.CheckboxContainer>
                                 </InputModal>
                             )}/>
-                    </S.BodyContent>
+                    {/*</S.BodyContent>*/}
 
                 </RegisterComponent>
             </FormProvider>

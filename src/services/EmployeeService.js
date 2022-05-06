@@ -1,24 +1,16 @@
 import Parse from "parse/react-native";
 import {SalonObject} from "./SalonService";
-import {
-    deleteEmployeeProcedureParse,
-    deleteEmployeeProceduresByEmployeeId,
-    saveEmployeeProcedureParse,
-} from "./ProcedureEmployeeService";
-import {getProcedureByName} from "./ProcedureService";
 import {buildEmployeeList, buildEmployeeObject} from "../factory/EmployeeFactory";
-import {deleteSchedulesByEmployeeId} from "./ScheduleService";
+import {deleteSchedulesByEmployees} from "./ScheduleService";
 import {convertToObj} from "../common/converters/GenericConverter";
 
 export const EmployeeObject = Parse.Object.extend("employee");
 
 export const getAllEmployeesBySalonId = async (salonId) => {
-
     const salon = new SalonObject({objectId: salonId});
     const EmployeeQuery = new Parse.Query(EmployeeObject);
     // EmployeeQuery.equalTo('employee_type', 'PRC');
     EmployeeQuery.equalTo("salon_id", salon);
-    //
     // EmployeeQuery.limit(limit)
     // EmployeeQuery.skip(skip)
     try {
@@ -58,18 +50,20 @@ export const getEmployeeById = async (employeeId) => {
     }
 };
 
-export const saveEmployeeParse = async (employee, isSigningUp) => {
-    const {cnpj, tel, tel2, employeeType, userName, salonId, email, procedures} =
+export const saveEmployeeParse = async (employee) => {
+    const {cnpj, tel, tel2, employeeType, name, salonId, email, procedures} =
         employee;
     const EmployeeParse = new EmployeeObject();
-    EmployeeParse.set("name", userName.trim());
+    EmployeeParse.set("name", name.trim());
     EmployeeParse.set("cnpj", cnpj);
     EmployeeParse.set("employee_type", employeeType);
     EmployeeParse.set("tel", tel);
     EmployeeParse.set("tel2", tel2);
     EmployeeParse.set("salon_id", new SalonObject({objectId: salonId}));
     EmployeeParse.set("email", email.trim());
-    EmployeeParse.set("procedures", procedures.map(procedure => {return procedure.id}))
+    EmployeeParse.set("procedures", JSON.stringify(procedures?.map(procedure => {
+        return {id: procedure.id}
+    }) ?? []))
 
 
     try {
@@ -84,32 +78,46 @@ export const saveEmployeeParse = async (employee, isSigningUp) => {
     }
 };
 
+export const saveEmployeesParse = async (employees) => {
 
-export const deleteEmployeeParse = async (employeeId) => {
-    const partner = new EmployeeObject({objectId: employeeId});
-    await deleteEmployeeProceduresByEmployeeId(employeeId);
-    await deleteSchedulesByEmployeeId(employeeId, false);
+    const employeesParse = employees.map(employee => {
+        const {cnpj, tel, tel2, employeeType, name, salonId, email, procedures} =
+            employee;
+        const EmployeeParse = new EmployeeObject();
+        EmployeeParse.set("name", name.trim());
+        EmployeeParse.set("cnpj", cnpj);
+        EmployeeParse.set("employee_type", employeeType);
+        EmployeeParse.set("tel", tel);
+        EmployeeParse.set("tel2", tel2);
+        EmployeeParse.set("salon_id", new SalonObject({objectId: salonId}));
+        EmployeeParse.set("email", email.trim());
+        EmployeeParse.set("procedures", JSON.stringify(procedures?.map(procedure => {
+            return {id: procedure.id}
+        }) ?? []))
 
-
+        return EmployeeParse
+    })
     try {
-        const deletedEmployee = await partner.destroy();
-
-        return convertToObj(deletedEmployee);
-
+        const savedEmployee = await Parse.Object.saveAll(employeesParse);
     } catch (e) {
         throw e;
     }
 };
 
 
-export const deleteEmployeesParse = async employees => {
+export const deleteEmployeeParse = async (employees) => {
+    const employeesToDelete = []
+
+    employees.forEach(({id}) => {
+        employeesToDelete.push(new EmployeeObject({objectId: id}))
+    })
+
     try {
-        for (const employee of employees) {
-            const EmployeeParse = new EmployeeObject({objectId: employee.id});
-            await EmployeeParse.destroy();
-            await deleteEmployeeProceduresByEmployeeId(employee.id);
-            await deleteSchedulesByEmployeeId(employee.id, false);
-        }
+        await deleteSchedulesByEmployees(employeesToDelete.map(employee => {
+            return employee.id
+        }));
+        await Parse.Object.destroyAll(employeesToDelete);
+
     } catch (e) {
         throw e;
     }
@@ -123,9 +131,7 @@ export const updateEmployeeParse = async (employee) => {
             cnpj,
             email,
             procedures,
-            procedureListWithoutChanges,
             id,
-            firstAcess
         } = employee;
         const EmployeeParse = new EmployeeObject({objectId: id});
 
@@ -134,17 +140,47 @@ export const updateEmployeeParse = async (employee) => {
         EmployeeParse.set("tel", tel);
         EmployeeParse.set("tel2", tel2);
         EmployeeParse.set("email", email.trim());
-        EmployeeParse.set("first_access", false);
-
+        EmployeeParse.set("procedures", JSON.stringify(procedures.map(procedure => {
+            return {id: procedure.id}
+        }) ?? []))
 
         try {
             const savedEmployee = await EmployeeParse.save();
-
             return buildEmployeeObject(convertToObj(savedEmployee));
-
         } catch (e) {
             throw  e;
         }
+    };
 
+
+export const updateEmployeesParse = async (employees) => {
+    const employeesParse = employees.map(({
+                       name,
+                       tel,
+                       tel2,
+                       cnpj,
+                       email,
+                       procedures,
+                       id,
+                   }) => {
+        const EmployeeParse = new EmployeeObject({objectId: id});
+        EmployeeParse.set("name", name.trim());
+        EmployeeParse.set("cnpj", cnpj);
+        EmployeeParse.set("tel", tel);
+        EmployeeParse.set("tel2", tel2);
+        EmployeeParse.set("email", email.trim());
+        EmployeeParse.set("procedures", JSON.stringify(procedures.map(procedure => {
+            return {id: procedure.id}
+        }) ?? []))
+
+        return EmployeeParse
+    })
+
+    try {
+        const savedEmployee = await Parse.Object.saveAll(employeesParse);
+        return buildEmployeeList(convertToObj(savedEmployee));
+    } catch (e) {
+        throw  e;
     }
-;
+};
+

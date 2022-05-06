@@ -35,7 +35,7 @@ export const CancelButton = styled.TouchableOpacity`
 
 export const ConfirmButton = styled.TouchableOpacity`
   elevation: 10;
-  opacity: ${props => (props.isEditing || props.disabled ? 0.3 : 1)};
+  opacity: ${props => (props.disabled ? 0.3 : 1)};
 `;
 
 export const ButtonText = styled.Text`

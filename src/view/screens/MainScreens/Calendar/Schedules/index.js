@@ -1,208 +1,186 @@
-import { useNavigation } from "@react-navigation/native";
+import {useNavigation} from "@react-navigation/native";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import Agenda from "../../../../components/huge/AgendaComponent";
 import List from "../../../../components/huge/ListComponent";
 import Loading from "../../../../components/small/Loading";
 import Notification from "../../../../components/small/Notification";
 import * as S from "./styled";
-import { setFirstAccessUser } from "../../../../../services/UserService";
+import {setFirstAccessUser} from "../../../../../services/UserService";
 import Colors from "../../../../../common/style/Colors";
-import { useSchedule, useUser } from "../../../../../hooks";
+import {useSchedule, useUser} from "../../../../../hooks";
+import Errors from "../../../../../common/Errors";
+import {useLayout} from "../../../../../hooks/Layout";
+import {Text} from "react-native";
 
-const Schedules = ({ route }) => {
-  const { currentUser, verifyNotification, setCurrentUser } = useUser();
-  const {
-    calendarSchedule,
-    schedules,
-    loadAllSchedules,
-    deleteScheduleProcedure,
-    deleteUniqueSchedule,
-    deleteScheduleList,
-    checkSchedule,
-    confirmSchedules,
-  } = useSchedule();
+const Schedules = ({route}) => {
+    const {currentUser, setCurrentUser} = useUser();
+    const {
+        calendarSchedule,
+        schedules,
+        loadAllSchedules,
+        updateSchedule,
+        deleteSchedule,
+        analyzeSchedules,
+    } = useSchedule();
 
-  const [isShowingAgenda, setIsShowingAgenda] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showAlertModal, setShowAlertModal] = useState({
-    text: "",
-    isVisible: false,
-    onOk: () => {
-    },
-    title: "",
-    onClose: () => {
-    },
-    cancelTitle: "",
-    okTitle: "",
-  });
+    const {handleLoading, modal, handleModal, loading} = useLayout()
 
-  const navigate = useNavigation();
+    const [isShowingAgenda, setIsShowingAgenda] = useState(false);
+    const [refreshing, setRefresing] = useState(false)
 
-  useEffect(() => {
+    const navigate = useNavigation();
 
-    navigate.addListener("focus", () => {
-      setIsShowingAgenda(route.params?.isToShowAgenda);
-    });
-  }, [navigate]);
+    useEffect(() => {
+        // setIsShowingAgenda(true);
+        // navigate.addListener("focus", () => {
+        //
+        // });
+    }, [navigate]);
 
-  useEffect(() => {
+    useEffect(() => {
+        if (currentUser.isFirstAccess) {1
+            // setShowAlertModal({
+            //     text: "Qualquer dúvida relacionada ao funcionamento da aplicação, fique a vontade para explorar nossos vídeos explicativos.",
+            //     isVisible: true,
+            //     onOk: navigateToTutorial,
+            //     title: `Bem-vindo ao Salooni.`,
+            //     cancelTitle: "Continuar",
+            //     okTitle: "TUTORIAL",
+            //     onClose: async () => {
+            //         await setCurrentUser(true, await setFirstAccessUser(currentUser.id));
+            //         setShowAlertModal({text: "", isVisible: false, ...showAlertModal});
+            //     },
+            // });
 
-    if (currentUser.isFirstAccess) {
-      setShowAlertModal({
-        text: "Qualquer dúvida relacionada ao funcionamento da aplicação, fique a vontade para explorar nossos vídeos explicativos.",
-        isVisible: true,
-        onOk: navigateToTutorial,
-        title: `Bem-vindo ao Salooni.`,
-        cancelTitle: "Continuar",
-        okTitle: "TUTORIAL",
-        onClose: async () => {
-          await setCurrentUser(true, await setFirstAccessUser(currentUser.id));
-          setShowAlertModal({ text: "", isVisible: false, ...showAlertModal });
-        },
-      });
+        }
+    }, []);
 
+
+    const navigateToTutorial = async () => {
+        await setCurrentUser(true, await setFirstAccessUser(currentUser.id));
+        navigate.navigate("UserInformationStack", {screen: "Videos"});
+    };
+
+    const handleAgenda = state => {
+        setIsShowingAgenda(!isShowingAgenda);
+    };
+
+    const confirmSchedule = checkedItems => {
+        // confirmSchedules(checkedItems);
+        // verifyNotification({
+        //   name: notificationsMessages.notifications[0].name,
+        //   verification: checkedItems.some(
+        //     schedule => !schedule.checked && schedule.passedHour,
+        //   ),
+        //   method: () =>
+        //     navigate.push("ApplicationStack", {
+        //       screen: "UnconfirmedSchedules",
+        //     }),
+        // });
+    };
+
+    const fetchData = async (skip, limit) => {
+        setRefresing(true);
+        try {
+            const {idSalon: salonId, idFunc: employeeId, employeeType} = currentUser
+
+            await loadAllSchedules({employeeId, salonId, employeeType})
+            setRefresing(false);
+        } catch (e) {
+            console.error(e)
+            setRefresing(false);
+            handleModal({
+                ...modal,
+                visible: true,
+                variant: "alert",
+                errors: Errors.LOAD_MORE_ERROR,
+            });
+        }
+    };
+
+    const onDeleteSchedule = async scheduleToDelete => {
+        handleLoading(true);
+        try {
+            await deleteSchedule(scheduleToDelete)
+            handleLoading(false)
+        } catch (error) {
+            handleLoading(false);
+            console.log(error);
+        }
+    };
+
+
+    const onUpdateSchedule = async (data) => {
+        handleLoading(true);
+        try {
+            await updateSchedule(data)
+            handleLoading(false);
+
+        } catch (error) {
+            console.error(error)
+            handleLoading(false);
+        }
+    };
+
+    const onAnalyzeSchedule = async (analyzedSchedules) => {
+        handleLoading(true);
+        try {
+            await analyzeSchedules(analyzedSchedules)
+            handleLoading(false);
+
+        } catch (error) {
+            console.error(error)
+            handleLoading(false);
+        }
     }
-  }, []);
 
+    return (
+        <S.Container>
+            <Agenda
+                isVisible={isShowingAgenda}
+                color={Colors.PURPLE}
+                handleModal={handleAgenda}
+                calendarSchedule={calendarSchedule}
+            />
 
-  const navigateToTutorial = async () => {
-    await setCurrentUser(true, await setFirstAccessUser(currentUser.id));
-    navigate.navigate("UserInformationStack", { screen: "Videos" });
-  };
-
-  const handleAgenda = state => {
-    setIsShowingAgenda(!isShowingAgenda);
-  };
-
-  const confirmSchedule = checkedItems => {
-    confirmSchedules(checkedItems);
-    // verifyNotification({
-    //   name: notificationsMessages.notifications[0].name,
-    //   verification: checkedItems.some(
-    //     schedule => !schedule.checked && schedule.passedHour,
-    //   ),
-    //   method: () =>
-    //     navigate.push("ApplicationStack", {
-    //       screen: "UnconfirmedSchedules",
-    //     }),
-    // });
-  };
-
-  const deleteSchedule = scheduleToDelete => {
-    setIsLoading(true);
-    deleteUniqueSchedule(scheduleToDelete).then(
-      () => {
-        setIsLoading(false);
-      },
-      error => {
-        setIsLoading(false);
-        console.log(error);
-      },
+            <List
+                showMenu
+                showAddButton
+                fetchData={fetchData}
+                refreshing={refreshing}
+                searchPlaceHolder={"Procure pelo cliente agendado "}
+                isOwner
+                showHeader
+                handleAgenda={handleAgenda}
+                showProfileIcon
+                headerText={"Calendário"}
+                color={Colors.PURPLE}
+                items={schedules}
+                menuItems={["name", "tel", "email", "procedures"]}
+                objectMenuItems={["client", "client", "client"]}
+                itemType={"schedule"}
+                listProperty={["name", "scheduleHour"]}
+                analyzeItem={onAnalyzeSchedule}
+                onDeleteItem={onDeleteSchedule}
+                onUpdateItem={onUpdateSchedule}
+                onAddNavigateTo={() =>
+                    navigate.push("ApplicationStack", {
+                        screen: "ScheduleRegister",
+                        params: {schedule: [], date: moment(new Date()).format()},
+                    })
+                }
+                onEditNavigateTo={item =>
+                    navigate.push("ApplicationStack", {
+                        screen: "ScheduleRegister",
+                        params: {
+                            schedule: item,
+                            date: {date: moment(new Date()).format()},
+                        },
+                    })
+                }
+            />
+        </S.Container>
     );
-  };
-
-  const deleteSchedules = schedulesToDelete => {
-    setIsLoading(true);
-    deleteScheduleList(schedulesToDelete).then(
-      () => {
-        setIsLoading(false);
-      },
-      error => {
-        setIsLoading(false);
-        console.log(error);
-      },
-    );
-  };
-
-  const checkSchedules = scheduleId => {
-    checkSchedule(scheduleId);
-  };
-
-  const onRefresh = () => {
-    return new Promise(resolve => {
-      setIsLoading(true);
-      loadAllSchedules({
-        salonId: currentUser.idSalon,
-        employeeId: currentUser.idFunc,
-        employeeType: currentUser.employeeType,
-      }).then(
-        newSchedules => {
-          setIsLoading(false);
-          resolve(newSchedules);
-        },
-        error => {
-          console.log(error);
-          setIsLoading(false);
-        },
-      );
-    });
-  };
-
-  return (
-    <S.Container>
-      <Notification />
-      <Agenda
-        isVisible={isShowingAgenda}
-        color={Colors.PURPLE}
-        handleModal={handleAgenda}
-        calendarSchedule={calendarSchedule}
-      />
-      <List
-        showMenu={true}
-        showAddButton={true}
-        onRefresh={onRefresh}
-        refreshing={isLoading}
-        searchPlaceHolder={"Procure pelo cliente agendado "}
-        isOwner={true}
-        showHeader={true}
-        handleAgenda={handleAgenda}
-        showProfileIcon={true}
-        headerText={"Calendário"}
-        color={Colors.PURPLE}
-        itemList={schedules}
-        menuItems={["name", "tel", "email", "procedures"]}
-        objectMenuItems={["client", "client", "client"]}
-        itemType={"schedule"}
-        listProperty={["name", "scheduleHour"]}
-        checkItems={checkSchedules}
-        confirmItems={confirmSchedule}
-        deleteItemList={deleteSchedules}
-        deleteUniqueItem={deleteSchedule}
-        deleteProcedure={deleteScheduleProcedure}
-        isLoading={isRefreshing}
-        onAddNavigateTo={() =>
-          navigate.push("ApplicationStack", {
-            screen: "ScheduleRegister",
-            params: { schedule: [], date: moment(new Date()).format() },
-          })
-        }
-        onEditNavigateTo={item =>
-          navigate.push("ApplicationStack", {
-            screen: "ScheduleRegister",
-            params: {
-              schedule: item,
-              date: { date: moment(new Date()).format() },
-            },
-          })
-        }
-      />
-
-      <Loading isLoading={isLoading} color={Colors.PURPLE} />
-
-      {/*<Modal*/}
-      {/*  text={*/}
-      {/*    showAlertModal.text*/}
-      {/*  }*/}
-      {/*  isVisible={showAlertModal.isVisible}*/}
-      {/*  onOk={showAlertModal.onOk}*/}
-      {/*  title={showAlertModal.title}*/}
-      {/*  onClose={showAlertModal.onClose}*/}
-      {/*  cancelTitle={showAlertModal.cancelTitle}*/}
-      {/*  okTitle={showAlertModal.okTitle}*/}
-      {/*/>*/}
-    </S.Container>
-  );
 };
 export default Schedules;

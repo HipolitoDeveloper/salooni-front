@@ -48,7 +48,7 @@ export const HeaderText = styled.Text`
 `;
 
 export const BodyContent = styled.View`
-  height: 70%;
+  height: 100%;
   display: flex;
   justify-content: flex-start;
   align-items: center;

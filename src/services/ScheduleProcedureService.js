@@ -149,24 +149,4 @@ export const confirmScheduleProcedure = async (procedures, checked) => {
 //   }
 // };
 
-export const getScheduleProceduresByClientId = async (
-  clientId,
-) => {
-    const ScheduleQuery = new Parse.Query(ScheduleObject);
-    ScheduleQuery.equalTo("client_id", new ClientObject({ objectId: clientId }));
-    ScheduleQuery.include("client_id");
-    const ScheduleProcedureQuery = new Parse.Query(ScheduleProcedureObject);
 
-    ScheduleProcedureQuery.include("procedure_id");
-    ScheduleProcedureQuery.matchesQuery("schedule_id", ScheduleQuery);
-
-    try {
-      const scheduleProcedures = await ScheduleProcedureQuery.find();
-
-      return sortClientProcedures(buildClientProcedures(
-        convertToObj(scheduleProcedures),
-      ));
-  } catch (e) {
-    throw e;
-  }
-};

@@ -1,35 +1,42 @@
 import React, {useContext, useEffect, useState} from 'react';
 import * as S from './styled';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {UserContext} from '../../../../hooks/User/UserContext';
-import {CloseButton, NotificationMessage, NotificationText} from './styled';
-import {ScheduleContext} from '../../../../hooks/Schedule/ScheduleContext';
+import {useNavigation} from "@react-navigation/native";
+import {useLayout} from "../../../../hooks/Layout";
 
-const Notification = ({}) => {
-  const {notifications, showingNotification, handleNotification} =
-    useContext(UserContext);
-  const {checkSchedule} = useContext(ScheduleContext);
+const Notification = ({message, page, route}) => {
+    const {handleNotification} = useLayout()
+    const {navigate} = useNavigation()
+    const navigateTo = () => {
+        const pages = {
+            "UnconfirmedSchedules": () => {
+                // console.log("navigate", navigate())
+                // console.log("route", route)
 
-  return showingNotification ? (
-    <S.Container>
-      <S.Content>
-        <S.NotificationMessage
-          onPress={() => {
-            notifications[0]?.method();
-            checkSchedule(-1);
-          }}>
-          <S.NotificationText>
-            {notifications[0]?.description}
-          </S.NotificationText>
-        </S.NotificationMessage>
-        <S.CloseButton onPress={() => handleNotification(false)}>
-          <Icon style={{padding: 6}} name={'times'} size={12} color={'white'} />
-        </S.CloseButton>
-      </S.Content>
-    </S.Container>
-  ) : (
-    <></>
-  );
+                navigate('ApplicationStack', {
+                    screen: 'UnconfirmedSchedules',
+                })
+            }
+        }
+
+        pages[page]()
+    }
+
+    return (
+        <S.Container>
+            <S.Content>
+                <S.NotificationMessage
+                    onPress={navigateTo}>
+                    <S.NotificationText>
+                        {message}
+                    </S.NotificationText>
+                </S.NotificationMessage>
+                <S.CloseButton onPress={() => handleNotification(false)}>
+                    <Icon style={{padding: 6}} name={'times'} size={12} color={'white'}/>
+                </S.CloseButton>
+            </S.Content>
+        </S.Container>
+    )
 };
 
 export default Notification;

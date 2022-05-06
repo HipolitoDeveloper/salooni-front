@@ -4,33 +4,60 @@ import * as S from "./styled";
 import {InputTitle} from "../Input/styled";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import moment from "moment";
+import Warning from "../Warning";
+import {Dimensions, Text} from "react-native";
+import {currentDate} from "../../../../factory/ScheduleFactory";
 
-const DatePicker = ({screenHeight, color, onChange, value}) => {
-    const [date, setDate] = useState(new Date())
+const DatePicker = ({color, onChange, value, error, label, icon, width, placeholder, fontSize, mode}) => {
+    const [date, setDate] = useState(currentDate)
     const [open, setOpen] = useState(false)
+    const screenWidth = Dimensions.get("screen").width;
+    const screenHeight = Dimensions.get("screen").height;
 
     return (
         <>
-            <S.DateTextContainer onPress={() => setOpen(true)}>
-                <InputTitle
-                    color={color}
-                    screenHeight={screenHeight}>
-                    Data de Agendamento*
-                </InputTitle>
+            <S.DateTextContainer onPress={() => setOpen(true)} width={width}>
+                {label && (
+                    <InputTitle
+                        style={{marginLeft: !!icon ? 35: 0, marginBottom: -1030}}
+                        color={color}
+                        screenHeight={screenHeight}>
+                        {label}
+                    </InputTitle>
+                )}
+                {!!error && (
+                    // <Text>
+                    //   {error.message}
+                    // </Text>
+                    <Warning
+                        right={`${screenWidth / 1.35}px`}
+                        bottom={"20px"}
+                        color={color}
+                        size={15}
+                    />
+                )}
+
                 <S.DateTextContent>
-                    <S.IconContainer>
-                        <Icon
-                            name={"calendar-alt"}
-                            size={30}
-                            color={color}
-                        />
-                    </S.IconContainer>
-                    <S.DateText>
-                        {moment(value).format("DD/MM/YYYY HH:mm")}
+                    {icon && (
+                        <S.IconContainer>
+                            <Icon
+                                name={"calendar-alt"}
+                                size={30}
+                                color={color}
+                            />
+
+                        </S.IconContainer>
+                    )}
+
+                    <S.DateText fontSize={screenHeight / fontSize} color={color}  hasIcon={!!icon}>
+                        {value
+                        ?  (moment(value).format("DD/MM/YYYY HH:mm"))
+                        : (<Text style={{color: "grey"}}>{placeholder}</Text>)}
                     </S.DateText>
                 </S.DateTextContent>
             </S.DateTextContainer>
             <Picker
+                mode={mode}
                 modal
                 open={open}
                 date={date}

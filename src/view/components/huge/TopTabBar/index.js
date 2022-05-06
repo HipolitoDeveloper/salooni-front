@@ -48,10 +48,10 @@ const TopTabBar = ({
     if (pages.length === 3) {
       switch (currentPage) {
         case 1:
-          position = isSmallerScreen ? 105 : 113;
+          position = isSmallerScreen ? 105 : 130;
           break;
         case 2:
-          position = isSmallerScreen ? 250 : 260;
+          position = isSmallerScreen ? 250 : 290;
           break;
         default:
           position = 0;
