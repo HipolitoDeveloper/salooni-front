@@ -63,7 +63,7 @@ export const procedureValidationSchema = yup.object().shape({
 
 export const employeeValidationSchema = yup.object().shape({
     name: yup.string().required(Errors.EMPLOYEENAME_REQUIRED_ALERT),
-    email: yup.string().email().required(Errors.EMAIL_REQUIRED_ALERT),
+    email: yup.string().required(Errors.EMAIL_REQUIRED_ALERT).email(Errors.EMAIL_VALIDATOR_ALERT),
     tel: yup.string().required(Errors.TEL_REQUIRED_ALERT),
     cnpj: yup
         .string()
@@ -72,12 +72,12 @@ export const employeeValidationSchema = yup.object().shape({
 });
 
 export const signinValidationSchema = yup.object().shape({
-    email: yup.string().required(Errors.EMAIL_FORMAT_ERROR).email().ownerValidator(),
+    email: yup.string().required(Errors.EMAIL_REQUIRED_ALERT).email(Errors.EMAIL_VALIDATOR_ALERT).ownerValidator(),
     password: yup.string(Errors.PASSWORD_REQUIRED_ALERT).required(),
 });
 
 export const employeeSigninValidationSchema = yup.object().shape({
-    email: yup.string().required().email().employeeValidator(),
+    email: yup.string().required(Errors.EMAIL_REQUIRED_ALERT).email(Errors.EMAIL_VALIDATOR_ALERT).employeeValidator(),
     password: yup.string().required(),
 });
 
@@ -94,7 +94,7 @@ export const profileUpdateValidationSchema = yup.object().shape({
         .required(Errors.CNPJ_REQUIRED_ALERT)
         .length(14, Errors.CNPJ_VALIDATOR_ALERT)
         .cnpjValidator(Errors.CNPJ_VALIDATOR_ALERT),
-    email: yup.string().email().required(Errors.EMAIL_REQUIRED_ALERT),
+    email: yup.string().email(Errors.EMAIL_VALIDATOR_ALERT).required(Errors.EMAIL_REQUIRED_ALERT),
 });
 
 export const clientValidationSchema = yup.object().shape({

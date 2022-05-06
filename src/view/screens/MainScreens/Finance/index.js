@@ -1,27 +1,19 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { Text, Dimensions } from 'react-native';
-import * as S from './styled'
-import {
-    LineChart,
-    BarChart,
-    PieChart,
-    ProgressChart,
-    ContributionGraph,
-    StackedBarChart
-} from "react-native-chart-kit";
+import React, {useContext, useEffect, useState} from 'react';
 
-import { getFinanceInformation } from '../../../../services/CloudService';
-import Loading from '../../../components/small/Loading';
-import { UserContext } from '../../../../hooks/User/UserContext';
-import Colors from "../../../../common/style/Colors";
+import {getFinanceInformation} from '../../../../services/CloudService';
 import ComingSoon from "../../../components/small/ComingSoon";
+import {useUser} from "../../../../hooks";
 
 
 const Finance = () => {
-    const [data, setData] = useState({ graphic: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], salonFinances: 0, partnerFinances: 0 });
+    const [data, setData] = useState({
+        graphic: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        salonFinances: 0,
+        partnerFinances: 0
+    });
     const [isLoading, setIsLoading] = useState(false)
 
-    const { currentUser } = useContext(UserContext);
+    const {currentUser} = useUser();
 
     useEffect(() => {
         setIsLoading(true);
@@ -48,7 +40,7 @@ const Finance = () => {
 
 
     return (
-        <ComingSoon />
+        <ComingSoon/>
         // <S.Container>
         //     <S.AuxiliarTitle>
         //         Faturamento anual
