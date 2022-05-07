@@ -2,14 +2,21 @@ import styled from 'styled-components/native/dist/styled-components.native.esm';
 import Fonts from "../../../../common/style/Fonts";
 import {StyleSheet} from "react-native";
 
+export const InputContainer = styled.View`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+
+`;
+
 export const InputContent = styled.View`
-  padding-bottom: 10px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  width: ${props => (props.width ? props.width : '100%')};
-  
+  margin-top: 5px;
+
 `;
 
 export const InputTitle = styled.Text`

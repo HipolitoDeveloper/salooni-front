@@ -67,7 +67,7 @@ export const CloseButtonContent = styled.TouchableOpacity`
   position: absolute;
   top: 0;
   left: ${props =>
-          Platform.OS === 'ios' ? '252px' : props.screenWidth / 1.60}px;
+          Platform.OS === 'ios' ? '252px' : props.screenWidth / 1.40}px;
   display: flex;
   align-items: center;
   justify-content: center;

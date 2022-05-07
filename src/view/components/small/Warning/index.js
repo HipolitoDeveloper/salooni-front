@@ -10,9 +10,7 @@ export const Warning = ({color, bottom, left, right, onPress}) => {
         <S.WarningContent
             onPress={onPress}
             color={Colors.PURPLE}
-            bottom={bottom}
-            left={left}
-            right={right}>
+            >
             <Icon name={"exclamation"} size={20} color={color}/>
             {/* <Icon name={'exclamation'} color={color} size={size ? size : 30} /> */}
         </S.WarningContent>

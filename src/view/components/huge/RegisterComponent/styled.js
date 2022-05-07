@@ -10,7 +10,15 @@ export const Content = styled.View`
   align-items: center;
   width: 100%;
   flex: 5;
+  
 `;
+
+export const Footer = styled.View`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1
+`
 
 export const ButtonsContent = styled.View``;
 
@@ -23,12 +31,6 @@ export const CancelButton = styled.TouchableOpacity`
   border-radius: 30px;
 `;
 
-export const Footer = styled.View`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex: 1
-`
 
 export const AddMessage = styled.Text`
   font-family: ${Fonts.MAIN};

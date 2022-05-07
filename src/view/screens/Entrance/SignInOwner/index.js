@@ -73,7 +73,7 @@ const SignInOwner = () => {
                             name={name}
                             placeholder={"E-mail"}
                             value={value}
-                            width={"80%"}
+                            width={"70%"}
                             keyboard={"email-address"}
                             fontSize={40}
                             mask="email"
@@ -93,7 +93,7 @@ const SignInOwner = () => {
                             name={name}
                             placeholder={"Senha"}
                             value={value}
-                            width={"80%"}
+                            width={"70%"}
                             keyboard={"default"}
                             isSecureTextEntry
                             fontSize={40}

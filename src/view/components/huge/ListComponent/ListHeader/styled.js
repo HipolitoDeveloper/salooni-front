@@ -11,11 +11,10 @@ export const Container = styled.View`
   align-items: flex-start;
   border-bottom-width: ${StyleSheet.hairlineWidth}px;
   elevation: ${props => (props.backButtonHeader ? 0 : 10)};
-  padding-top: ${Platform.OS === "ios" ? "40px" : "0"};
+  //padding-top: ${Platform.OS === "ios" ? "40px" : "15px"};
 `;
 
 export const Content = styled.View`
-  padding-top: 20px;
   width: 100%;
   height: 100%;
   display: flex;
@@ -28,12 +27,21 @@ export const Header = styled.View`
   width: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
-  align-items: flex-end;
-  height: 30px;
+  align-items: center;
+  flex: 1;
+
 `;
 
+export const HeaderInformation = styled.View`
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: ${props => props.centralize? 70 : 40}px;
+`
+
 export const SubHeader = styled.View`
+  flex: 1;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -41,12 +49,10 @@ export const SubHeader = styled.View`
 `;
 
 export const TitleContent = styled.View`
+  height: 120%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 150%;
-  border: 1px solid red;
+  flex-direction: row;
 `;
 
 export const TitleName = styled.Text`
@@ -54,8 +60,7 @@ export const TitleName = styled.Text`
   font-size: ${props => props.screenHeight / 25}px;
   color: ${props => props.headerColor};
   letter-spacing: 2px;
-  height: 120%;
-  margin: 0 auto;
+
 `;
 
 export const SubTitleName = styled.Text`
@@ -99,8 +104,7 @@ export const IconContent = styled.View`
   height: 50px;
   width: 50px;
   border-radius: 40px;
-  position: absolute;
-  left: 15px;
+
 `;
 
 export const SearchIconContainer = styled.TouchableOpacity`
@@ -141,16 +145,10 @@ export const SwitchButton = styled.TouchableOpacity`
 `;
 
 export const CalendarIcon = styled.TouchableOpacity`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
   background-color: ${props => props.backgroundColor};
   padding: 5px;
-  width: 28px;
   border-radius: 5px;
-  position: absolute;
-  right: ${props => props.screenWidth / 4}px;
+  margin-left: 10px;
 `;
 
 export const ProfileIcon = styled.TouchableOpacity`

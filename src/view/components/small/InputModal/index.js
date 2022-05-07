@@ -64,13 +64,7 @@ export const InputModal = ({
                         <S.TextContent>
                             <S.Text screenHeight={screenHeight}>{inputTitle}</S.Text>
                         </S.TextContent>
-                        <S.CloseButtonContent
-                            screenWidth={screenWidth}
-                            onPress={() => setIsShowingInput(false)}>
-                            <S.CloseButton>
-                                <Icon name={'times'} size={18} color={'white'}/>
-                            </S.CloseButton>
-                        </S.CloseButtonContent>
+
                         <S.InputsContent>{children}</S.InputsContent>
                     </S.InputsContainer>
                 </Modal>

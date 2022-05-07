@@ -3,11 +3,9 @@ import Colors from "../../../../../common/style/Colors";
 import Fonts from "../../../../../common/style/Fonts";
 export const Wrapper = styled.View`
   width: 100%;
-  position: absolute;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  bottom: 0;
 `;
 
 export const Container = styled.View`

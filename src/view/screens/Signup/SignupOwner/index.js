@@ -9,8 +9,6 @@ const SignupOwners = () => {
 
   return (
     <S.Container>
-      <S.Content>
-        <S.BodyContent>
           <Controller
             name="salonName"
             control={control}
@@ -152,17 +150,6 @@ const SignupOwners = () => {
               />
             )} />
 
-        </S.BodyContent>
-        <S.FooterContent>
-          {/*{errorMessage !== "" && (*/}
-          {/*  <ErrorMessage*/}
-          {/*    text={errorMessage}*/}
-          {/*    width={"70%"}*/}
-          {/*    textColor={Colors.PURPLE}*/}
-          {/*  />*/}
-          {/*)}*/}
-        </S.FooterContent>
-      </S.Content>
     </S.Container>
   );
 };
