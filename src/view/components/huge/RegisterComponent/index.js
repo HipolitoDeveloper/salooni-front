@@ -197,7 +197,7 @@ const RegisterComponent = ({
             {!registeredItemIsEditing && isMultiInsert && (
                 <S.Footer>
                     <FloatButton
-                        bottom={`${screenHeight / (isSmallerScreen ? 5 : 7)}px`}
+                        bottom={`${screenHeight / (isSmallerScreen ? 10 : 7)}px`}
                         right={"40px"}
                         onPress={handleSubmit(chooseAddEmployeeMethod)}
                         buttonColor={color}
@@ -206,22 +206,24 @@ const RegisterComponent = ({
                     <S.AddMessage screenHeight={screenHeight}>
                         Não esqueça de adicionar as informações.
                     </S.AddMessage>
+
+                    {!isEditing && isMultiInsert && (
+                        <RegisteredItemsModal
+                            color={color}
+                            isOpened={isRegisteredItemsBoxOpened}
+                            handleOpening={() =>
+                                setIsRegisteredItemsBoxOpened(!isRegisteredItemsBoxOpened)
+                            }
+                            deletePreRegisteredItem={deletePreRegisteredItem}
+                            handleSelect={handleSelect}
+                            items={registeredItems}
+                            rightInformation={registeredItemRightInformation}
+                            leftInformation={registeredItemLeftInformation}
+                        />
+                    )}
                 </S.Footer>
             )}
-            {!isEditing && isMultiInsert && (
-                <RegisteredItemsModal
-                    color={color}
-                    isOpened={isRegisteredItemsBoxOpened}
-                    handleOpening={() =>
-                        setIsRegisteredItemsBoxOpened(!isRegisteredItemsBoxOpened)
-                    }
-                    deletePreRegisteredItem={deletePreRegisteredItem}
-                    handleSelect={handleSelect}
-                    items={registeredItems}
-                    rightInformation={registeredItemRightInformation}
-                    leftInformation={registeredItemLeftInformation}
-                />
-            )}
+
             {/*<Modal*/}
             {/*  text={`Você possui ${registeredItems.length} itens pré-registrados, gostaria de cancelar esses pré-registros?`}*/}
             {/*  isVisible={modalState}*/}
