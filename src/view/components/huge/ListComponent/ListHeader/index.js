@@ -1,183 +1,183 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import * as S from "./styled";
 import Icon from "react-native-vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
+import {useNavigation} from "@react-navigation/native";
 import Salooni from "../../../../../assets/svg/salooniSVG.svg";
-import Search from "../../../../../assets/svg/searchSVG.svg";
 import Times from "../../../../../assets/svg/timesSVG.svg";
-import { View, Text, Dimensions } from "react-native";
-import { CalendarIcon, CloseButton, ProfileIcon } from "./styled";
+import {Dimensions} from "react-native";
 import Profile from "../../../../../assets/svg/profileSVG.svg";
 import BackButton from "../../../small/BackButton";
 import Colors from "../../../../../common/style/Colors";
 
 const ListHeader = ({
-                      backButtonHeader,
-                      onSearch,
-                      headerTitle,
-                      headerSubTitle,
-                      headerColor,
-                      calendarView,
-                      showProfileIcon,
-                      isDeleting,
-                      selectedItemsLength,
-                      onCancel,
-                      handleAgenda,
-                      headerHeight,
-                      searchPlaceHolder,
-                      scrolling,
-                      showBackButton,
-                      showCloseButton
+                        backButtonHeader,
+                        onSearch,
+                        headerTitle,
+                        headerSubTitle,
+                        headerColor,
+                        calendarView,
+                        showProfileIcon,
+                        isDeleting,
+                        selectedItemsLength,
+                        onCancel,
+                        handleAgenda,
+                        headerHeight,
+                        searchPlaceHolder,
+                        scrolling,
+                        showBackButton,
+                        showCloseButton
                     }) => {
-  const screenHeight = Dimensions.get("screen").height;
-  const screenWidth = Dimensions.get("screen").width;
-  const isSmallerScreen = screenHeight < 650;
+    const screenHeight = Dimensions.get("screen").height;
+    const screenWidth = Dimensions.get("screen").width;
+    const isSmallerScreen = screenHeight < 650;
 
-  const [scheduleView, setScheduleView] = useState("");
-  const [search, setSearch] = useState("");
+    const [scheduleView, setScheduleView] = useState("");
+    const [search, setSearch] = useState("");
 
-  const navigation = useNavigation();
+    const navigation = useNavigation();
 
-  useEffect(() => {
-    setScheduleView(calendarView);
-  }, []);
+    useEffect(() => {
+        setScheduleView(calendarView);
+    }, []);
 
-  return (
-    <S.Container
-      backButtonHeader={backButtonHeader}
-      style={[
-        {
-          height: headerHeight,
-        },
-      ]}>
-      {backButtonHeader ? (
-        <S.HeaderContent>
-          <BackButton
-            positionLeft={"20px"}
-            positionTop={"60px"}
-            onPress={() => {
-              navigation.push("TabStack", { screen: "Schedules" });
-            }}
-            buttonColor={Colors.PURPLE}
-          />
-          <S.HeaderText>Agendamentos a confirmar</S.HeaderText>
-        </S.HeaderContent>
-      ) : (
-        <S.Content>
-          <S.Header>
-            {!isDeleting && scrolling && (
-              <S.IconContent>
-                {showBackButton ? (
-                  <BackButton
-                    onPress={() =>
-                      navigation.goBack()
-                    }
-                    buttonColor={headerColor}
-                    positionTop={"20px"}
-                    positionLeft={"10px"}
-                  />
-                ) : (
-                  <Salooni
-                    fill={headerColor}
-                    borderFill={"#fff"}
-                    width={screenWidth / 8}
-                    height={screenHeight / 8}
-                  />
-                )}
-              </S.IconContent>
-            )}
-            {isDeleting ? (
-              <S.DeleteContent headerColor={headerColor}>
-                <S.DeleteText>{`Deseja apagar os ${selectedItemsLength} itens?`}</S.DeleteText>
-                <S.DeleteCancelIcon onPress={onCancel}>
-                  <Times
-                    fill={"#fff"}
-                    borderFill={"#fff"}
-                    width={10}
-                    height={10}
-                  />
-                </S.DeleteCancelIcon>
-              </S.DeleteContent>
-            ) : (
-              <>
-                  <S.TitleName
-                    screenHeight={screenHeight}
-                    headerColor={headerColor}>
-                    {headerTitle}
-                  </S.TitleName>
-                  {headerSubTitle && (
-                    <S.SubTitleName
-                      screenHeight={screenHeight}
-                      headerColor={headerColor}>
-                      cliente {headerSubTitle}
-                    </S.SubTitleName>
-                  )}
-                {handleAgenda && (
-                  <S.CalendarIcon
-                    screenWidth={screenWidth}
-                    onPress={handleAgenda}
-                    backgroundColor={headerColor}>
-                    <Icon name={"calendar"} size={14} color={"white"} />
-                  </S.CalendarIcon>
-                )}
-
-                {showCloseButton && (
-                  <S.CloseButton onPress={() => navigation.pop()}>
-                    <Icon name={"close-circle"} size={25} color={'black'}/>
-                  </S.CloseButton>
-                )}
-
-                {showProfileIcon && (
-                  <S.ProfileIcon
-                    onPress={() =>
-                      navigation.push("AppSettingsStack")
-                    }>
-                    <Profile
-                      fill={headerColor}
-                      borderFill={"#fff"}
-                      width={screenWidth / 12}
-                      height={screenHeight / 12}
+    return (
+        <S.Container
+            backButtonHeader={backButtonHeader}
+            style={[
+                {
+                    height: headerHeight,
+                },
+            ]}>
+            {backButtonHeader ? (
+                <S.HeaderContent>
+                    <BackButton
+                        positionLeft={"20px"}
+                        positionTop={"60px"}
+                        onPress={() => {
+                            navigation.push("TabStack", {screen: "Schedules"});
+                        }}
+                        buttonColor={Colors.PURPLE}
                     />
-                  </S.ProfileIcon>
-                )}
-              </>
+                    <S.HeaderText>Agendamentos a confirmar</S.HeaderText>
+                </S.HeaderContent>
+            ) : (
+                <S.Content>
+                    <S.Header>
+                        {!isDeleting && scrolling && (
+                            showBackButton ? (
+                                <BackButton
+                                    onPress={() =>
+                                        navigation.goBack()
+                                    }
+                                    buttonColor={headerColor}
+                                    positionTop={"20px"}
+                                    positionLeft={"10px"}
+                                />
+                            ) : (
+                                <Salooni
+                                    fill={headerColor}
+                                    borderFill={"#fff"}
+                                    width={screenWidth / 8}
+                                    height={screenHeight / 8}
+                                />
+                            )
+                        )}
+                        {isDeleting ? (
+                            <S.DeleteContent headerColor={headerColor}>
+                                <S.DeleteText>{`Deseja apagar os ${selectedItemsLength} itens?`}</S.DeleteText>
+                                <S.DeleteCancelIcon onPress={onCancel}>
+                                    <Times
+                                        fill={"#fff"}
+                                        borderFill={"#fff"}
+                                        width={10}
+                                        height={10}
+                                    />
+                                </S.DeleteCancelIcon>
+                            </S.DeleteContent>
+                        ) : (
+                            <S.HeaderInformation centralize={!showProfileIcon && !handleAgenda}>
+                                <S.TitleContent>
+                                    <S.TitleName
+                                        screenHeight={screenHeight}
+                                        headerColor={headerColor}>
+                                        {headerTitle}
+                                    </S.TitleName>
+                                    {handleAgenda && (
+                                        <S.CalendarIcon
+                                            screenWidth={screenWidth}
+                                            onPress={handleAgenda}
+                                            backgroundColor={headerColor}>
+                                            <Icon name={"calendar"} size={14} color={"white"}/>
+                                        </S.CalendarIcon>
+                                    )}
+                                </S.TitleContent>
+
+                                {headerSubTitle && (
+                                    <S.SubTitleName
+                                        screenHeight={screenHeight}
+                                        headerColor={headerColor}>
+                                        cliente {headerSubTitle}
+                                    </S.SubTitleName>
+                                )}
+
+
+                                {showCloseButton && (
+                                    <S.CloseButton onPress={() => navigation.pop()}>
+                                        <Icon name={"close-circle"} size={25} color={'black'}/>
+                                    </S.CloseButton>
+                                )}
+
+                                {showProfileIcon && (
+                                    <S.ProfileIcon
+                                        onPress={() =>
+                                            navigation.push("AppSettingsStack")
+                                        }>
+                                        <Profile
+                                            fill={headerColor}
+                                            borderFill={"#fff"}
+                                            width={screenWidth / 12}
+                                            height={screenHeight / 12}
+                                        />
+                                    </S.ProfileIcon>
+                                )}
+                            </S.HeaderInformation>
+                        )}
+                    </S.Header>
+
+                    <S.SubHeader>
+                        <S.SearchContainer>
+                            <S.SearchIcon>
+                                <Icon
+                                    name={"search"}
+                                    size={25}
+                                    color={"black"}
+                                />
+                            </S.SearchIcon>
+                            <S.SearchInput
+                                screenHeight={screenHeight}
+                                // value={search}
+                                onChangeText={onSearch}
+                                placeholder={searchPlaceHolder}
+                                placeholderTextColor={"black"}
+                            />
+
+                            <S.CancelInput
+                                onPress={() => {
+                                    onSearch("");
+                                }}
+                                hitSlop={{top: 12, left: 12, right: 12, bottom: 12}}>
+                                <Icon
+                                    name={"close"}
+                                    size={18}
+                                    color={"black"}
+                                />
+                            </S.CancelInput>
+                        </S.SearchContainer>
+                    </S.SubHeader>
+                </S.Content>
             )}
-          </S.Header>
-
-          <S.SubHeader>
-            <S.SearchContainer>
-              <S.SearchIcon>
-                <Icon
-                  name={"search"}
-                  size={25}
-                  color={"black"}
-                />
-              </S.SearchIcon>
-              <S.SearchInput
-                screenHeight={screenHeight}
-                // value={search}
-                onChangeText={onSearch}
-                placeholder={searchPlaceHolder}
-                placeholderTextColor={"black"}
-              />
-
-              <S.CancelInput
-                onPress={() => {
-                    onSearch("");
-                }}
-                hitSlop={{ top: 12, left: 12, right: 12, bottom: 12 }}>
-                  <Icon
-                      name={"close"}
-                      size={18}
-                      color={"black"}
-                  />
-              </S.CancelInput>
-            </S.SearchContainer>
-          </S.SubHeader>
-        </S.Content>
-      )}
-    </S.Container>
-  );
+        </S.Container>
+    );
 };
 
 export default ListHeader;
