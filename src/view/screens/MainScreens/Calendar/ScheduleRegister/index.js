@@ -59,10 +59,6 @@ const ScheduleRegister = ({route}) => {
     const navigate = useNavigation();
 
     useEffect(() => {
-        setValue("employee",
-            currentEmployee ??
-            {})
-
         setProcedureOptions(currentEmployee?.procedures?.map(employeeProcedure => {
             const availableProcedure = procedures.find(procedure => employeeProcedure.id === procedure.id)
             return {id: availableProcedure?.id, name: availableProcedure?.name, time: availableProcedure?.time}
@@ -75,7 +71,6 @@ const ScheduleRegister = ({route}) => {
         if (Object.keys(scheduleInView).length !== 0) {
             setIsEditing(true)
             const {id, client, employee, procedures: scheduleProcedures, scheduleDate} = scheduleInView
-            console.log("scheduleInView", scheduleInView)
             setValue("id", id)
             setValue("client", client)
             setValue("employee", employee)
@@ -92,8 +87,12 @@ const ScheduleRegister = ({route}) => {
                 }
             }))
 
+        } else {
+            setValue("employee",
+                currentEmployee ??
+                {})
         }
-    }, [procedures, route])
+    }, [procedures, route, currentEmployee])
 
     const setProcedures = () => {
         setValue("procedures", [])
