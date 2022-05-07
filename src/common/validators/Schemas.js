@@ -64,31 +64,31 @@ export const procedureValidationSchema = yup.object().shape({
 export const employeeValidationSchema = yup.object().shape({
     name: yup.string().required(Errors.EMPLOYEENAME_REQUIRED_ALERT),
     email: yup.string().required(Errors.EMAIL_REQUIRED_ALERT).email(Errors.EMAIL_VALIDATOR_ALERT),
-    tel: yup.string().required(Errors.TEL_REQUIRED_ALERT),
+    tel: yup.string().required(Errors.TEL_REQUIRED_ALERT).length(11, Errors.TEL_VALIDATOR_ALERT),
     cnpj: yup
         .string()
-        .length(14, Errors.CNPJ_VALIDATOR_ALERT)
+        .test("cnpj-empty-check", Errors.CNPJ_VALIDATOR_ALERT, (cnpj) => cnpj.length === 0 || cnpj.length === 14)
         .cnpjValidator(Errors.CNPJ_VALIDATOR_ALERT),
 });
 
 export const signinValidationSchema = yup.object().shape({
     email: yup.string().required(Errors.EMAIL_REQUIRED_ALERT).email(Errors.EMAIL_VALIDATOR_ALERT).ownerValidator(),
-    password: yup.string(Errors.PASSWORD_REQUIRED_ALERT).required(),
+    password: yup.string().required(Errors.PASSWORD_REQUIRED_ALERT),
 });
 
 export const employeeSigninValidationSchema = yup.object().shape({
     email: yup.string().required(Errors.EMAIL_REQUIRED_ALERT).email(Errors.EMAIL_VALIDATOR_ALERT).employeeValidator(),
-    password: yup.string().required(),
+    password: yup.string().required(Errors.PASSWORD_REQUIRED_ALERT),
 });
 
 export const employeeSignupValidationSchema = yup.object().shape({
-    password: yup.string().required(),
-    confirmPassword: yup.string().matchPasswordValidator(),
+    password: yup.string().required(Errors.PASSWORD_REQUIRED_ALERT),
+    confirmPassword: yup.string().required(Errors.PASSWORD_REQUIRED_ALERT).matchPasswordValidator(),
 });
 
 export const profileUpdateValidationSchema = yup.object().shape({
-    name: yup.string().required(),
-    salonName: yup.string().required(),
+    name: yup.string().required(Errors.OWNER_REQUIRED_ALERT),
+    salonName: yup.string().required(Errors.SALONNAME_REQUIRED_ALERT),
     cnpj: yup
         .string()
         .required(Errors.CNPJ_REQUIRED_ALERT)
@@ -100,10 +100,11 @@ export const profileUpdateValidationSchema = yup.object().shape({
 export const clientValidationSchema = yup.object().shape({
     name: yup.string().required(Errors.NAME_REQUIRED_ALERT),
     email: yup.string().required(Errors.EMAIL_REQUIRED_ALERT),
-    cpf: yup.string().cpfValidator(Errors.CPF_VALIDATOR_ALERT),
+    cpf: yup.string().test("cpf-empty-check", Errors.CPF_VALIDATOR_ALERT, (cpf) => cpf.length === 0 || cpf.length === 11)
+        .cpfValidator(Errors.CPF_VALIDATOR_ALERT),
     bornDate: yup.string(),
-    tel: yup.string().required(Errors.TEL_REQUIRED_ALERT),
-    tel2: yup.string(),
+    tel: yup.string().required(Errors.TEL_REQUIRED_ALERT).length(11, Errors.TEL_VALIDATOR_ALERT),
+    tel2: yup.string().test("tel2-empty-check", Errors.TEL_VALIDATOR_ALERT, (tel2) => tel2.length === 0 || tel2.length === 11),
 })
 
 export const scheduleValidationSchema = yup.object().shape({
