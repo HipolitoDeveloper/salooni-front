@@ -71,7 +71,7 @@ const DatePicker = ({color, onChange, value, error, label, icon, width, placehol
                 onCancel={() => {
                     setOpen(false)
                 }}
-                title={"Selecione uma data"}
+                title={"Selecione um horário"}
             />
         </>
     )

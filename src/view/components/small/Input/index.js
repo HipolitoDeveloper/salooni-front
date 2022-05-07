@@ -1,5 +1,5 @@
 import React, {useCallback, useState} from "react";
-import {Dimensions, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Dimensions, StyleSheet, Text} from "react-native";
 import * as S from "./styled";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import Warning from "../Warning";
@@ -7,7 +7,6 @@ import Colors from "../../../../common/style/Colors";
 import Fonts from "../../../../common/style/Fonts";
 import MaskInput, {Masks} from 'react-native-mask-input';
 import {useLayout} from "../../../../hooks/Layout";
-import Errors from "../../../../common/Errors";
 
 const Input = ({
                    error,
@@ -68,24 +67,16 @@ const Input = ({
     };
 
     const showErrors = () => {
-        handleModal({...modal, visible: true, variant: "alert", errors:[{message:error.message }] });
+        handleModal({...modal, visible: true, variant: "alert", errors: [{message: error.message}]});
     }
     return (
-        <View style={[styles.container, {width: width}]}>
+        <S.InputContainer style={[styles.container, {width: width}]}>
             {/*{leftPlaceholder && value?.length > 0 && (*/}
             {/*    <Text style={[styles.leftPlaceholder]}>{leftPlaceholder}</Text>*/}
             {/*)}*/}
 
+
             <S.InputContent>
-                {!!error && (
-                    <Warning
-                        onPress={showErrors}
-                        right={`${screenWidth / 1.23}px`}
-                        bottom={"16px"}
-                        color={color}
-                        size={10}
-                    />
-                )}
                 <S.InputTitle screenHeight={screenHeight} color={color}>
                     {label}
                 </S.InputTitle>
@@ -99,6 +90,8 @@ const Input = ({
                             opacity: 1,
                             width: "100%",
                             borderBottomWidth: 1,
+                            paddingRight: 30,
+                            paddingBottom: 0
                             // borderBottomColor: borderBottomColoor
                         },
                     ]}
@@ -119,9 +112,15 @@ const Input = ({
                             name={"eye"}
                             size={24}
                             color={Colors.PURPLE}
-                            style={{marginLeft: 10}}
+                            style={{marginRight: !!error ? 30 : 10}}
                         />
                     </S.ShowPasswordButton>
+                )}
+                {!!error && (
+                    <Warning
+                        onPress={showErrors}
+                        color={color}
+                    />
                 )}
             </S.InputContent>
             {!isInputValid.state && (
@@ -137,10 +136,12 @@ const Input = ({
                     )}
                 </S.MessageBox>
             )}
+
+
             {rightPlaceholder && value?.length > 0 && (
                 <Text style={[styles.rightPlaceholder]}>{rightPlaceholder}</Text>
             )}
-        </View>
+        </S.InputContainer>
     );
 };
 
