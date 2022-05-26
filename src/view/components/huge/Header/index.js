@@ -19,10 +19,6 @@ const Header = ({
     setScheduleView(calendarView);
   }, []);
 
-  const openSideMenu = () => {
-    navigation.openDrawer();
-  };
-
   const handleScheduleView = () => {
     handleCalendarView(scheduleView ? 'AGN' : 'LST');
     setScheduleView(!scheduleView);

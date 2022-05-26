@@ -29,6 +29,7 @@ export const Header = styled.View`
   flex-direction: row;
   align-items: center;
   flex: 1;
+  margin-left: 5px;
 
 `;
 

@@ -67,7 +67,7 @@ export const employeeValidationSchema = yup.object().shape({
     tel: yup.string().required(Errors.TEL_REQUIRED_ALERT).length(11, Errors.TEL_VALIDATOR_ALERT),
     cnpj: yup
         .string()
-        .test("cnpj-empty-check", Errors.CNPJ_VALIDATOR_ALERT, (cnpj) => cnpj.length === 0 || cnpj.length === 14)
+        .test("cnpj-empty-check", Errors.CNPJ_VALIDATOR_ALERT, (cnpj) => cnpj?.length !== 0 || cnpj?.length !== 14)
         .cnpjValidator(Errors.CNPJ_VALIDATOR_ALERT),
 });
 
@@ -100,11 +100,11 @@ export const profileUpdateValidationSchema = yup.object().shape({
 export const clientValidationSchema = yup.object().shape({
     name: yup.string().required(Errors.NAME_REQUIRED_ALERT),
     email: yup.string().required(Errors.EMAIL_REQUIRED_ALERT),
-    cpf: yup.string().test("cpf-empty-check", Errors.CPF_VALIDATOR_ALERT, (cpf) => cpf.length === 0 || cpf.length === 11)
+    cpf: yup.string().test("cpf-empty-check", Errors.CPF_VALIDATOR_ALERT, (cpf) => cpf?.length !== 0 || cpf?.length !== 11)
         .cpfValidator(Errors.CPF_VALIDATOR_ALERT),
     bornDate: yup.string(),
     tel: yup.string().required(Errors.TEL_REQUIRED_ALERT).length(11, Errors.TEL_VALIDATOR_ALERT),
-    tel2: yup.string().test("tel2-empty-check", Errors.TEL_VALIDATOR_ALERT, (tel2) => tel2.length === 0 || tel2.length === 11),
+    tel2: yup.string().test("tel2-empty-check", Errors.TEL_VALIDATOR_ALERT, (tel2) => ( tel2?.length !== 0 || tel2?.length !== 11)),
 })
 
 export const scheduleValidationSchema = yup.object().shape({

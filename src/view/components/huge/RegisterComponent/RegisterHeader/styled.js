@@ -15,6 +15,7 @@ export const Container = styled.View`
 `;
 
 export const Content = styled.View`
+
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -45,12 +46,16 @@ export const ButtonText = styled.Text`
   font-family: ${Fonts.MAIN};
 `;
 
-export const HeaderTitleContent = styled.View``;
+export const HeaderTitleContent = styled.View`
+  width: 100%;
+  align-items: center;
+`;
 
 export const HeaderTitle = styled.Text`
   font-family: ${Fonts.MAIN};
   font-size: ${props => props.screenHeight / 46}px;
   color: ${props => props.headerColor};
+  margin-right: 15px;
 `;
 
 export const HeaderLine = styled.View`
