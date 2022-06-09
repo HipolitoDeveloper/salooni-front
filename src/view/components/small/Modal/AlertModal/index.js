@@ -15,7 +15,7 @@ const AlertModal = ({
             <S.HeaderContent>
                 <S.HeaderTitle>{title}</S.HeaderTitle>
                 <S.HeaderDescription>
-                    Não foi possível concluir o cadastro, pois:
+                    Tivemos alguns problemas com:
                 </S.HeaderDescription>
             </S.HeaderContent>
             <S.BodyContent>

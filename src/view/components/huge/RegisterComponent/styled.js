@@ -23,12 +23,11 @@ export const Footer = styled.View`
 export const ButtonsContent = styled.View``;
 
 export const CancelButton = styled.TouchableOpacity`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   background-color: ${props => props.color};
-  position: absolute;
-  bottom: ${props => props.bottom};
-  right: 120px;
   padding: 10px;
-  border-radius: 30px;
 `;
 
 

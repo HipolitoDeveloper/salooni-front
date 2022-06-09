@@ -72,6 +72,7 @@ const UserProvider = ({ children }) => {
 
   const onLogout = async () => {
     await setCurrentUser(null);
+    await Parse.User.logOut()
     changeStack(Constants.OUT_ROUTE_STACK);
   };
 

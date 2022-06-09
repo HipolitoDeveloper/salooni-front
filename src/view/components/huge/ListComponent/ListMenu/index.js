@@ -277,31 +277,35 @@ const ListMenu = ({
                                                 iconSize: 13,
                                             }}
                                         />
-                                        <Button
-                                            disabled={false}
-                                            marginBottom={"20px"}
-                                            onPress={() => {
-                                                onDeleteItem([menuState.itemInView]);
-                                                closeMenu();
-                                            }}
-                                            color={Colors.BACKGROUND_COLOR}
-                                            textColor={Colors.BACKGROUND_COLOR}
-                                            backgroundColor={color}
-                                            text={"Excluir"}
-                                            width={"120px"}
-                                            height={"35px"}
-                                            fontSize={"17px"}
-                                            leftContent={{
-                                                show: true,
-                                                height: "20px",
-                                                width: "20px",
-                                                icon: "trash",
-                                                iconColor: "black",
-                                                backgroundColor: `${color}`,
-                                                borderRadius: "20px",
-                                                iconSize: 13,
-                                            }}
-                                        />
+
+                                        {isOwner && (
+                                            <Button
+                                                disabled={false}
+                                                marginBottom={"20px"}
+                                                onPress={() => {
+                                                    onDeleteItem([menuState.itemInView]);
+                                                    closeMenu();
+                                                }}
+                                                color={Colors.BACKGROUND_COLOR}
+                                                textColor={Colors.BACKGROUND_COLOR}
+                                                backgroundColor={color}
+                                                text={"Excluir"}
+                                                width={"120px"}
+                                                height={"35px"}
+                                                fontSize={"17px"}
+                                                leftContent={{
+                                                    show: true,
+                                                    height: "20px",
+                                                    width: "20px",
+                                                    icon: "trash",
+                                                    iconColor: "black",
+                                                    backgroundColor: `${color}`,
+                                                    borderRadius: "20px",
+                                                    iconSize: 13,
+                                                }}
+                                            />
+                                        )}
+
                                     </>
                                 )}
                             </S.FooterButtons>

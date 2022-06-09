@@ -3,7 +3,7 @@ import RegisterHeader from "./RegisterHeader";
 import RegisteredItemsModal from "./RegisteredItemsModal";
 import * as S from "./styled";
 import FloatButton from "../../small/FloatButton";
-import {Dimensions, Platform} from "react-native";
+import {Dimensions, Platform, Text} from "react-native";
 import Times from "../../../../assets/svg/timesSVG.svg";
 import {UserContext} from "../../../../hooks";
 import Colors from "../../../../common/style/Colors";
@@ -173,24 +173,26 @@ const RegisterComponent = ({
                     isEditing={isEditing}
                 />
             )}
+
+            {registeredItemIsEditing && (
+                <S.CancelButton
+                    color={color}
+                    onPress={cancelEditing}>
+                    <Times
+                        fill={"#fff"}
+                        borderFill={Colors.LIGHT_GREY}
+                        width={10}
+                        height={10}
+                    />
+                    <Text style={{marginLeft: 20, color: 'white', fontSize: 16}}>Cancelar edição</Text>
+                </S.CancelButton>
+            )}
             <S.Content
                 behavior={Platform.OS === "ios" ? "height" : "padding"}
                 keyboardShouldPersistTaps="handled">
                 {children}
 
-                {registeredItemIsEditing && (
-                    <S.CancelButton
-                        bottom={`${screenHeight / (isSmallerScreen ? 5 : 6)}px`}
-                        color={color}
-                        onPress={cancelEditing}>
-                        <Times
-                            fill={"#fff"}
-                            borderFill={Colors.LIGHT_GREY}
-                            width={10}
-                            height={10}
-                        />
-                    </S.CancelButton>
-                )}
+
 
             </S.Content>
 

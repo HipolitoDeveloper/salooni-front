@@ -42,11 +42,11 @@ const ScheduleProvider = ({children}) => {
         try {
             schedules = await getAllSchedulesBySalon(employeeId, salonId, employeeType, false);
 
-            if (schedules.some(schedule => !schedule.analyzedSchedule && schedule.passedHour)) {
-                handleNotification(true, Notifications.unconfirmedSchedules, "UnconfirmedSchedules")
-            } else {
-                handleNotification(false)
-            }
+            // if (schedules.some(schedule => !schedule.analyzedSchedule && schedule.passedHour)) {
+            //     handleNotification(true, Notifications.unconfirmedSchedules, "UnconfirmedSchedules")
+            // } else {
+            //     handleNotification(false)
+            // }
 
         } catch (e) {
             handleError(e, "schedule");

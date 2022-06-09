@@ -17,7 +17,7 @@ const Clients = () => {
     const {clients, deleteClient, loadAllClients, updateClient} =
         useClient()
 
-    const {currentUser} = useUser();
+    const {currentUser, isOwner} = useUser()
     const {handleModal, modal, handleLoading, loading} = useLayout();
 
     const [refreshing, setRefresing] = useState(false)
@@ -83,7 +83,7 @@ const Clients = () => {
                 showAddButton={true}
                 fetchData={fetchData}
                 refreshing={refreshing}
-                isOwner={true}
+                isOwner={isOwner}
                 itemType={"client"}
                 showHeader={true}
                 headerText={"Clientes"}

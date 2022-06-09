@@ -84,6 +84,8 @@ export default {
         'Não foi possível atualizar o perfil, pois as informações já estão sendo utilizadas por outro usuário no sistema!',
     DUPLICATE_EMAIL_FORM_EROR:
         'Um dos itens pré-registrados não pode ser salvo, pois possui um e-mail já registrado em nosso sistema.',
+    LOGIN_MESSAGE:
+        'Usuário e/ou senha inválidos.',
     ERROR_MESSAGE:
         'Algo de errado aconteceu. Estamos trabalhando para resolver.',
     NO_CONNECTION_ERROR:

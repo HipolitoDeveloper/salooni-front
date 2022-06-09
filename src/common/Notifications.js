@@ -1,3 +1,3 @@
 export default {
-    'unconfirmedSchedules': 'Veja aqui seus agendamentos não confirmados'
+    'unconfirmedSchedules': 'Parece que você tem procedimentos não realizados.'
 };

@@ -6,26 +6,16 @@ import Fonts from "../../../../common/style/Fonts";
 
 export const Container = styled.View`
   display: flex;
-  justify-content: flex-start;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
   height: 60px;
-  background-color: white;
+  background-color: ${Colors.DARK_BLUE};
+
   width: 100%;
   elevation: 5;
 `;
 
-export const Content = styled.View`
-  margin-top: 0;
-  font-size: 12px;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  background-color: ${Colors.DARK_BLUE};
-  elevation: 30;
-`;
 
 export const NotificationMessage = styled.TouchableOpacity`
   width: 80%;
@@ -35,12 +25,20 @@ export const NotificationMessage = styled.TouchableOpacity`
   font-size: 16px;
 `;
 
+export const NotificationTitle = styled.Text`
+  width: 80%;
+  font-family: ${Fonts.MAIN};
+  margin-left: 10px;
+  color: ${Colors.LIGHT_GREY};
+  font-size: 23px;
+`;
+
 export const NotificationText = styled.Text`
   width: 80%;
   font-family: ${Fonts.MAIN};
   margin-left: 10px;
   color: ${Colors.LIGHT_GREY};
-  font-size: 16px;
+  font-size: 14px;
 `;
 
 export const CloseButton = styled.TouchableOpacity`

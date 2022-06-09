@@ -51,7 +51,7 @@ const DatePicker = ({color, onChange, value, error, label, icon, width, placehol
 
                     <S.DateText fontSize={screenHeight / fontSize} color={color}  hasIcon={!!icon}>
                         {value
-                        ?  (moment(value).format("DD/MM/YYYY HH:mm"))
+                        ?  (moment(value).format(mode === 'date' ? "DD/MM/YYYY" : "DD/MM/YYYY HH:mm"))
                         : (<Text style={{color: "grey"}}>{placeholder}</Text>)}
                     </S.DateText>
                 </S.DateTextContent>

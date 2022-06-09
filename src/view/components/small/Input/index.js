@@ -96,7 +96,7 @@ const Input = ({
                         },
                     ]}
                     onChangeText={(masked, unmasked) => {
-                        handleChange(unmasked);
+                        handleChange(mask === 'brl'? masked: unmasked);
                     }}
                     placeholderTextColor={"grey"}
                     secureTextEntry={isSecureTextEntry && isShowingPassword}

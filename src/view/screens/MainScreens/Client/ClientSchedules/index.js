@@ -28,7 +28,7 @@ const ClientSchedules = ({ route }) => {
         (async () => {
             await fetchData()
         })();
-    },[client])
+    },[client, procedures])
 
     const fetchData = async (skip, limit) => {
         handleLoading(true);
@@ -37,13 +37,15 @@ const ClientSchedules = ({ route }) => {
             handleLoading(false);
 
             const clientAgenda = []
+            console.log("procedure",procedures);
+
             schedules.forEach(({procedures:scheduleProcedures , scheduleDate, employee, formattedDateHour, analyzedSchedule, passedHour, marked, id}) => {
                 if(scheduleProcedures.length) {
                     scheduleProcedures?.forEach(scheduleProcedure => {
-                        const {name} = procedures.find(procedure => scheduleProcedure.id === procedure.id)
+                        const procedure = procedures.find(procedure => scheduleProcedure.id === procedure.id)
                         clientAgenda.push({
                             ...scheduleProcedure,
-                            name,
+                            name: procedure?.name,
                             scheduleDate,
                             employee,
                             formattedDateHour,
@@ -74,7 +76,7 @@ const ClientSchedules = ({ route }) => {
                 ...modal,
                 visible: true,
                 variant: "alert",
-                errors: Errors.LOAD_MORE_ERROR,
+                errors: [Errors.LOAD_MORE_ERROR],
             });
         }
     };

@@ -237,6 +237,7 @@ const ClientRegister = ({route}) => {
                                         placeholder={"Data de Nascimento"}
                                         label={"Data de Nascimento*"}
                                         mode="date"
+                                        
                             />
                         )}/>
 

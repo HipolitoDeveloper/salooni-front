@@ -3,6 +3,7 @@ import {SalonObject} from "./SalonService";
 import {buildEmployeeList, buildEmployeeObject} from "../factory/EmployeeFactory";
 import {deleteSchedulesByEmployees} from "./ScheduleService";
 import {convertToObj} from "../common/converters/GenericConverter";
+import Errors from "../common/Errors";
 
 export const EmployeeObject = Parse.Object.extend("employee");
 
@@ -30,7 +31,11 @@ export const getEmployeeByEmail = async (employeeEmail) => {
     try {
         const employee = await EmployeeQuery.first();
 
-        return buildEmployeeObject(convertToObj(employee));
+        if(employee) {
+            return buildEmployeeObject(convertToObj(employee));
+        } else {
+           throw Errors.NOT_A_EMAIL_EMPLOYEE_ERROR
+        }
 
     } catch (e) {
         throw e;

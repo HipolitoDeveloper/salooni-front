@@ -43,8 +43,7 @@ const SignInOwner = () => {
             await onLogin(data)
             handleLoading(false);
         } catch (error) {
-            console.error("SigninOwnerError", JSON.stringify(error))
-            handleModal({...modal, visible: true, variant: "alert", errors: [{message: Errors.ERROR_MESSAGE}]});
+            handleModal({...modal, visible: true, variant: "alert", errors: [{message: Errors.LOGIN_MESSAGE}]});
             handleLoading(false);
         }
     };

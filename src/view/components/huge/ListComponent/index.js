@@ -351,7 +351,7 @@ const List = ({
                                 isDeleting={isDeleting}
                                 itemType={itemType}
                                 color={color}
-                                onSelect={selectItem}
+                                onSelect={isOwner? selectItem: () => {}}
                                 selectedItems={selectedItems}
                                 onPressItem={() => {
                                     handleMenu(item)
@@ -375,7 +375,7 @@ const List = ({
                         }
                     />
                 </S.Body>
-                {!showFooter && showAddButton && (
+                {!showFooter && showAddButton && isOwner && (
                     <FloatButton
                         bottom={"40px"}
                         right={"30px"}

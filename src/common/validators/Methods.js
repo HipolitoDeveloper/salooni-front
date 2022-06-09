@@ -205,7 +205,7 @@ export function employeeValidator(message) {
             const {path, createError} = this;
             try {
                 const {employee: {employeeType}} = await getUsersByEmail(value.trim());
-                if (employeeType !== "PRC") {
+                if (employeeType !== "FNC") {
                     reject(createError({path, message: Errors.NOT_A_EMAIL_EMPLOYEE_ERROR}));
                 }
 

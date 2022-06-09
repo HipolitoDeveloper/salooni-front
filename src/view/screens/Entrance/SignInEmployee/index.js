@@ -22,9 +22,9 @@ import {getEmployeeByEmail} from "../../../../services/EmployeeService";
 import Errors from "../../../../common/Errors";
 
 const defaultValues = {
-    email: "parceiro1@gmail.com",
+    email: "",
     password: "",
-    cnpj: "62541680000108"
+    cnpj: ""
 };
 
 
@@ -124,6 +124,7 @@ const SignInEmployee = () => {
             await onSignup(data);
             handleLoading(false);
         } catch (error) {
+            console.error(error)
             handleModal({...modal,  title: Constants.ATTENTION,visible: true, variant: "alert", errors: [{message: Errors.ERROR_MESSAGE}]});
             handleLoading(false);
         }

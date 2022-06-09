@@ -3,6 +3,7 @@ import * as S from './styled';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from "@react-navigation/native";
 import {useLayout} from "../../../../hooks/Layout";
+import {NotificationTitle} from "./styled";
 
 const Notification = ({message, page, route}) => {
     const {handleNotification} = useLayout()
@@ -24,9 +25,9 @@ const Notification = ({message, page, route}) => {
 
     return (
         <S.Container>
-            <S.Content>
                 <S.NotificationMessage
                     onPress={navigateTo}>
+
                     <S.NotificationText>
                         {message}
                     </S.NotificationText>
@@ -34,7 +35,6 @@ const Notification = ({message, page, route}) => {
                 <S.CloseButton onPress={() => handleNotification(false)}>
                     <Icon style={{padding: 6}} name={'times'} size={12} color={'white'}/>
                 </S.CloseButton>
-            </S.Content>
         </S.Container>
     )
 };

@@ -76,9 +76,9 @@ const LayoutProvider = ({children}) => {
 
     return (
         <LayoutContext.Provider value={contextValues}>
-            {notification.hasNotification && (
-                <Notification {...notification} />
-            )}
+            {/*{notification.hasNotification && (*/}
+            {/*    <Notification {...notification} />*/}
+            {/*)}*/}
 
             <Modal
                 {...modal}

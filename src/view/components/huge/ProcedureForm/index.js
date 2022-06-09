@@ -35,7 +35,9 @@ const ProcedureForm = ({
                            updateProcedures,
                            contextSetValue
                        }) => {
-        const methods = useForm({resolver: yupResolver(procedureValidationSchema)});
+        const methods = useForm(
+            // {resolver: yupResolver(procedureValidationSchema)}
+        );
         const {control, reset, setValue, formState: {errors}, resetField} = methods;
 
         const [isEditing, setIsEditing] = useState(false);
@@ -107,15 +109,16 @@ const ProcedureForm = ({
         }
 
         const onSave = async (procedures) => {
-            handleLoading(true);
-            try {
-                await saveProcedures(procedures)
-                handleLoading(false);
-                goBack()
-            } catch (error) {
-                handleLoading(false);
-                console.error(error);
-            }
+            console.log("procedures", procedures)
+            // handleLoading(true);
+            // try {
+            //     await saveProcedures(procedures)
+            //     handleLoading(false);
+            //     goBack()
+            // } catch (error) {
+            //     handleLoading(false);
+            //     console.error(error);
+            // }
         }
 
         const onUpdate = async (procedure) => {

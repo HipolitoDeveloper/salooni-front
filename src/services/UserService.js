@@ -31,7 +31,12 @@ export const signUp = async (user) => {
   UserParse.set("password", password.trim());
   UserParse.set("employee_id", new EmployeeObject({ objectId: employeeId }));
 
+  const EmployeeParse = new EmployeeObject(({ objectId: employeeId }))
+  EmployeeParse.set("first_access", true)
+
+
   try {
+    await EmployeeParse.save()
     return convertToObj(await UserParse.signUp());
   } catch (e) {
     throw e;
