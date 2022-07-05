@@ -48,44 +48,47 @@ const SignupTabBar = ({state}) => {
     }, []);
 
     const validateSalonInformation = async (data) => {
+
+
         const {procedures, employees, ...owner} = data;
         try {
-
             console.log("data", data)
-            await validateInformationBeforeInsert({
-                procedures: procedures,
-                employees: employees,
-                owner: owner,
-            });
 
-            if (!employees.length || !procedures.length) {
-                handleModal({
-                    ...modal,
-                    visible: true,
-                    variant: "confirm",
-                    title: Constants.ATTENTION,
-                    text: !employees.length ? Constants.SIGNUP_WITHOUT_EMPLOYEES : Constants.SIGNUP_WITHOUT_PROCEDURES,
-                    onOk: async () => {
-                        clearModal();
-                        await doSignup(data);
-                    },
-                });
-            } else {
+            // await validateInformationBeforeInsert({
+            //     procedures: procedures,
+            //     employees: employees,
+            //     owner: owner,
+            // });
+
+            // if (!employees.length || !procedures.length) {
+            //     handleModal({
+            //         ...modal,
+            //         visible: true,
+            //         variant: "confirm",
+            //         title: Constants.ATTENTION,
+            //         text: !employees.length ? Constants.SIGNUP_WITHOUT_EMPLOYEES : Constants.SIGNUP_WITHOUT_PROCEDURES,
+            //         onOk: async () => {
+            //             clearModal();
+            //             await doSignup(data);
+            //         },
+            //     });
+            // } else {
                 await doSignup(data);
-            }
+            // }
         } catch (error) {
             console.error("validateSalonInformationError", error)
             handleModal({
                 ...modal,
                 visible: true,
                 variant: "alert",
-                errors: error,
+                errors: [{message: Errors.ERROR_MESSAGE}]
+
             });
         }
     };
 
     const doSignup = async (data) => {
-        const {salonName, employees, procedures, ...owner} = data;
+        let {salonName, employees, procedures, ...owner} = data;
         handleLoading(true);
         try {
             const salon = {salonName, cnpj: owner.cnpj, employeeQt: employees.length};
@@ -101,8 +104,10 @@ const SignupTabBar = ({state}) => {
                 }))
             }
 
-
-            owner.procedures = savedProcedures
+            owner = {
+                ...owner,
+                savedProcedures: procedures
+            }
             const {id: employeeId} = await saveEmployeeParse(owner);
 
 
@@ -137,7 +142,7 @@ const SignupTabBar = ({state}) => {
         } catch (error) {
             handleLoading(false);
             console.log("SignupTabBarError", error)
-            handleModal({...modal, visible: true, errors:[{message: Errors.DUPLICATE_EMAIL_ERROR}]});
+            handleModal({...modal, variant: 'alert', visible: true, errors:[{message: Errors.DUPLICATE_EMAIL_ERROR}]});
         }
     };
 

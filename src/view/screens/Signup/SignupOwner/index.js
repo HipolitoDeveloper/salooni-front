@@ -21,7 +21,7 @@ const SignupOwners = () => {
                 name={name}
                 placeholder={"Salão"}
                 width={"80%"}
-                fontSize={40}
+                fontSize={44}
                 color={Colors.PURPLE}
                 label={"Nome do Salão*"}
                 isToValidate
@@ -44,7 +44,7 @@ const SignupOwners = () => {
                 placeholder={"CNPJ"}
                 width={"80%"}
                 keyboardType={"numeric"}
-                fontSize={40}
+                fontSize={44}
                 mask={"cnpj"}
                 color={Colors.PURPLE}
                 label={"CNPJ*"}
@@ -67,7 +67,7 @@ const SignupOwners = () => {
                 name={name}
                 placeholder={"Nome do Proprietário"}
                 width={"80%"}
-                fontSize={40}
+                fontSize={44}
                 color={Colors.PURPLE}
                 label={"Nome do Proprietário*"}
                 isToValidate
@@ -90,7 +90,7 @@ const SignupOwners = () => {
                 placeholder={"Telefone"}
                 width={"80%"}
                 keyboardType={"numeric"}
-                fontSize={40}
+                fontSize={44}
                 mask={"phone"}
                 color={Colors.PURPLE}
                 label={"Telefone*"}
@@ -115,7 +115,7 @@ const SignupOwners = () => {
                 width={"80%"}
                 keyboardType={"email-address"}
                 isSecureTextEntry={false}
-                fontSize={40}
+                fontSize={44}
                 disabled={false}
                 mask="email"
                 color={Colors.PURPLE}
@@ -139,7 +139,7 @@ const SignupOwners = () => {
                 placeholder={"Senha"}
                 width={"80%"}
                 isSecureTextEntry
-                fontSize={40}
+                fontSize={44}
                 mask="password"
                 color={Colors.PURPLE}
                 label={"Senha*"}

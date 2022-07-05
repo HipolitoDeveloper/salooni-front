@@ -39,17 +39,21 @@ const RegisterComponent = ({
     const registeredItemIsEditing = registeredItems.some(employee => employee.isInView === true)
 
 
-    const cancelEditing = () => {
-        setRegisteredItems(registeredItems.map((registeredItem) => {
-            registeredItem.isInView = false
-            return registeredItem;
-        }));
+    const cancelEditing = (reset) => {
+        if(reset) {
+            setRegisteredItems(registeredItems.map((registeredItem) => {
+                registeredItem.isInView = false
+                return registeredItem;
+            }));
+        }
         clearItem();
     };
 
 
     const handleSelect = (item) => {
-        setRegisteredItems(registeredItems.map((registeredItem) => {
+        console.log("item", item)
+
+        setRegisteredItems(registeredItems.map((registeredItem, index) => {
             if (registeredItem === item) {
                 registeredItem.isInView = !item.isInView;
 
@@ -63,6 +67,7 @@ const RegisterComponent = ({
                                 maintenanceDays,
                                 hasMaintenance,
                                 maintenanceValue,
+                                hasCommission,
                                 commissionPercentage,
                                 commissionFixedValue
                             } = item
@@ -70,10 +75,14 @@ const RegisterComponent = ({
                             setValue("cost", cost)
                             setValue("duration", duration)
                             setValue("hasMaintenance", hasMaintenance)
+                            setValue("hasCommission", hasCommission)
+
                             setValue("maintenanceValue", maintenanceValue)
                             setValue("maintenanceDays", maintenanceDays)
                             setValue("commissionPercentage", commissionPercentage)
                             setValue("commissionFixedValue", commissionFixedValue)
+                            setValue("index", index)
+
                         },
                         "employee": () => {
                             const {name, cnpj, tel, email, procedures: employeeProcedures} = item
@@ -82,6 +91,8 @@ const RegisterComponent = ({
                             setValue("tel", tel)
                             setValue("email", email)
                             setValue("procedures", employeeProcedures)
+                            setValue("index", index)
+
                         }
                     }
 
@@ -99,15 +110,15 @@ const RegisterComponent = ({
 
     const editItem = (item) => {
         setRegisteredItems(registeredItems.map((registeredItem, i) => {
-            if (registeredItems.indexOf(item) === i) {
-
+            if (item.index === i) {
                 registeredItem = {...item};
             }
+            registeredItem.isInView = false
 
             return registeredItem;
         }));
 
-        cancelEditing()
+        cancelEditing(false)
         setIsRegisteredItemsBoxOpened(true);
 
     };
@@ -177,7 +188,7 @@ const RegisterComponent = ({
             {registeredItemIsEditing && (
                 <S.CancelButton
                     color={color}
-                    onPress={cancelEditing}>
+                    onPress={() => cancelEditing(true)}>
                     <Times
                         fill={"#fff"}
                         borderFill={Colors.LIGHT_GREY}
@@ -196,7 +207,7 @@ const RegisterComponent = ({
 
             </S.Content>
 
-            {!registeredItemIsEditing && isMultiInsert && (
+            {isMultiInsert && (
                 <S.Footer>
                     <FloatButton
                         bottom={`${screenHeight / (isSmallerScreen ? 10 : 7)}px`}
@@ -209,7 +220,7 @@ const RegisterComponent = ({
                         Não esqueça de adicionar as informações.
                     </S.AddMessage>
 
-                    {!isEditing && isMultiInsert && (
+                    {!isEditing && isMultiInsert  && !registeredItemIsEditing && (
                         <RegisteredItemsModal
                             color={color}
                             isOpened={isRegisteredItemsBoxOpened}

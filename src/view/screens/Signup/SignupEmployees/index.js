@@ -6,7 +6,6 @@ import {useForm, useFormContext} from "react-hook-form";
 const SignupPartners = ({route}) => {
     const { setValue: contextSetValue, getValues: contextGetValues } = useFormContext();
 
-    console.log("procedures", contextGetValues("procedures"))
     return <EmployeeForm isSigningUp
                          isMultiInsert
                          color={Colors.PURPLE}

@@ -2,7 +2,6 @@ import {convertToBRL} from "../common/converters/GenericConverter";
 
 export const buildProcedureList = procedures => {
     return procedures.map(procedure => {
-        console.log("procedure.commission_value", procedure.commission_value !== 0)
         return {
             id: procedure.objectId,
             name: procedure.name,

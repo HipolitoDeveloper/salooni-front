@@ -57,6 +57,7 @@ export const procedureValidationSchema = yup.object().shape({
         then: yup.string().required(Errors.MAINTENANCE_REQUIRED_ALERT),
         otherwise: yup.string().notRequired(),
     }),
+    hasCommission: yup.boolean(),
     commissionFixedValue: yup.string().commissionValidator(),
     commissionPercentage: yup.string(),
 });

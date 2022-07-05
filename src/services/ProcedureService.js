@@ -57,7 +57,7 @@ export const saveProcedureParse = async (procedures) => {
                                             name,
                                             duration,
                                             cost,
-                                            commissionValue,
+                                            commissionFixedValue,
                                             commissionPercentage,
                                             employeeId,
                                             salonId,
@@ -67,11 +67,13 @@ export const saveProcedureParse = async (procedures) => {
                                             isFixedValue,
                                           }) => {
 
+
+    console.log("procedure", procedures)
     const ProcedureParse = new ProcedureObject();
     ProcedureParse.set(
         "maintenance_value",
         hasMaintenance
-            ? parseFloat(maintenanceValue.replace(".", "").replace(",", "."))
+            ? parseFloat(maintenanceValue.replace(".", "").replace(",", ".").replace("R$", "" ))
             : 0,
     );
     ProcedureParse.set(
@@ -82,15 +84,15 @@ export const saveProcedureParse = async (procedures) => {
     ProcedureParse.set(
         "commission_value",
         parseFloat(
-            hasCommission && isFixedValue
-                ? commissionValue.replace(".", "").replace(",", ".")
+            hasCommission && commissionFixedValue !== undefined
+                ? commissionFixedValue.replace(".", "").replace(",", ".").replace("R$", "" )
                 : 0,
         ),
     );
 
     ProcedureParse.set(
         "commission_percentage",
-        hasCommission && isPercentage
+        hasCommission && commissionPercentage !== undefined
             ? parseFloat(commissionPercentage)
             : 0,
     );
@@ -98,7 +100,7 @@ export const saveProcedureParse = async (procedures) => {
     ProcedureParse.set("time", parseInt(duration));
     ProcedureParse.set(
         "value",
-        parseFloat(cost.replace(".", "").replace(",", ".")),
+        parseFloat(cost.replace(".", "").replace(",", ".").replace("R$", "" ))
     );
 
     if(employeeId) {
@@ -115,6 +117,7 @@ export const saveProcedureParse = async (procedures) => {
   try {
     const newProcedures = await Parse.Object.saveAll(proceduresParse)
 
+    console.log("newProcedures", newProcedures)
     return buildProcedureList(convertToObj(newProcedures));
   } catch (e) {
     throw e;
@@ -157,7 +160,7 @@ export const updateProcedureParse = async (procedure) => {
   ProcedureParse.set(
     "maintenance_value",
     hasMaintenance
-      ? parseFloat(maintenanceValue.replace(".", "").replace(",", "."))
+      ? parseFloat(maintenanceValue.replace(".", "").replace(",", ".").replace("R$", "" ))
       : 0,
   );
   ProcedureParse.set(
@@ -169,7 +172,7 @@ export const updateProcedureParse = async (procedure) => {
     "commission_value",
     parseFloat(
       hasCommission && isFixedValue
-        ? commissionValue.replace(".", "").replace(",", ".")
+        ? commissionValue.replace(".", "").replace(",", ".").replace("R$", "" )
         : 0,
     ),
   );
@@ -186,7 +189,7 @@ export const updateProcedureParse = async (procedure) => {
   ProcedureParse.set("time", parseInt(duration));
   ProcedureParse.set(
     "value",
-    parseFloat(cost.replace(".", "").replace(",", ".")),
+    parseFloat(cost.replace(".", "").replace(",", ".").replace("R$", "" )),
   );
 
   try {

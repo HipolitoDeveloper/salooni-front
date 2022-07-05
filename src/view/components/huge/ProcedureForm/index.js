@@ -36,7 +36,7 @@ const ProcedureForm = ({
                            contextSetValue
                        }) => {
         const methods = useForm(
-            // {resolver: yupResolver(procedureValidationSchema)}
+            {resolver: yupResolver(procedureValidationSchema)}
         );
         const {control, reset, setValue, formState: {errors}, resetField} = methods;
 
@@ -110,15 +110,15 @@ const ProcedureForm = ({
 
         const onSave = async (procedures) => {
             console.log("procedures", procedures)
-            // handleLoading(true);
-            // try {
-            //     await saveProcedures(procedures)
-            //     handleLoading(false);
-            //     goBack()
-            // } catch (error) {
-            //     handleLoading(false);
-            //     console.error(error);
-            // }
+            handleLoading(true);
+            try {
+                await saveProcedures(procedures)
+                handleLoading(false);
+                goBack()
+            } catch (error) {
+                handleLoading(false);
+                console.error(error);
+            }
         }
 
         const onUpdate = async (procedure) => {
@@ -163,7 +163,7 @@ const ProcedureForm = ({
                                     placeholder={"Nome do Procedimento"}
                                     value={value}
                                     width={"80%"}
-                                    fontSize={40}
+                                    fontSize={44}
                                     color={color}
                                     label={"Nome*"}
                                     noEmpty
@@ -185,7 +185,7 @@ const ProcedureForm = ({
                                     value={value}
                                     width={"80%"}
                                     keyboardType={"numeric"}
-                                    fontSize={40}
+                                    fontSize={44}
                                     mask={"hour"}
                                     maxLength={3}
                                     rightPlaceholder={"minutos"}
@@ -210,7 +210,7 @@ const ProcedureForm = ({
                                     value={value}
                                     width={"80%"}
                                     keyboardType={"numeric"}
-                                    fontSize={40}
+                                    fontSize={44}
                                     mask={"brl"}
                                     leftPlaceholder={"R$"}
                                     color={color}
@@ -329,17 +329,6 @@ const ProcedureForm = ({
                                         </S.CheckboxContent>
 
                                         <S.CheckboxContent>
-                                            {/*<BouncyCheckbox*/}
-                                            {/*    style={{borderColor: color}}*/}
-                                            {/*    isChecked={isFixedValue}*/}
-                                            {/*    onPress={() =>*/}
-                                            {/*        handleCheckbox(!isFixedValue, "isFixedValue")*/}
-                                            {/*    }*/}
-                                            {/*    fillColor={color}*/}
-                                            {/*    disableBuiltInState*/}
-                                            {/*    disableText*/}
-                                            {/*/>*/}
-
                                             <Controller
                                                 name="commissionFixedValue"
                                                 control={control}
