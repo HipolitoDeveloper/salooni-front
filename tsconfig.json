@@ -1,0 +1,18 @@
+{
+
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "esnext",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "./"
+  },
+
+  "exclude": ["node_modules"],
+  "extends": "expo/tsconfig.base"
+}

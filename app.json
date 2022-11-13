@@ -2,6 +2,7 @@
   "expo": {
     "name": "salooni",
     "slug": "salooni",
+    "owner": "hipolitodeveloper",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,6 +29,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "apiURL": "process.env.API_URL"
     }
   }
 }
