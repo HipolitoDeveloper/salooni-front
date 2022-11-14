@@ -6,6 +6,8 @@ import {LayoutProvider} from "./src/hooks/layout/useLayout";
 import {NativeBaseProvider, StatusBar} from "native-base";
 import theme from "./src/common/theme";
 import React from "react";
+import {ApolloProvider} from "@apollo/client";
+import client from "./src/common/apollo.client";
 
 if (__DEV__) {
     import('./ReactotronConfig').then(() => console.log('Reactotron Configured'))
@@ -22,10 +24,12 @@ export default function App() {
     return (
         <NavigationContainer>
             <NativeBaseProvider theme={theme}>
-                <StatusBar backgroundColor='purple.1000' barStyle='dark-content'/>
-                <LayoutProvider>
-                    <MainStack/>
-                </LayoutProvider>
+                <ApolloProvider client={client}>
+                    <StatusBar backgroundColor='purple.1000' barStyle='dark-content'/>
+                    <LayoutProvider>
+                        <MainStack/>
+                    </LayoutProvider>
+                </ApolloProvider>
             </NativeBaseProvider>
 
         </NavigationContainer>

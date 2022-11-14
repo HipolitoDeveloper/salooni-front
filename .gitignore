@@ -10,5 +10,7 @@ npm-debug.*
 *.orig.*
 web-build/
 
+src/graphql/*
+
 # macOS
 .DS_Store
