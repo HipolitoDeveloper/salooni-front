@@ -1,5 +1,7 @@
+import React from "react";
+
 import {createContext, useContext, useState} from "react";
-import {IAlertDialog} from "../../components/layout/AlertDialog";
+import {IAlertDialog} from "@components/layout/AlertDialog";
 
 interface ILayoutContext {
     alertDialog?: IAlertDialog;

@@ -1,7 +1,7 @@
 {
 
   "compilerOptions": {
-    "target": "ES2015",
+    "target": "es2015",
     "module": "esnext",
     "allowJs": true,
     "skipLibCheck": true,
@@ -10,7 +10,17 @@
     "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "paths": {
+      "@assets/*": ["assets/*"],
+      "@common/*": ["src/common/*"],
+      "@modules/*": ["src/modules/*"],
+      "@components/*": ["src/components/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@interfaces/*": ["src/interfaces/*"],
+      "@screens/*": ["src/screens/*"]
+
+    }
   },
 
   "exclude": ["node_modules"],
