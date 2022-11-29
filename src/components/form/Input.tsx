@@ -1,44 +1,53 @@
 import React from "react";
 import {FormControl, HStack, IInputProps, Input as BaseInput, WarningOutlineIcon} from "native-base";
+import {Control, Controller} from "react-hook-form";
 
 
 export interface IInput extends IInputProps {
-    error?: any;
-    isSecureTextEntry?: boolean
+    isSecureTextEntry?: boolean;
+    control: Control,
+    name: string;
 }
 
 const Input: React.FC<IInput> = ({
                                      placeholder,
-                                     size= 'xl',
+                                     size = 'xl',
                                      width,
                                      variant = 'underlined',
-                                     error,
                                      isSecureTextEntry = false,
                                      value, clearButtonMode,
-                                     onChangeText,
                                      style,
-                                     type
+                                     type,
+                                     onChangeText,
+                                     name,
+                                     control,
+                                     ...props
                                  }) => {
-
     return (
-        <HStack w={width}>
-            <FormControl isInvalid={!!error}>
-                <BaseInput placeholder={placeholder} size={size} variant={variant} type={type}
-                           onChangeText={onChangeText} clearButtonMode={clearButtonMode} value={value}
-                           secureTextEntry={isSecureTextEntry}
-                           focusOutlineColor={'purple.1000'}
-                           placeholderTextColor={'black.1000'}
-                />
 
+        <Controller name={name} control={control} render={({field: {onChange, value}, fieldState: {error}}) => (
+            <HStack w={width}>
 
-                {!error && (
-                    <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs"/>}>
-                        Try different from previous passwords.
-                    </FormControl.ErrorMessage>
-                )}
+                <FormControl isInvalid={!!error}>
+                    <BaseInput placeholder={placeholder} size={size} variant={variant} type={type}
+                               clearButtonMode={clearButtonMode}
+                               secureTextEntry={isSecureTextEntry}
+                               focusOutlineColor={'purple.1000'}
+                               placeholderTextColor={'black.1000'}
+                               onChangeText={onChange}
+                               value={value}
+                               {...props}
+                    />
+                    {!!error && (
+                        <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs"/>}>
+                            {error.message}
+                        </FormControl.ErrorMessage>
+                    )}
+                </FormControl>
+            </HStack>
+        )
+        }/>
 
-            </FormControl>
-        </HStack>
     )
 }
 

@@ -5,8 +5,21 @@ import SalooniLogo from "@assets/app/svg/salooniSVG.svg";
 import Input from "@components/form/Input";
 import Button from "@components/form/Button";
 import {signin} from "@common/typograph";
+import {useForm} from "react-hook-form";
+import {IUserSignin} from "@modules/entrance/employee_signin/employeeSignin.schema";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {IOwnerSignin, SOwnerSignin} from "@modules/entrance/owner_signin/ownerSignin.schema";
 
 const OwnerSigninScreen: React.FC = () => {
+    const { handleSubmit, control} = useForm<IOwnerSignin>({
+        resolver: zodResolver(SOwnerSignin)
+    });
+
+    const signIn = (formData: IUserSignin) => {
+        console.log("formData", formData)
+        console.log("formData")
+
+    }
 
     return (
         <Layout>
@@ -15,9 +28,10 @@ const OwnerSigninScreen: React.FC = () => {
                              width={200}
                              height={200}/>
 
-                <Input placeholder={'E-mail'}/>
 
-                <Input placeholder={'Senha'}/>
+                <Input placeholder={'E-mail'} control={control} name={'email'} keyboardType={'email-address'}/>
+
+                <Input placeholder={'Senha'} control={control} name={'password'}/>
 
                 <Flex alignItems='flex-end' w='100%'>
                     <Button variant='link'>
@@ -25,7 +39,7 @@ const OwnerSigninScreen: React.FC = () => {
                     </Button>
                 </Flex>
 
-                <Button variant={'rounded'} size='lg'>
+                <Button variant={'rounded'} size='lg' onPress={handleSubmit(signIn)}>
                     {signin.ENTER}
                 </Button>
 
