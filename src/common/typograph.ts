@@ -5,4 +5,11 @@ const entrance = {
     'EMPLOYEE': 'Parceiro'
 }
 
-export {entrance}
+const signin = {
+    'ENTER': 'Entrar',
+    'VERIFY': 'Verificar',
+    'DONT_HAVE_USER': 'Não possui cadastro?',
+    'SIGNUP':'Registre-se'
+}
+
+export {entrance, signin}

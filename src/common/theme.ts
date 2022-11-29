@@ -1,4 +1,5 @@
 import {extendTheme} from "native-base";
+import ButtonOverride from "@components/overrides/ButtonOverride";
 
 const colors = {
     white: {
@@ -20,7 +21,10 @@ const colors = {
 }
 
 const theme = extendTheme({
-    colors: colors
+    colors: colors,
+    components: {
+        Button: ButtonOverride
+    }
 })
 
 export default theme
