@@ -23,25 +23,27 @@ const defaultValue = {
 }
 
 const UserSignup = () => {
-    const {handleGraphQLError, handleSuccessDialog} = useLayout();
+    const {handleGraphQLError, handleSuccessDialog, handleLoading} = useLayout();
     const {handleSession} = useSession()
 
     const {handleSubmit, control} = useForm<TUserSignup>({
         resolver: zodResolver(SUserSignup),
         defaultValues: defaultValue
     });
-    handleSuccessDialog(successMessages.SIGNUP_SUCCESS)
     const [callCloud] = useCallCloudCodeMutation({
         onCompleted({callCloudCode: {result: {data}}}) {
             handleSession({viewer: data})
             handleSuccessDialog(successMessages.SIGNUP_SUCCESS)
+            handleLoading(false)
         },
         onError(error) {
             handleGraphQLError(JSON.parse(JSON.stringify(error)) as TGraphQLError)
+            handleLoading(false)
         }
     })
 
     const signUp = async (formData: TUserSignup) => {
+        handleLoading(true)
         await callCloud({
             variables: {
                 input: {

@@ -1,5 +1,5 @@
 import Button, {IButton} from "../form/Button";
-import { AlertDialog as BaseAlertDialog} from "native-base";
+import {AlertDialog as BaseAlertDialog} from "native-base";
 import React, {useRef} from "react";
 
 export interface IDialog {
@@ -15,10 +15,12 @@ const Dialog = ({isOpen, onClose, children, buttons, title}) => {
 
     const cancelRef = useRef(null);
 
-    return(
-        <BaseAlertDialog  leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
+    return (
+        <BaseAlertDialog leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose} avoidKeyboard={true}
+                         isKeyboardDismissable={true}
+        >
             <BaseAlertDialog.Content>
-                <BaseAlertDialog.CloseButton />
+                <BaseAlertDialog.CloseButton/>
                 <BaseAlertDialog.Header>{title}</BaseAlertDialog.Header>
                 <BaseAlertDialog.Body>
                     {children}
@@ -27,7 +29,7 @@ const Dialog = ({isOpen, onClose, children, buttons, title}) => {
                 {buttons.length > 0 && (
                     <BaseAlertDialog.Footer>
                         {buttons.map(({variant, onPress, children, name}) => (
-                            <Button key={name} variant={variant} onPress={onPress} >
+                            <Button key={name} variant={variant} onPress={onPress}>
                                 {children}
                             </Button>
                         ))}
