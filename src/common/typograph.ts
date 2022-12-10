@@ -1,5 +1,5 @@
 const entrance = {
-
+    'WELCOME': 'Bem-vindo',
     'WELCOME_MESSAGE': 'Olá, você é um?',
     'OWNER': 'Proprietário',
     'EMPLOYEE': 'Parceiro'

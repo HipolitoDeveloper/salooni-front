@@ -1,6 +1,6 @@
 import React from "react";
 import Layout from "@components/layout/Layout";
-import {Flex, HStack, Text, VStack} from "native-base";
+import {Flex, HStack, Pressable, Text, VStack} from "native-base";
 import SalooniLogo from "@assets/app/svg/salooniSVG.svg";
 import Input from "@components/form/Input";
 import Button from "@components/form/Button";
@@ -13,10 +13,14 @@ import {useLayout} from "@hooks/layout/useLayout";
 import {TGraphQLError} from "@interfaces/graphQL";
 import useSession from "@hooks/session/useSession";
 import Reactotron from "reactotron-react-native";
+import {useNavigation} from "@react-navigation/native";
+import {TEntranceStack} from "../../../routes/entrance.stack";
 
 const OwnerSigninScreen: React.FC = () => {
     const {handleGraphQLError} = useLayout();
     const {session, handleSession} = useSession()
+    const {navigate} = useNavigation<TEntranceStack>();
+
 
     const {handleSubmit, control} = useForm<IUserSignin>({
         resolver: zodResolver(SUserSignin)
@@ -71,7 +75,10 @@ const OwnerSigninScreen: React.FC = () => {
                     <HStack>
                         <Text color='black.1000'>{signin.DONT_HAVE_USER} {' '}
                         </Text>
-                        <Text color='purple.1000'>{signin.SIGNUP}</Text>
+                        <Pressable  onPress={() => navigate('UserSignup')} >
+                            <Text color='purple.1000'>{signin.SIGNUP}</Text>
+
+                        </Pressable>
                     </HStack>
                 </Button>
             </VStack>
