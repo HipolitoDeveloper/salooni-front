@@ -3,29 +3,26 @@ import Dialog from "@components/dialogs/Dialog";
 import {CircleIcon, HStack, Text} from "native-base";
 import {application} from "@common/typograph";
 
-interface IErrorDialog {
-    messages: string[];
+interface ISuccessDialog {
     isOpen: boolean;
     onClose: () => void;
     onOpen: () => void;
+    description: string;
 
 }
 
-const ErrorDialog: React.FC<IErrorDialog> = ({messages, isOpen, onClose, onOpen}) => {
+const SuccessDialog: React.FC<ISuccessDialog> = ({isOpen, onClose, onOpen, description}) => {
 
     return (
-        <Dialog isOpen={isOpen} onClose={onClose} buttons={[]} title={application.ATTENTION}>
-            {messages?.length && messages?.map(message => (
+        <Dialog isOpen={isOpen} onClose={onClose} buttons={[]} title={application.SUCCESS}>
                 <HStack alignItems='center' space='10px'>
-                    <CircleIcon size='10px' color='purple.1000'/>
                     <Text>
-                        {message}
+                        {description}
                     </Text>
                 </HStack>
-            ))}
         </Dialog>
     )
 
 }
 
-export default ErrorDialog
+export default SuccessDialog

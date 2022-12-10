@@ -8,7 +8,7 @@ import {signin} from "@common/typograph";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useLogInMutation} from "@modules/entrance/entrance.graphql.generated";
-import {IUserSignin, SUserSignin} from "@modules/entrance/entrance.schema";
+import {TUserSigin, SUserSignin} from "@modules/entrance/entrance.schema";
 import {useLayout} from "@hooks/layout/useLayout";
 import {TGraphQLError} from "@interfaces/graphQL";
 import useSession from "@hooks/session/useSession";
@@ -22,12 +22,13 @@ const OwnerSigninScreen: React.FC = () => {
     const {navigate} = useNavigation<TEntranceStack>();
 
 
-    const {handleSubmit, control} = useForm<IUserSignin>({
+    const {handleSubmit, control} = useForm<TUserSigin>({
         resolver: zodResolver(SUserSignin)
     });
 
     const [logIn] = useLogInMutation({
-        onCompleted({logIn: {viewer: {sessionToken, user}}}) {
+        onCompleted({logIn: data}) {
+            handleSession(data)
 
         },
         onError(error) {
@@ -35,8 +36,8 @@ const OwnerSigninScreen: React.FC = () => {
         }
     })
 
-    const signIn = async (formData: IUserSignin) => {
-        const {data: {logIn: data}} = await logIn({
+    const signIn = async (formData: TUserSigin) => {
+        await logIn({
             variables: {
                 input: {
                     username: formData.email,
@@ -44,9 +45,6 @@ const OwnerSigninScreen: React.FC = () => {
                 }
             },
         })
-
-        handleSession(data)
-
     }
 
     return (

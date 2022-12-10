@@ -7,7 +7,7 @@ import Reactotron from "reactotron-react-native";
 import {useEffect, useState} from "react";
 import {LogInMutation} from "@modules/entrance/entrance.graphql.generated";
 
-interface ISession {
+type TSession = {
     user: TUser;
     salon: TSalon;
     employee: TEmployee
@@ -16,7 +16,7 @@ interface ISession {
 
 
 const useSession = () => {
-    const [session, setSession] = useState<ISession>(null)
+    const [session, setSession] = useState<TSession>(null)
 
     useEffect(() => {
         (async () => {
