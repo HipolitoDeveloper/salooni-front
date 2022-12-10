@@ -13,6 +13,8 @@ import {useCallCloudCodeMutation} from "@modules/cloud/cloud.graphql.generated";
 import {TGraphQLError} from "@interfaces/graphQL";
 import useSession from "@hooks/session/useSession";
 import {CloudCodeFunction} from "../../../schema";
+import {useNavigation} from "@react-navigation/native";
+import {TEntranceStack} from "../../../routes/entrance.stack";
 
 const defaultValue = {
     "salonName": "TESTE233",
@@ -25,6 +27,7 @@ const defaultValue = {
 const UserSignup = () => {
     const {handleGraphQLError, handleSuccessDialog, handleLoading} = useLayout();
     const {handleSession} = useSession()
+    const {goBack} = useNavigation<TEntranceStack>();
 
     const {handleSubmit, control} = useForm<TUserSignup>({
         resolver: zodResolver(SUserSignup),
@@ -56,7 +59,7 @@ const UserSignup = () => {
 
     return (
         <Layout>
-            <ActionHeader onConfirm={handleSubmit(signUp)} onCancel={() => console.log("cancelado")}
+            <ActionHeader onConfirm={handleSubmit(signUp)} onCancel={goBack}
                           title={entrance.WELCOME} color={'purple.1000'}/>
 
             <VStack justifyContent='space-around' h='80%'>
