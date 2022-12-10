@@ -8,7 +8,7 @@ export type LogInMutationVariables = Types.Exact<{
 }>;
 
 
-export type LogInMutation = { __typename?: 'Mutation', logIn?: { __typename?: 'LogInPayload', viewer: { __typename?: 'Viewer', sessionToken: string, user: { __typename?: 'User', email?: string | null, username?: string | null, employee_id?: { __typename?: 'Employee', cnpj?: string | null, email?: string | null, employee_type?: string | null, first_access: boolean, id: string, name?: string | null, tel?: string | null, objectId: string, salon_id?: { __typename?: 'Salon', cnpj?: string | null, employee_qt?: number | null, id: string, name?: string | null, objectId: string } | null } | null } } } | null };
+export type LogInMutation = { __typename?: 'Mutation', logIn?: { __typename?: 'LogInPayload', viewer: { __typename?: 'Viewer', sessionToken: string, user: { __typename?: 'User', objectId: string, email?: string | null, username?: string | null, acc_type: string, first_access?: boolean | null, employee_id?: { __typename?: 'Employee', cnpj?: string | null, email?: string | null, name?: string | null, tel?: string | null, objectId: string, salon_id?: { __typename?: 'Salon', cnpj?: string | null, name?: string | null, objectId: string } | null } | null } } } | null };
 
 
 export const LogInDocument = gql`
@@ -16,21 +16,19 @@ export const LogInDocument = gql`
   logIn(input: $input) {
     viewer {
       user {
+        objectId
         email
         username
+        acc_type
+        first_access
         employee_id {
           cnpj
           email
-          employee_type
-          first_access
-          id
           name
           tel
           objectId
           salon_id {
             cnpj
-            employee_qt
-            id
             name
             objectId
           }

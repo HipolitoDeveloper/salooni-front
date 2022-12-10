@@ -120,6 +120,21 @@ export type BytesWhereInput = {
   notInQueryKey?: InputMaybe<SelectInput>;
 };
 
+export type CallCloudCodeInput = {
+  clientMutationId?: InputMaybe<Scalars['String']>;
+  /** This is the function to be called. */
+  functionName: CloudCodeFunction;
+  /** These are the params to be passed to the function. */
+  params?: InputMaybe<Scalars['Object']>;
+};
+
+export type CallCloudCodePayload = {
+  __typename?: 'CallCloudCodePayload';
+  clientMutationId?: Maybe<Scalars['String']>;
+  /** This is the result value of the cloud code function execution. */
+  result?: Maybe<Scalars['Any']>;
+};
+
 /** The CenterSphereInput type is used to specifiy a centerSphere operation on a geoWithin query. */
 export type CenterSphereInput = {
   /** This is the center of the sphere. */
@@ -275,6 +290,11 @@ export type ClientWhereInput = {
   updatedAt?: InputMaybe<DateWhereInput>;
 };
 
+/** The CloudCodeFunction enum type contains a list of all available cloud code functions. */
+export enum CloudCodeFunction {
+  Signup = 'signup'
+}
+
 export type CreateClassInput = {
   clientMutationId?: InputMaybe<Scalars['String']>;
   /** This is the name of the object class. */
@@ -329,8 +349,6 @@ export type CreateEmployeeFieldsInput = {
   cnpj?: InputMaybe<Scalars['String']>;
   /** This is the object email. */
   email?: InputMaybe<Scalars['String']>;
-  /** This is the object employee_type. */
-  employee_type?: InputMaybe<Scalars['String']>;
   /** This is the object first_access. */
   first_access: Scalars['Boolean'];
   /** This is the object name. */
@@ -472,8 +490,6 @@ export type CreateSalonFieldsInput = {
   ACL?: InputMaybe<AclInput>;
   /** This is the object cnpj. */
   cnpj?: InputMaybe<Scalars['String']>;
-  /** This is the object employee_qt. */
-  employee_qt?: InputMaybe<Scalars['Float']>;
   /** This is the object name. */
   name?: InputMaybe<Scalars['String']>;
 };
@@ -580,6 +596,8 @@ export type CreateSessionPayload = {
 /** The CreateUserFieldsInput input type is used in operations that involve creation of objects in the User class. */
 export type CreateUserFieldsInput = {
   ACL?: InputMaybe<AclInput>;
+  /** This is the object acc_type. */
+  acc_type: Scalars['String'];
   /** This is the object authData. */
   authData?: InputMaybe<Scalars['Object']>;
   /** This is the object email. */
@@ -588,6 +606,8 @@ export type CreateUserFieldsInput = {
   emailVerified?: InputMaybe<Scalars['Boolean']>;
   /** This is the object employee_id. */
   employee_id?: InputMaybe<EmployeePointerInput>;
+  /** This is the object first_access. */
+  first_access?: InputMaybe<Scalars['Boolean']>;
   /** This is the object password. */
   password: Scalars['String'];
   /** This is the object username. */
@@ -884,8 +904,6 @@ export type Employee = Node & ParseObject & {
   createdAt: Scalars['Date'];
   /** This is the object email. */
   email?: Maybe<Scalars['String']>;
-  /** This is the object employee_type. */
-  employee_type?: Maybe<Scalars['String']>;
   /** This is the object first_access. */
   first_access: Scalars['Boolean'];
   /** The ID of an object */
@@ -932,8 +950,6 @@ export enum EmployeeOrder {
   CreatedAtDesc = 'createdAt_DESC',
   EmailAsc = 'email_ASC',
   EmailDesc = 'email_DESC',
-  EmployeeTypeAsc = 'employee_type_ASC',
-  EmployeeTypeDesc = 'employee_type_DESC',
   FirstAccessAsc = 'first_access_ASC',
   FirstAccessDesc = 'first_access_DESC',
   IdAsc = 'id_ASC',
@@ -994,8 +1010,6 @@ export type EmployeeWhereInput = {
   createdAt?: InputMaybe<DateWhereInput>;
   /** This is the object email. */
   email?: InputMaybe<StringWhereInput>;
-  /** This is the object employee_type. */
-  employee_type?: InputMaybe<StringWhereInput>;
   /** This is the object first_access. */
   first_access?: InputMaybe<BooleanWhereInput>;
   /** This is the object id. */
@@ -1391,6 +1405,8 @@ export type LogOutPayload = {
 /** Mutation is the top level type for mutations. */
 export type Mutation = {
   __typename?: 'Mutation';
+  /** The callCloudCode mutation can be used to invoke a cloud code function. */
+  callCloudCode?: Maybe<CallCloudCodePayload>;
   /** The createClass mutation can be used to create the schema for a new object class. */
   createClass?: Maybe<CreateClassPayload>;
   /** The createClient mutation can be used to create a new object of the Client class. */
@@ -1489,6 +1505,12 @@ export type Mutation = {
   updateVideos?: Maybe<UpdateVideosPayload>;
   /** The updateVideos_categories mutation can be used to update an object of the Videos_categories class. */
   updateVideos_categories?: Maybe<UpdateVideos_CategoriesPayload>;
+};
+
+
+/** Mutation is the top level type for mutations. */
+export type MutationCallCloudCodeArgs = {
+  input: CallCloudCodeInput;
 };
 
 
@@ -2567,8 +2589,6 @@ export type Salon = Node & ParseObject & {
   cnpj?: Maybe<Scalars['String']>;
   /** This is the date in which the object was created. */
   createdAt: Scalars['Date'];
-  /** This is the object employee_qt. */
-  employee_qt?: Maybe<Scalars['Float']>;
   /** The ID of an object */
   id: Scalars['ID'];
   /** This is the object name. */
@@ -2607,8 +2627,6 @@ export enum SalonOrder {
   CnpjDesc = 'cnpj_DESC',
   CreatedAtAsc = 'createdAt_ASC',
   CreatedAtDesc = 'createdAt_DESC',
-  EmployeeQtAsc = 'employee_qt_ASC',
-  EmployeeQtDesc = 'employee_qt_DESC',
   IdAsc = 'id_ASC',
   IdDesc = 'id_DESC',
   NameAsc = 'name_ASC',
@@ -2661,8 +2679,6 @@ export type SalonWhereInput = {
   cnpj?: InputMaybe<StringWhereInput>;
   /** This is the object createdAt. */
   createdAt?: InputMaybe<DateWhereInput>;
-  /** This is the object employee_qt. */
-  employee_qt?: InputMaybe<NumberWhereInput>;
   /** This is the object id. */
   id?: InputMaybe<IdWhereInput>;
   /** This is the object name. */
@@ -3400,8 +3416,6 @@ export type UpdateEmployeeFieldsInput = {
   cnpj?: InputMaybe<Scalars['String']>;
   /** This is the object email. */
   email?: InputMaybe<Scalars['String']>;
-  /** This is the object employee_type. */
-  employee_type?: InputMaybe<Scalars['String']>;
   /** This is the object first_access. */
   first_access?: InputMaybe<Scalars['Boolean']>;
   /** This is the object name. */
@@ -3540,8 +3554,6 @@ export type UpdateSalonFieldsInput = {
   ACL?: InputMaybe<AclInput>;
   /** This is the object cnpj. */
   cnpj?: InputMaybe<Scalars['String']>;
-  /** This is the object employee_qt. */
-  employee_qt?: InputMaybe<Scalars['Float']>;
   /** This is the object name. */
   name?: InputMaybe<Scalars['String']>;
 };
@@ -3656,6 +3668,8 @@ export type UpdateSessionPayload = {
 /** The UpdateUserFieldsInput input type is used in operations that involve creation of objects in the User class. */
 export type UpdateUserFieldsInput = {
   ACL?: InputMaybe<AclInput>;
+  /** This is the object acc_type. */
+  acc_type?: InputMaybe<Scalars['String']>;
   /** This is the object authData. */
   authData?: InputMaybe<Scalars['Object']>;
   /** This is the object email. */
@@ -3664,6 +3678,8 @@ export type UpdateUserFieldsInput = {
   emailVerified?: InputMaybe<Scalars['Boolean']>;
   /** This is the object employee_id. */
   employee_id?: InputMaybe<EmployeePointerInput>;
+  /** This is the object first_access. */
+  first_access?: InputMaybe<Scalars['Boolean']>;
   /** This is the object password. */
   password?: InputMaybe<Scalars['String']>;
   /** This is the object username. */
@@ -3745,6 +3761,8 @@ export type UpdateVideos_CategoriesPayload = {
 export type User = Node & ParseObject & {
   __typename?: 'User';
   ACL: Acl;
+  /** This is the object acc_type. */
+  acc_type: Scalars['String'];
   /** This is the object authData. */
   authData?: Maybe<Scalars['Object']>;
   /** This is the date in which the object was created. */
@@ -3755,6 +3773,8 @@ export type User = Node & ParseObject & {
   emailVerified?: Maybe<Scalars['Boolean']>;
   /** This is the object employee_id. */
   employee_id?: Maybe<Employee>;
+  /** This is the object first_access. */
+  first_access?: Maybe<Scalars['Boolean']>;
   /** The ID of an object */
   id: Scalars['ID'];
   /** This is the object id. */
@@ -3808,18 +3828,24 @@ export type UserEdge = {
 
 export type UserLoginWithInput = {
   ACL?: InputMaybe<AclInput>;
+  /** This is the object acc_type. */
+  acc_type: Scalars['String'];
   /** This is the object email. */
   email?: InputMaybe<Scalars['String']>;
   /** This is the object emailVerified. */
   emailVerified?: InputMaybe<Scalars['Boolean']>;
   /** This is the object employee_id. */
   employee_id?: InputMaybe<EmployeePointerInput>;
+  /** This is the object first_access. */
+  first_access?: InputMaybe<Scalars['Boolean']>;
 };
 
 /** The UserOrder input type is used when sorting objects of the User class. */
 export enum UserOrder {
   AclAsc = 'ACL_ASC',
   AclDesc = 'ACL_DESC',
+  AccTypeAsc = 'acc_type_ASC',
+  AccTypeDesc = 'acc_type_DESC',
   AuthDataAsc = 'authData_ASC',
   AuthDataDesc = 'authData_DESC',
   CreatedAtAsc = 'createdAt_ASC',
@@ -3830,6 +3856,8 @@ export enum UserOrder {
   EmailDesc = 'email_DESC',
   EmployeeIdAsc = 'employee_id_ASC',
   EmployeeIdDesc = 'employee_id_DESC',
+  FirstAccessAsc = 'first_access_ASC',
+  FirstAccessDesc = 'first_access_DESC',
   IdAsc = 'id_ASC',
   IdDesc = 'id_DESC',
   ObjectIdAsc = 'objectId_ASC',
@@ -3880,6 +3908,8 @@ export type UserWhereInput = {
   NOR?: InputMaybe<Array<UserWhereInput>>;
   /** This is the OR operator to compound constraints. */
   OR?: InputMaybe<Array<UserWhereInput>>;
+  /** This is the object acc_type. */
+  acc_type?: InputMaybe<StringWhereInput>;
   /** This is the object authData. */
   authData?: InputMaybe<ObjectWhereInput>;
   /** This is the object createdAt. */
@@ -3890,6 +3920,8 @@ export type UserWhereInput = {
   emailVerified?: InputMaybe<BooleanWhereInput>;
   /** This is the object employee_id. */
   employee_id?: InputMaybe<EmployeeRelationWhereInput>;
+  /** This is the object first_access. */
+  first_access?: InputMaybe<BooleanWhereInput>;
   /** This is the object id. */
   id?: InputMaybe<IdWhereInput>;
   /** This is the object objectId. */

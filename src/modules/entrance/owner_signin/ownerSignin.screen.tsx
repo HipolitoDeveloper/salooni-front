@@ -6,18 +6,42 @@ import Input from "@components/form/Input";
 import Button from "@components/form/Button";
 import {signin} from "@common/typograph";
 import {useForm} from "react-hook-form";
-import {IUserSignin} from "@modules/entrance/employee_signin/employeeSignin.schema";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {IOwnerSignin, SOwnerSignin} from "@modules/entrance/owner_signin/ownerSignin.schema";
+import {useLogInMutation} from "@modules/entrance/entrance.graphql.generated";
+import {IUserSignin, SUserSignin} from "@modules/entrance/entrance.schema";
+import {useLayout} from "@hooks/layout/useLayout";
+import {TGraphQLError} from "@interfaces/graphQL";
+import useSession from "@hooks/session/useSession";
+import Reactotron from "reactotron-react-native";
 
 const OwnerSigninScreen: React.FC = () => {
-    const { handleSubmit, control} = useForm<IOwnerSignin>({
-        resolver: zodResolver(SOwnerSignin)
+    const {handleGraphQLError} = useLayout();
+    const {session, handleSession} = useSession()
+
+    const {handleSubmit, control} = useForm<IUserSignin>({
+        resolver: zodResolver(SUserSignin)
     });
 
-    const signIn = (formData: IUserSignin) => {
-        console.log("formData", formData)
-        console.log("formData")
+    const [logIn] = useLogInMutation({
+        onCompleted({logIn: {viewer: {sessionToken, user}}}) {
+
+        },
+        onError(error) {
+            handleGraphQLError(JSON.parse(JSON.stringify(error)) as TGraphQLError)
+        }
+    })
+
+    const signIn = async (formData: IUserSignin) => {
+        const {data: {logIn: data}} = await logIn({
+            variables: {
+                input: {
+                    username: formData.email,
+                    password: formData.password
+                }
+            },
+        })
+
+        handleSession(data)
 
     }
 
@@ -31,7 +55,7 @@ const OwnerSigninScreen: React.FC = () => {
 
                 <Input placeholder={'E-mail'} control={control} name={'email'} keyboardType={'email-address'}/>
 
-                <Input placeholder={'Senha'} control={control} name={'password'}/>
+                <Input placeholder={'Senha'} control={control} name={'password'} secureTextEntry={true}/>
 
                 <Flex alignItems='flex-end' w='100%'>
                     <Button variant='link'>
