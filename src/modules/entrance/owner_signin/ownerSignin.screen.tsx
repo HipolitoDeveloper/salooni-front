@@ -10,7 +10,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useLogInMutation} from "@modules/entrance/entrance.graphql.generated";
 import {TUserSigin, SUserSignin} from "@modules/entrance/entrance.schema";
 import {useLayout} from "@hooks/layout/useLayout";
-import {TGraphQLError} from "@interfaces/graphQL";
+import {TGraphQLError} from "../../../types/graphQL.type";
 import useSession from "@hooks/session/useSession";
 import Reactotron from "reactotron-react-native";
 import {useNavigation} from "@react-navigation/native";

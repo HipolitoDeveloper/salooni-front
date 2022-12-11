@@ -1,5 +1,5 @@
 import React, {createContext, useContext, useState} from "react";
-import {TGraphQLError} from "@interfaces/graphQL";
+import {TGraphQLError} from "../../types/graphQL.type";
 import ErrorDialog from "@components/dialogs/ErrorDialog";
 import {useDisclose} from "native-base";
 import SuccessDialog from "@components/dialogs/SuccessDialog";

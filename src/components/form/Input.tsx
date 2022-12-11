@@ -4,9 +4,8 @@ import {Control, Controller} from "react-hook-form";
 
 
 export interface IInput extends IInputProps {
-    isSecureTextEntry?: boolean;
-    control: Control,
-    name: string;
+    control?: Control,
+    name?: string;
 }
 
 const Input: React.FC<IInput> = ({
@@ -14,7 +13,6 @@ const Input: React.FC<IInput> = ({
                                      size = 'xl',
                                      width,
                                      variant = 'underlined',
-                                     isSecureTextEntry = false,
                                      value, clearButtonMode,
                                      style,
                                      type,
@@ -25,28 +23,39 @@ const Input: React.FC<IInput> = ({
                                  }) => {
     return (
 
-        <Controller name={name} control={control} render={({field: {onChange, value}, fieldState: {error}}) => (
-            <HStack w={width}>
+        control ? (
+            <Controller name={name} control={control} render={({field: {onChange, value}, fieldState: {error}}) => (
+                <HStack w={width}>
 
-                <FormControl isInvalid={!!error}>
-                    <BaseInput placeholder={placeholder} size={size} variant={variant} type={type}
-                               clearButtonMode={clearButtonMode}
-                               secureTextEntry={isSecureTextEntry}
-                               focusOutlineColor={'purple.1000'}
-                               placeholderTextColor={'black.1000'}
-                               onChangeText={onChange}
-                               value={value}
-                               {...props}
-                    />
-                    {!!error && (
-                        <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs"/>}>
-                            {error.message}
-                        </FormControl.ErrorMessage>
-                    )}
-                </FormControl>
-            </HStack>
+                    <FormControl isInvalid={!!error}>
+                        <BaseInput placeholder={placeholder} size={size} variant={variant} type={type}
+                                   clearButtonMode={clearButtonMode}
+                                   focusOutlineColor={'purple.1000'}
+                                   placeholderTextColor={'black.1000'}
+                                   onChangeText={onChange}
+                                   value={value}
+                                   {...props}
+                        />
+                        {!!error && (
+                            <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs"/>}>
+                                {error.message}
+                            </FormControl.ErrorMessage>
+                        )}
+                    </FormControl>
+                </HStack>
+            )
+            }/>
+        ) : (
+                <BaseInput placeholder={placeholder} size={size} variant={variant} type={type}
+
+                           clearButtonMode={clearButtonMode}
+                           focusOutlineColor={'purple.1000'}
+                           placeholderTextColor={'gray.1000'}
+                           style={{fontSize: 14}}
+                           {...props}
+                />
         )
-        }/>
+
 
     )
 }

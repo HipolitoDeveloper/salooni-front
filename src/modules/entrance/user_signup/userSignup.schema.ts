@@ -10,5 +10,5 @@ export const SUserSignup = z.object({
     password: z.string({required_error: errors.PASSWORD_REQUIRED}).refine((password) => password.length >= 6, {message: errors.PASSWORD_LENGTH})
 })
 
-export type TUserSignup = z.infer<typeof SUserSignin>
+export type TUserSignup = z.infer<typeof SUserSignup>
 

@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {StorageKeys} from "@common/asyncstorage.constants";
-import {TUser} from "@interfaces/User";
-import {TEmployee} from "@interfaces/Employee";
-import {TSalon} from "@interfaces/Salon";
+import {TUser} from "../../types/user.type";
+import {TEmployee} from "../../types/employee.type";
+import {TSalon} from "../../types/salon.type";
 import Reactotron from "reactotron-react-native";
 import {useEffect, useState} from "react";
 import {LogInMutation} from "@modules/entrance/entrance.graphql.generated";

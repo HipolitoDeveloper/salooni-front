@@ -20,7 +20,7 @@ module.exports = function (api) {
                       "@modules": "./src/modules",
                       "@components": "./src/components",
                       "@hooks": "./src/hooks",
-                      "@interfaces": "./src/interfaces",
+                      "@interfaces": "./src/types",
                       "@screens": "./src/screens"
                     },
                 },

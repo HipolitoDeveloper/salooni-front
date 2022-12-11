@@ -8,6 +8,9 @@ const colors = {
     black: {
       1000 : '#010101'
     },
+    gray: {
+        1000 : '#8e8e8e'
+    },
     purple: {
         1000: '#A177AF',
         200: '#D0BBD7'

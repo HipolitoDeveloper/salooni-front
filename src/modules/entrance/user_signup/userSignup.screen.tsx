@@ -10,7 +10,7 @@ import {Center, VStack} from "native-base";
 import Input from "@components/form/Input";
 import SalooniLogo from "@assets/app/svg/salooniSVG.svg";
 import {useCallCloudCodeMutation} from "@modules/cloud/cloud.graphql.generated";
-import {TGraphQLError} from "@interfaces/graphQL";
+import {TGraphQLError} from "../../../types/graphQL.type";
 import useSession from "@hooks/session/useSession";
 import {CloudCodeFunction} from "../../../schema";
 import {useNavigation} from "@react-navigation/native";
@@ -51,7 +51,7 @@ const UserSignup = () => {
             variables: {
                 input: {
                     functionName: CloudCodeFunction.Signup,
-                    params: {...formData, acctype: 'OWN'}
+                    params: {...formData, salonName: formData.salonName.toLowerCase(), acctype: 'OWN'}
                 }
             },
         })
