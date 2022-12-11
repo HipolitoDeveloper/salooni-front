@@ -8,6 +8,7 @@ interface ISuggestionItem {
 }
 const SuggestionItem: React.FC<ISuggestionItem> = ({onItemClick, label, value}) => {
     return(
+        value &&
         <TouchableOpacity onPress={() => onItemClick(value)}>
             <Text>{value[label]}</Text>
         </TouchableOpacity>

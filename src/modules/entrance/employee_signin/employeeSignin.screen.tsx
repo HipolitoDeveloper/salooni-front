@@ -9,61 +9,30 @@ import {SEmployeeSignin, TEmployeeSignin} from "@modules/entrance/employee_signi
 import {zodResolver} from "@hookform/resolvers/zod";
 import InputAutocomplete from "@components/form/autocomplete/InputAutocomplete";
 import {useSalonsLazyQuery} from "@modules/salon/salon.graphql.generated";
-import {TAutocompleteOptions} from "../../../types/form.type";
 import {TSalon} from "../../../types/salon.type";
-
+import {TSignInSteps} from "../../../types/signin.type";
+import EmployeeFirstStep from "@components/signin/EmployeeFirstStep";
 
 const EmployeeSigninScreen: React.FC = () => {
-    const [step, setStep] = useState<'first' | 'second' | 'third'>('first')
-    const [salons, setSalons] = useState<TSalon[]>([])
+    const [step, setStep] = useState<TSignInSteps>('first')
     const [selectedSalon, setSelectedSalon] = useState<TSalon>(null)
 
     const {control, handleSubmit, formState: {errors}} = useForm<TEmployeeSignin>({
         resolver: zodResolver(SEmployeeSignin)
     });
 
-    const [searchSalons] = useSalonsLazyQuery()
     const sigIn = (formData: TEmployeeSignin) => {
         console.log("formData", formData)
-    }
-
-    const getSalons = async (searchTerm: string) => {
-        await searchSalons({
-            variables: {
-                "where": {
-                    "name": {
-                        "matchesRegex": searchTerm.toLowerCase()
-                    }
-                }
-            },
-            onCompleted({salons: {edges}}) {
-                setSalons(edges?.map(({node: {name, objectId}}) => ({name, objectId})) ?? [])
-
-            }
-        })
-    }
-
-    const handleStep = (step: ) => {
-
     }
 
     const renderSteps = useCallback(() => {
         const steps = {
             'first': (
-                <VStack width='100%'>
-                    <InputAutocomplete
-                                       onEndEditing={({nativeEvent: {text}}) => getSalons(text)}
-                                       suggestionItemLabel='name'
-                                       onItemClick={(item) => console.log("item", item)}
-                                       name='salon'
-                                       options={salons}
-                                       placeholder='Procure pelo salão associdado'
-                                       width='100%'/>
-                </VStack>)
+                <EmployeeFirstStep handleStep={setStep} setSelectedSalon={setSelectedSalon} />)
         }
 
         return steps[step]
-    }, [step, salons])
+    }, [step])
 
     return (
         <Layout>

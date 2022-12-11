@@ -31,7 +31,8 @@ const InputAutocomplete: React.FC<IInputAutocomplete> = ({options, suggestionIte
                 borderBottomWidth: StyleSheet.hairlineWidth,
                 borderLeftWidth: StyleSheet.hairlineWidth,
                 borderRightWidth: StyleSheet.hairlineWidth,
-                borderColor: '#A177AF'
+                borderColor: '#A177AF',
+                padding: options.length ? 10 : 0
             }}
             data={options}
             renderTextInput={() => <Input {...props} />}
