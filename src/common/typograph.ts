@@ -9,7 +9,13 @@ const signin = {
     'ENTER': 'Entrar',
     'VERIFY': 'Verificar',
     'DONT_HAVE_USER': 'Não possui cadastro?',
-    'SIGNUP':'Registre-se'
+    'SIGNUP':'Registre-se',
+    'SELECTED_SALON': 'Salão selecionado: '
+}
+
+const signup = {
+    'SIGNUP': 'Cadastrar',
+
 }
 
 const errors = {
@@ -31,4 +37,4 @@ const successMessages = {
     'SIGNUP_SUCCESS': 'Cadastro realizado! \n\nVocê está sendo redirecionado para o Salooni.'
 }
 
-export {entrance, signin, errors, application, successMessages}
+export {entrance, signin, signup, errors, application, successMessages}

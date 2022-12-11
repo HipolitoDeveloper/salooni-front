@@ -1,53 +1,50 @@
 import React, {useCallback, useState} from "react";
 import Layout from "@components/layout/Layout";
-import {VStack} from "native-base";
+import {Box, Center, HStack, Pressable, Text, VStack} from "native-base";
 import SalooniLogo from "@assets/app/svg/salooniSVG.svg";
-import Button from "@components/form/Button";
-import {signin} from "@common/typograph";
-import {useForm} from "react-hook-form";
-import {SEmployeeSignin, TEmployeeSignin} from "@modules/entrance/employee_signin/employeeSignin.schema";
-import {zodResolver} from "@hookform/resolvers/zod";
-import InputAutocomplete from "@components/form/autocomplete/InputAutocomplete";
-import {useSalonsLazyQuery} from "@modules/salon/salon.graphql.generated";
-import {TSalon} from "../../../types/salon.type";
-import {TSignInSteps} from "../../../types/signin.type";
-import EmployeeFirstStep from "@components/signin/EmployeeFirstStep";
+import {TEmployeeEntranceOptions} from "../../../types/entrance.type";
+import EmployeeSignup from "@components/employee_module/signup/EmployeeSignup";
+import EmployeeSignin from "@components/employee_module/signin/EmployeeSignin";
 
 const EmployeeSigninScreen: React.FC = () => {
-    const [step, setStep] = useState<TSignInSteps>('first')
-    const [selectedSalon, setSelectedSalon] = useState<TSalon>(null)
+    const [selectedEntranceOption, setSelectedEntranceOption] = useState<TEmployeeEntranceOptions>()
 
-    const {control, handleSubmit, formState: {errors}} = useForm<TEmployeeSignin>({
-        resolver: zodResolver(SEmployeeSignin)
-    });
-
-    const sigIn = (formData: TEmployeeSignin) => {
-        console.log("formData", formData)
-    }
-
-    const renderSteps = useCallback(() => {
+    const renderEntranceOption = useCallback(() => {
         const steps = {
-            'first': (
-                <EmployeeFirstStep handleStep={setStep} setSelectedSalon={setSelectedSalon} />)
+            'signin': (
+                <EmployeeSignin/>),
+            'signup': (
+                <EmployeeSignup/>)
         }
 
-        return steps[step]
-    }, [step])
+        return steps[selectedEntranceOption]
+    }, [selectedEntranceOption])
 
     return (
         <Layout>
-            <VStack space='80px' alignItems='center' justifyContent='center' p='30px' mt='20px'>
+            <VStack display='flex' space='80px' alignItems='center' justifyContent='center' p='30px' mt='20px'>
                 <SalooniLogo fill={'#A177AF'}
                              width={200}
                              height={200}/>
 
-                {renderSteps()}
-
-                <Button variant={'rounded'} size='lg' onPress={handleSubmit(sigIn)}>
-                    {signin.VERIFY}
-                </Button>
-
+                <Box h={250} w='100%' >
+                    {renderEntranceOption()}
+                </Box>
+                <Center>
+                    <HStack space='5px'>
+                        <Pressable onPress={() => setSelectedEntranceOption('signin')}>
+                            <Text color={selectedEntranceOption === 'signin' ? 'black.1000' : 'purple.1000'}
+                                  fontWeight='bold'>Já possui um cadastro?</Text>
+                        </Pressable>
+                        <Text fontWeight='bold'>/</Text>
+                        <Pressable onPress={() => setSelectedEntranceOption('signup')}>
+                            <Text color={selectedEntranceOption === 'signup' ? 'black.1000' : 'purple.1000'}
+                                  fontWeight='bold'>Cadastre-se</Text>
+                        </Pressable>
+                    </HStack>
+                </Center>
             </VStack>
+
         </Layout>
     )
 }

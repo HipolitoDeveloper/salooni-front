@@ -7,4 +7,4 @@ export const SUserSignin = z.object({
 })
 
 
-export type TUserSigin = z.infer<typeof SUserSignin>
+export type TUserSignin = z.infer<typeof SUserSignin>

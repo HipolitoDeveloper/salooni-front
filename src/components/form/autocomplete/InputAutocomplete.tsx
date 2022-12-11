@@ -35,7 +35,7 @@ const InputAutocomplete: React.FC<IInputAutocomplete> = ({options, suggestionIte
                 padding: options.length ? 10 : 0
             }}
             data={options}
-            renderTextInput={() => <Input {...props} />}
+            renderTextInput={() => <Input control={null} {...props} />}
             flatListProps={{
                 keyExtractor: (item) => item.objectId,
                 renderItem: ({item}) => <SuggestionItem label={suggestionItemLabel} value={item}

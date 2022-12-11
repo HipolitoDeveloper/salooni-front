@@ -34,6 +34,7 @@ const Input: React.FC<IInput> = ({
                                    placeholderTextColor={'black.1000'}
                                    onChangeText={onChange}
                                    value={value}
+                                   style={{fontSize: 14}}
                                    {...props}
                         />
                         {!!error && (

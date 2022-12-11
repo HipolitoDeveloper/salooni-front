@@ -8,7 +8,7 @@ import {signin} from "@common/typograph";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useLogInMutation} from "@modules/entrance/entrance.graphql.generated";
-import {TUserSigin, SUserSignin} from "@modules/entrance/entrance.schema";
+import {TUserSignin, SUserSignin} from "@modules/entrance/entrance.schema";
 import {useLayout} from "@hooks/layout/useLayout";
 import {TGraphQLError} from "../../../types/graphQL.type";
 import useSession from "@hooks/session/useSession";
@@ -22,7 +22,7 @@ const OwnerSigninScreen: React.FC = () => {
     const {navigate} = useNavigation<TEntranceStack>();
 
 
-    const {handleSubmit, control} = useForm<TUserSigin>({
+    const {handleSubmit, control} = useForm<TUserSignin>({
         resolver: zodResolver(SUserSignin)
     });
 
@@ -36,7 +36,7 @@ const OwnerSigninScreen: React.FC = () => {
         }
     })
 
-    const signIn = async (formData: TUserSigin) => {
+    const signIn = async (formData: TUserSignin) => {
         await logIn({
             variables: {
                 input: {
