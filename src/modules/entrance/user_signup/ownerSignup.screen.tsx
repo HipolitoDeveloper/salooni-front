@@ -5,7 +5,7 @@ import {entrance, successMessages} from "@common/typograph";
 import {useLayout} from "@hooks/layout/useLayout";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
-import {SUserSignup, TUserSignup} from "@modules/entrance/user_signup/userSignup.schema";
+import {SOwnerSignup, TOwnerSignup} from "@modules/entrance/user_signup/ownerSignup.schema";
 import {Center, VStack} from "native-base";
 import Input from "@components/form/Input";
 import SalooniLogo from "@assets/app/svg/salooniSVG.svg";
@@ -15,6 +15,7 @@ import useSession from "@hooks/session/useSession";
 import {CloudCodeFunction} from "../../../schema";
 import {useNavigation} from "@react-navigation/native";
 import {TEntranceStack} from "../../../routes/entrance.stack";
+import {EUserAccType} from "../../../types/user.type";
 
 const defaultValue = {
     "salonName": "TESTE233",
@@ -29,8 +30,8 @@ const UserSignup = () => {
     const {handleSession} = useSession()
     const {goBack} = useNavigation<TEntranceStack>();
 
-    const {handleSubmit, control} = useForm<TUserSignup>({
-        resolver: zodResolver(SUserSignup),
+    const {handleSubmit, control} = useForm<TOwnerSignup>({
+        resolver: zodResolver(SOwnerSignup),
         defaultValues: defaultValue
     });
     const [callCloud] = useCallCloudCodeMutation({
@@ -45,13 +46,13 @@ const UserSignup = () => {
         }
     })
 
-    const signUp = async (formData: TUserSignup) => {
+    const signUp = async (formData: TOwnerSignup) => {
         handleLoading(true)
         await callCloud({
             variables: {
                 input: {
                     functionName: CloudCodeFunction.Signup,
-                    params: {...formData, salonName: formData.salonName.toLowerCase(), acctype: 'OWN'}
+                    params: {...formData, salonName: formData.salonName.toLowerCase().trim(), acctype: EUserAccType.OWN}
                 }
             },
         })

@@ -5,7 +5,7 @@ import EntranceScreen from "../modules/entrance/entrance.screen";
 import OwnerSigninScreen from "@modules/entrance/owner_signin/ownerSignin.screen";
 import EmployeeSigninScreen from "@modules/entrance/employee_signin/employeeSignin.screen";
 import {CompositeNavigationProp} from "@react-navigation/native";
-import UserSignupScreen from "@modules/entrance/user_signup/userSignup.screen";
+import UserSignupScreen from "@modules/entrance/user_signup/ownerSignup.screen";
 
 export type TEntranceStack = CompositeNavigationProp<NativeStackNavigationProp<{
     EntranceOptions: undefined;
