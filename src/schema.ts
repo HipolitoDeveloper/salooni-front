@@ -292,7 +292,8 @@ export type ClientWhereInput = {
 
 /** The CloudCodeFunction enum type contains a list of all available cloud code functions. */
 export enum CloudCodeFunction {
-  Signup = 'signup'
+  Signup = 'signup',
+  Signin = 'signin'
 }
 
 export type CreateClassInput = {

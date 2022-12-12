@@ -283,14 +283,10 @@ type Element {
 "The Employee object type is used in operations that involve outputting objects of Employee class."
 type Employee implements Node & ParseObject {
     ACL: ACL!
-    "This is the object cnpj."
-    cnpj: String
+    "This is the object can_access_salon."
+    can_access_salon: Boolean
     "This is the date in which the object was created."
     createdAt: Date!
-    "This is the object email."
-    email: String
-    "This is the object first_access."
-    first_access: Boolean!
     "The ID of an object"
     id: ID!
     "This is the object name."
@@ -954,8 +950,6 @@ type RoleEdge {
 "The Salon object type is used in operations that involve outputting objects of Salon class."
 type Salon implements Node & ParseObject {
     ACL: ACL!
-    "This is the object cnpj."
-    cnpj: String
     "This is the date in which the object was created."
     createdAt: Date!
     "The ID of an object"
@@ -1305,7 +1299,7 @@ type User implements Node & ParseObject {
     "This is the object employee_id."
     employee_id: Employee
     "This is the object first_access."
-    first_access: Boolean
+    first_access: Boolean!
     "The ID of an object"
     id: ID!
     "This is the object id."
@@ -1460,6 +1454,7 @@ enum ClientOrder {
 
 "The CloudCodeFunction enum type contains a list of all available cloud code functions."
 enum CloudCodeFunction {
+    signin
     signup
 }
 
@@ -1467,14 +1462,10 @@ enum CloudCodeFunction {
 enum EmployeeOrder {
     ACL_ASC
     ACL_DESC
-    cnpj_ASC
-    cnpj_DESC
+    can_access_salon_ASC
+    can_access_salon_DESC
     createdAt_ASC
     createdAt_DESC
-    email_ASC
-    email_DESC
-    first_access_ASC
-    first_access_DESC
     id_ASC
     id_DESC
     name_ASC
@@ -1586,8 +1577,6 @@ enum RoleOrder {
 enum SalonOrder {
     ACL_ASC
     ACL_DESC
-    cnpj_ASC
-    cnpj_DESC
     createdAt_ASC
     createdAt_DESC
     id_ASC
@@ -1968,12 +1957,8 @@ input CreateClientInput {
 "The CreateEmployeeFieldsInput input type is used in operations that involve creation of objects in the Employee class."
 input CreateEmployeeFieldsInput {
     ACL: ACLInput
-    "This is the object cnpj."
-    cnpj: String
-    "This is the object email."
-    email: String
-    "This is the object first_access."
-    first_access: Boolean!
+    "This is the object can_access_salon."
+    can_access_salon: Boolean
     "This is the object name."
     name: String
     "This is the object salon_id."
@@ -2069,8 +2054,6 @@ input CreateRoleInput {
 "The CreateSalonFieldsInput input type is used in operations that involve creation of objects in the Salon class."
 input CreateSalonFieldsInput {
     ACL: ACLInput
-    "This is the object cnpj."
-    cnpj: String
     "This is the object name."
     name: String
 }
@@ -2160,7 +2143,7 @@ input CreateUserFieldsInput {
     "This is the object employee_id."
     employee_id: EmployeePointerInput
     "This is the object first_access."
-    first_access: Boolean
+    first_access: Boolean!
     "This is the object password."
     password: String!
     "This is the object username."
@@ -2359,14 +2342,10 @@ input EmployeeWhereInput {
     NOR: [EmployeeWhereInput!]
     "This is the OR operator to compound constraints."
     OR: [EmployeeWhereInput!]
-    "This is the object cnpj."
-    cnpj: StringWhereInput
+    "This is the object can_access_salon."
+    can_access_salon: BooleanWhereInput
     "This is the object createdAt."
     createdAt: DateWhereInput
-    "This is the object email."
-    email: StringWhereInput
-    "This is the object first_access."
-    first_access: BooleanWhereInput
     "This is the object id."
     id: IdWhereInput
     "This is the object name."
@@ -2881,8 +2860,6 @@ input SalonWhereInput {
     NOR: [SalonWhereInput!]
     "This is the OR operator to compound constraints."
     OR: [SalonWhereInput!]
-    "This is the object cnpj."
-    cnpj: StringWhereInput
     "This is the object createdAt."
     createdAt: DateWhereInput
     "This is the object id."
@@ -3281,12 +3258,8 @@ input UpdateClientInput {
 "The UpdateEmployeeFieldsInput input type is used in operations that involve creation of objects in the Employee class."
 input UpdateEmployeeFieldsInput {
     ACL: ACLInput
-    "This is the object cnpj."
-    cnpj: String
-    "This is the object email."
-    email: String
-    "This is the object first_access."
-    first_access: Boolean
+    "This is the object can_access_salon."
+    can_access_salon: Boolean
     "This is the object name."
     name: String
     "This is the object salon_id."
@@ -3386,8 +3359,6 @@ input UpdateRoleInput {
 "The UpdateSalonFieldsInput input type is used in operations that involve creation of objects in the Salon class."
 input UpdateSalonFieldsInput {
     ACL: ACLInput
-    "This is the object cnpj."
-    cnpj: String
     "This is the object name."
     name: String
 }
@@ -3563,7 +3534,7 @@ input UserLoginWithInput {
     "This is the object employee_id."
     employee_id: EmployeePointerInput
     "This is the object first_access."
-    first_access: Boolean
+    first_access: Boolean!
 }
 
 "Allow to link OR add and link an object of the User class."

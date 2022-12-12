@@ -7,7 +7,7 @@ import EmployeeSignup from "@components/employee_module/signup/EmployeeSignup";
 import EmployeeSignin from "@components/employee_module/signin/EmployeeSignin";
 
 const EmployeeSigninScreen: React.FC = () => {
-    const [selectedEntranceOption, setSelectedEntranceOption] = useState<TEmployeeEntranceOptions>()
+    const [selectedEntranceOption, setSelectedEntranceOption] = useState<TEmployeeEntranceOptions>('signin')
 
     const renderEntranceOption = useCallback(() => {
         const steps = {

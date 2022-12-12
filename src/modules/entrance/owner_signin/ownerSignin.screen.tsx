@@ -4,7 +4,7 @@ import {Flex, HStack, Pressable, Text, VStack} from "native-base";
 import SalooniLogo from "@assets/app/svg/salooniSVG.svg";
 import Input from "@components/form/Input";
 import Button from "@components/form/Button";
-import {signin} from "@common/typograph";
+import {signin, successMessages} from "@common/typograph";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useLogInMutation} from "@modules/entrance/entrance.graphql.generated";
@@ -15,33 +15,49 @@ import useSession from "@hooks/session/useSession";
 import Reactotron from "reactotron-react-native";
 import {useNavigation} from "@react-navigation/native";
 import {TEntranceStack} from "../../../routes/entrance.stack";
+import {useCallCloudCodeMutation} from "@modules/cloud/cloud.graphql.generated";
+import {CloudCodeFunction} from "../../../schema";
+import {EUserAccType} from "../../../types/user.type";
+
+const defaultValue = {
+    "email": "33@gmail.com",
+    "password": '123245'
+}
 
 const OwnerSigninScreen: React.FC = () => {
-    const {handleGraphQLError} = useLayout();
+    const {handleGraphQLError, handleLoading} = useLayout();
     const {session, handleSession} = useSession()
     const {navigate} = useNavigation<TEntranceStack>();
 
 
     const {handleSubmit, control} = useForm<TUserSignin>({
-        resolver: zodResolver(SUserSignin)
+        resolver: zodResolver(SUserSignin),
+        defaultValues: defaultValue
+
     });
 
-    const [logIn] = useLogInMutation({
-        onCompleted({logIn: data}) {
-            handleSession(data)
-
+    const [callCloud] = useCallCloudCodeMutation({
+        onCompleted({callCloudCode: {result: {data}}}) {
+            handleSession({viewer: data})
+            handleLoading(false)
         },
         onError(error) {
             handleGraphQLError(JSON.parse(JSON.stringify(error)) as TGraphQLError)
+            handleLoading(false)
         }
     })
 
     const signIn = async (formData: TUserSignin) => {
-        await logIn({
+        handleLoading(true)
+        await callCloud({
             variables: {
                 input: {
-                    username: formData.email,
-                    password: formData.password
+                    functionName: CloudCodeFunction.Signin,
+                    params: {
+                        username: formData.email,
+                        password: formData.password,
+                        "acceptedAccType": EUserAccType.OWN
+                    }
                 }
             },
         })
