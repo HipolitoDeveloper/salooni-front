@@ -8,14 +8,12 @@ export const LOGIN = gql`
                     email
                     username
                     acc_type
+                    first_access
                     employee_id {
-
-
                         name
                         tel
                         objectId
-                        salon_id {
-
+                        salon_id {                           
                             id
                             name
                             objectId

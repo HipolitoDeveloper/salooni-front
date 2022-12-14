@@ -8,7 +8,7 @@ export type LogInMutationVariables = Types.Exact<{
 }>;
 
 
-export type LogInMutation = { __typename?: 'Mutation', logIn?: { __typename?: 'LogInPayload', viewer: { __typename?: 'Viewer', sessionToken: string, user: { __typename?: 'User', email?: string | null, username?: string | null, acc_type: string, id: string, objectId: string, employee_id?: { __typename?: 'Employee', name?: string | null, tel?: string | null, objectId: string, salon_id?: { __typename?: 'Salon', id: string, name?: string | null, objectId: string } | null } | null } } } | null };
+export type LogInMutation = { __typename?: 'Mutation', logIn?: { __typename?: 'LogInPayload', viewer: { __typename?: 'Viewer', sessionToken: string, user: { __typename?: 'User', email?: string | null, username?: string | null, acc_type: string, first_access: boolean, id: string, objectId: string, employee_id?: { __typename?: 'Employee', name?: string | null, tel?: string | null, objectId: string, salon_id?: { __typename?: 'Salon', id: string, name?: string | null, objectId: string } | null } | null } } } | null };
 
 
 export const LogInDocument = gql`
@@ -19,6 +19,7 @@ export const LogInDocument = gql`
         email
         username
         acc_type
+        first_access
         employee_id {
           name
           tel
@@ -50,7 +51,7 @@ export type LogInMutationFn = Apollo.MutationFunction<LogInMutation, LogInMutati
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [logInMutation, { data, loading, error }] = useLogInMutation({
+ * const [logInMutation, { data, splash, error }] = useLogInMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },

@@ -31,7 +31,7 @@ export type CallCloudCodeMutationFn = Apollo.MutationFunction<CallCloudCodeMutat
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [callCloudCodeMutation, { data, loading, error }] = useCallCloudCodeMutation({
+ * const [callCloudCodeMutation, { data, splash, error }] = useCallCloudCodeMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },

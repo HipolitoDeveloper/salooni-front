@@ -4,20 +4,19 @@ import {Flex, HStack, Pressable, Text, VStack} from "native-base";
 import SalooniLogo from "@assets/app/svg/salooniSVG.svg";
 import Input from "@components/form/Input";
 import Button from "@components/form/Button";
-import {signin, successMessages} from "@common/typograph";
+import {signin} from "@common/typograph";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {useLogInMutation} from "@modules/entrance/entrance.graphql.generated";
-import {TUserSignin, SUserSignin} from "@modules/entrance/entrance.schema";
+import {SUserSignin, TUserSignin} from "@modules/entrance/entrance.schema";
 import {useLayout} from "@hooks/layout/useLayout";
 import {TGraphQLError} from "../../../types/graphQL.type";
 import useSession from "@hooks/session/useSession";
-import Reactotron from "reactotron-react-native";
 import {useNavigation} from "@react-navigation/native";
 import {TEntranceStack} from "../../../routes/entrance.stack";
 import {useCallCloudCodeMutation} from "@modules/cloud/cloud.graphql.generated";
 import {CloudCodeFunction} from "../../../schema";
 import {EUserAccType} from "../../../types/user.type";
+import {ERouteState, useAppRouteState} from "@hooks/route/useAppRouteState";
 
 const defaultValue = {
     "email": "33@gmail.com",
@@ -28,6 +27,7 @@ const OwnerSigninScreen: React.FC = () => {
     const {handleGraphQLError, handleLoading} = useLayout();
     const {session, handleSession} = useSession()
     const {navigate} = useNavigation<TEntranceStack>();
+    const {handleRouteState} = useAppRouteState()
 
 
     const {handleSubmit, control} = useForm<TUserSignin>({
@@ -40,6 +40,7 @@ const OwnerSigninScreen: React.FC = () => {
         onCompleted({callCloudCode: {result: {data}}}) {
             handleSession({viewer: data})
             handleLoading(false)
+            handleRouteState(ERouteState.IN)
         },
         onError(error) {
             handleGraphQLError(JSON.parse(JSON.stringify(error)) as TGraphQLError)
@@ -89,7 +90,7 @@ const OwnerSigninScreen: React.FC = () => {
                     <HStack>
                         <Text color='black.1000'>{signin.DONT_HAVE_USER} {' '}
                         </Text>
-                        <Pressable  onPress={() => navigate('UserSignup')} >
+                        <Pressable onPress={() => navigate('UserSignup')}>
                             <Text color='purple.1000'>{signin.SIGNUP}</Text>
 
                         </Pressable>

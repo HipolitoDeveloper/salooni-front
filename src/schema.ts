@@ -292,8 +292,8 @@ export type ClientWhereInput = {
 
 /** The CloudCodeFunction enum type contains a list of all available cloud code functions. */
 export enum CloudCodeFunction {
-  Signup = 'signup',
-  Signin = 'signin'
+  Signin = 'signin',
+  Signup = 'signup'
 }
 
 export type CreateClassInput = {
@@ -346,6 +346,8 @@ export type CreateClientPayload = {
 /** The CreateEmployeeFieldsInput input type is used in operations that involve creation of objects in the Employee class. */
 export type CreateEmployeeFieldsInput = {
   ACL?: InputMaybe<AclInput>;
+  /** This is the object can_access_salon. */
+  can_access_salon?: InputMaybe<Scalars['Boolean']>;
   /** This is the object name. */
   name?: InputMaybe<Scalars['String']>;
   /** This is the object salon_id. */
@@ -891,6 +893,8 @@ export type Element = {
 export type Employee = Node & ParseObject & {
   __typename?: 'Employee';
   ACL: Acl;
+  /** This is the object can_access_salon. */
+  can_access_salon?: Maybe<Scalars['Boolean']>;
   /** This is the date in which the object was created. */
   createdAt: Scalars['Date'];
   /** The ID of an object */
@@ -931,6 +935,8 @@ export type EmployeeEdge = {
 export enum EmployeeOrder {
   AclAsc = 'ACL_ASC',
   AclDesc = 'ACL_DESC',
+  CanAccessSalonAsc = 'can_access_salon_ASC',
+  CanAccessSalonDesc = 'can_access_salon_DESC',
   CreatedAtAsc = 'createdAt_ASC',
   CreatedAtDesc = 'createdAt_DESC',
   IdAsc = 'id_ASC',
@@ -985,6 +991,8 @@ export type EmployeeWhereInput = {
   NOR?: InputMaybe<Array<EmployeeWhereInput>>;
   /** This is the OR operator to compound constraints. */
   OR?: InputMaybe<Array<EmployeeWhereInput>>;
+  /** This is the object can_access_salon. */
+  can_access_salon?: InputMaybe<BooleanWhereInput>;
   /** This is the object createdAt. */
   createdAt?: InputMaybe<DateWhereInput>;
   /** This is the object id. */
@@ -3381,6 +3389,8 @@ export type UpdateClientPayload = {
 /** The UpdateEmployeeFieldsInput input type is used in operations that involve creation of objects in the Employee class. */
 export type UpdateEmployeeFieldsInput = {
   ACL?: InputMaybe<AclInput>;
+  /** This is the object can_access_salon. */
+  can_access_salon?: InputMaybe<Scalars['Boolean']>;
   /** This is the object name. */
   name?: InputMaybe<Scalars['String']>;
   /** This is the object salon_id. */

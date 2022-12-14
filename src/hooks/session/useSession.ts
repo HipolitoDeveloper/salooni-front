@@ -3,7 +3,6 @@ import {StorageKeys} from "@common/asyncstorage.constants";
 import {TUser} from "../../types/user.type";
 import {TEmployee} from "../../types/employee.type";
 import {TSalon} from "../../types/salon.type";
-import Reactotron from "reactotron-react-native";
 import {useEffect, useState} from "react";
 import {LogInMutation} from "@modules/entrance/entrance.graphql.generated";
 
@@ -12,6 +11,7 @@ type TSession = {
     salon: TSalon;
     employee: TEmployee
     sessionToken: string;
+    logged: boolean
 }
 
 
@@ -20,47 +20,57 @@ const useSession = () => {
 
     useEffect(() => {
         (async () => {
-            setSession({
-                user: JSON.parse(await AsyncStorage.getItem(StorageKeys.user)),
-                salon: JSON.parse(await AsyncStorage.getItem(StorageKeys.salon)),
-                employee: JSON.parse(await AsyncStorage.getItem(StorageKeys.user)),
-                sessionToken: await AsyncStorage.getItem(StorageKeys.sessionToken)
-            })
+            // await AsyncStorage.removeItem(StorageKeys.sessionToken)
+            await sessionSetter();
         })()
 
     }, [])
 
     const handleSession = ({viewer: {user, sessionToken}}: LogInMutation['logIn']) => {
         (async () => {
-            await AsyncStorage.setItem('session_storage', sessionToken)
-            await AsyncStorage.setItem('user', JSON.stringify({
+            const newSessionToken = sessionToken;
+            const newUser ={
                 id: user.objectId,
                 email: user.email,
                 accType: user.acc_type,
                 username: user.username,
                 firstAcces: user.first_access
-            }))
+            }
 
             const {employee_id: employee} = user;
-            await AsyncStorage.setItem('employee', JSON.stringify({
+            const newEmployee = {
                 id: employee.objectId,
-                email: employee.email,
-                cnpj: employee.cnpj,
                 tel: employee.tel,
                 name: employee.name
-            }))
+            }
 
             const {salon_id: salon} = employee;
-            await AsyncStorage.setItem('salon', JSON.stringify({
+            const newSalon ={
                 id: employee.objectId,
-                cnpj: salon.cnpj,
                 name: salon.name
-            }))
+            }
+
+            await AsyncStorage.setItem(StorageKeys.user, JSON.stringify(newUser))
+            await AsyncStorage.setItem(StorageKeys.salon, JSON.stringify(newSalon))
+            await AsyncStorage.setItem(StorageKeys.employee, JSON.stringify(newEmployee))
+            await AsyncStorage.setItem(StorageKeys.sessionToken, sessionToken)
+
+            await sessionSetter(newSessionToken, newUser, newEmployee, newSalon)
         })();
     }
 
+    const sessionSetter = async (sessionToken?, user?, employee?, salon?) => {
+        setSession({
+            user: user ?? JSON.parse(await AsyncStorage.getItem(StorageKeys.user)),
+            salon: salon ?? JSON.parse(await AsyncStorage.getItem(StorageKeys.salon)),
+            employee: employee ?? JSON.parse(await AsyncStorage.getItem(StorageKeys.user)),
+            sessionToken: sessionToken ?? await AsyncStorage.getItem(StorageKeys.sessionToken),
+            logged: sessionToken ? !!sessionToken : !!await AsyncStorage.getItem(StorageKeys.sessionToken)
+        })
+    }
 
-    return {handleSession , session}
+
+    return {handleSession, session}
 }
 
 export default useSession
