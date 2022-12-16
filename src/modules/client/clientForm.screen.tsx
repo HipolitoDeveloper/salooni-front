@@ -1,7 +1,7 @@
 import React from "react";
 import Layout from "@components/layout/Layout";
 import ActionHeader from "@components/form/ActionHeader";
-import {application} from "@common/typograph";
+import {application, successMessages} from "@common/typograph";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {useNavigation} from "@react-navigation/native";
@@ -10,16 +10,23 @@ import {SClientForm, TClientForm} from "@modules/client/clientForm.schema";
 import Input from "@components/form/Input";
 import LayoutForm from "@components/layout/LayoutForm";
 import DatePickerInput from "@components/form/datepicker/DatePickerInput";
+import useSession from "@hooks/session/useSession";
+import {useCallCloudCodeMutation} from "@modules/cloud/cloud.graphql.generated";
+import {TGraphQLError} from "../../types/graphQL.type";
+import {useCreateClientMutation} from "@modules/client/client.graphql.generated";
+import {useLayout} from "@hooks/layout/useLayout";
 
 const defaultValue = {
     birthdate: new Date(),
-    name: "",
-    tel: "",
-    email: ""
+    name: "123123",
+    tel: "11 9997257490",
+    email: "gabriel@gmail.com"
 }
 
 const ClientFormScreen = () => {
     const {goBack} = useNavigation<TAppStack>();
+    const {session} = useSession()
+    const {handleGraphQLError, handleSuccessDialog, handleLoading} = useLayout();
 
 
     const {handleSubmit, control} = useForm<TClientForm>({
@@ -27,7 +34,33 @@ const ClientFormScreen = () => {
         defaultValues: defaultValue
     });
 
-    const submit = () => {
+    const [createClient] = useCreateClientMutation({
+        onCompleted() {
+            handleSuccessDialog(successMessages.CREATION_SUCCESS)
+            handleLoading(false)
+        },
+        onError(error) {
+            handleGraphQLError(JSON.parse(JSON.stringify(error)) as TGraphQLError)
+            handleLoading(false)
+        }
+    })
+
+    const submit = async (formData: TClientForm) => {
+        const data = {
+            ...formData,
+            birthdate: new Date(formData.birthdate).toISOString(),
+            salon_id: {
+                link: session.salon.id
+            }
+        }
+
+        await createClient({
+            variables: {
+                input: {
+                    fields: data
+                }
+            }
+        })
 
     }
 

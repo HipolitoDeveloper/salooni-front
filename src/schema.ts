@@ -158,8 +158,6 @@ export type Client = Node & ParseObject & {
   ACL: Acl;
   /** This is the object birthdate. */
   birthdate?: Maybe<Scalars['String']>;
-  /** This is the object cpf. */
-  cpf?: Maybe<Scalars['String']>;
   /** This is the date in which the object was created. */
   createdAt: Scalars['Date'];
   /** This is the object email. */
@@ -174,8 +172,6 @@ export type Client = Node & ParseObject & {
   salon_id?: Maybe<Salon>;
   /** This is the object tel. */
   tel?: Maybe<Scalars['String']>;
-  /** This is the object tel2. */
-  tel2?: Maybe<Scalars['String']>;
   /** This is the date in which the object was las updated. */
   updatedAt: Scalars['Date'];
 };
@@ -206,8 +202,6 @@ export enum ClientOrder {
   AclDesc = 'ACL_DESC',
   BirthdateAsc = 'birthdate_ASC',
   BirthdateDesc = 'birthdate_DESC',
-  CpfAsc = 'cpf_ASC',
-  CpfDesc = 'cpf_DESC',
   CreatedAtAsc = 'createdAt_ASC',
   CreatedAtDesc = 'createdAt_DESC',
   EmailAsc = 'email_ASC',
@@ -220,8 +214,6 @@ export enum ClientOrder {
   ObjectIdDesc = 'objectId_DESC',
   SalonIdAsc = 'salon_id_ASC',
   SalonIdDesc = 'salon_id_DESC',
-  Tel2Asc = 'tel2_ASC',
-  Tel2Desc = 'tel2_DESC',
   TelAsc = 'tel_ASC',
   TelDesc = 'tel_DESC',
   UpdatedAtAsc = 'updatedAt_ASC',
@@ -268,8 +260,6 @@ export type ClientWhereInput = {
   OR?: InputMaybe<Array<ClientWhereInput>>;
   /** This is the object birthdate. */
   birthdate?: InputMaybe<StringWhereInput>;
-  /** This is the object cpf. */
-  cpf?: InputMaybe<StringWhereInput>;
   /** This is the object createdAt. */
   createdAt?: InputMaybe<DateWhereInput>;
   /** This is the object email. */
@@ -284,8 +274,6 @@ export type ClientWhereInput = {
   salon_id?: InputMaybe<SalonRelationWhereInput>;
   /** This is the object tel. */
   tel?: InputMaybe<StringWhereInput>;
-  /** This is the object tel2. */
-  tel2?: InputMaybe<StringWhereInput>;
   /** This is the object updatedAt. */
   updatedAt?: InputMaybe<DateWhereInput>;
 };
@@ -316,8 +304,6 @@ export type CreateClientFieldsInput = {
   ACL?: InputMaybe<AclInput>;
   /** This is the object birthdate. */
   birthdate?: InputMaybe<Scalars['String']>;
-  /** This is the object cpf. */
-  cpf?: InputMaybe<Scalars['String']>;
   /** This is the object email. */
   email?: InputMaybe<Scalars['String']>;
   /** This is the object name. */
@@ -326,8 +312,6 @@ export type CreateClientFieldsInput = {
   salon_id?: InputMaybe<SalonPointerInput>;
   /** This is the object tel. */
   tel?: InputMaybe<Scalars['String']>;
-  /** This is the object tel2. */
-  tel2?: InputMaybe<Scalars['String']>;
 };
 
 export type CreateClientInput = {
@@ -3357,8 +3341,6 @@ export type UpdateClientFieldsInput = {
   ACL?: InputMaybe<AclInput>;
   /** This is the object birthdate. */
   birthdate?: InputMaybe<Scalars['String']>;
-  /** This is the object cpf. */
-  cpf?: InputMaybe<Scalars['String']>;
   /** This is the object email. */
   email?: InputMaybe<Scalars['String']>;
   /** This is the object name. */
@@ -3367,8 +3349,6 @@ export type UpdateClientFieldsInput = {
   salon_id?: InputMaybe<SalonPointerInput>;
   /** This is the object tel. */
   tel?: InputMaybe<Scalars['String']>;
-  /** This is the object tel2. */
-  tel2?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateClientInput = {

@@ -39,7 +39,8 @@ const application = {
 }
 
 const successMessages = {
-    'SIGNUP_SUCCESS': 'Cadastro realizado! \n\nVocê está sendo redirecionado para o Salooni.'
+    'SIGNUP_SUCCESS': 'Cadastro realizado! \n\nVocê está sendo redirecionado para o Salooni.',
+    'CREATION_SUCCESS': 'Cadastro realizado! \n\nGostaria de adicionar mais algum cliente?'
 }
 
 export {entrance, signin, signup, errors, application, successMessages}

@@ -51,7 +51,7 @@ export type LogInMutationFn = Apollo.MutationFunction<LogInMutation, LogInMutati
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [logInMutation, { data, splash, error }] = useLogInMutation({
+ * const [logInMutation, { data, loading, error }] = useLogInMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
