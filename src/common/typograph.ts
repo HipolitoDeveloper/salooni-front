@@ -32,7 +32,10 @@ const errors = {
 const application = {
     'SUCCESS': 'Sucesso!',
     'ATTENTION': 'Atenção!',
-    'CLIENT': 'Cliente'
+    'CLIENT': 'Cliente',
+    'CONFIRM': 'Confirmar',
+    'CANCEL': 'Cancelar',
+    'SELECT_DATE': 'Selecione uma data'
 }
 
 const successMessages = {

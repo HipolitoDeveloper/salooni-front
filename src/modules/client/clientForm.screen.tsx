@@ -9,8 +9,7 @@ import {TAppStack} from "../../routes/app.stack";
 import {SClientForm, TClientForm} from "@modules/client/clientForm.schema";
 import Input from "@components/form/Input";
 import LayoutForm from "@components/layout/LayoutForm";
-import DatePicker from "@components/form/DatePicker";
-import InputDatePicker from "@components/form/DatePicker";
+import DatePickerInput from "@components/form/datepicker/DatePickerInput";
 
 const defaultValue = {
     birthdate: new Date(),
@@ -39,9 +38,11 @@ const ClientFormScreen = () => {
             <LayoutForm>
                 <Input placeholder={'Nome'} control={control} name={'name'}/>
                 <Input placeholder={'E-mail'} control={control} name={'email'}/>
-                <InputDatePicker inputProps={{
-                    placeholder: 'Data de nascimento'
-                }} control={control} name={'birthdate'}/>
+                <DatePickerInput
+                    inputProps={{placeholder: 'Data de nascimento'}}
+                    datePickerModalProps={{mode: 'calendar'}}
+                    control={control}
+                    name={'birthdate'}/>
                 <Input placeholder={'Celular'} control={control} name={'tel'}/>
             </LayoutForm>
         </Layout>
