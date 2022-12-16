@@ -5,6 +5,7 @@ import SalooniLogo from "@assets/app/svg/salooniSVG.svg";
 import {TEmployeeEntranceOptions} from "../../../types/entrance.type";
 import EmployeeSignup from "@components/employee_module/signup/EmployeeSignup";
 import EmployeeSignin from "@components/employee_module/signin/EmployeeSignin";
+import LayoutForm from "@components/layout/LayoutForm";
 
 const EmployeeSigninScreen: React.FC = () => {
     const [selectedEntranceOption, setSelectedEntranceOption] = useState<TEmployeeEntranceOptions>('signin')
@@ -22,7 +23,7 @@ const EmployeeSigninScreen: React.FC = () => {
 
     return (
         <Layout>
-            <VStack display='flex' space='80px' alignItems='center' justifyContent='center' p='30px' mt='20px'>
+            <LayoutForm>
                 <SalooniLogo fill={'#A177AF'}
                              width={200}
                              height={200}/>
@@ -43,7 +44,7 @@ const EmployeeSigninScreen: React.FC = () => {
                         </Pressable>
                     </HStack>
                 </Center>
-            </VStack>
+            </LayoutForm>
 
         </Layout>
     )

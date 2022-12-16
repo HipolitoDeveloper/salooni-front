@@ -26,11 +26,13 @@ const errors = {
     'PHONE': 'O telefone não pode ser vazio',
     'PASSWORD_LENGTH': 'Senha inválida, siga as requisições.',
     'PASSWORD_REQUIRED': 'A senha não pode ser vazia',
+    'BIRTHDATE': 'Data de nascimento não pode ser vazia'
 }
 
 const application = {
     'SUCCESS': 'Sucesso!',
-    'ATTENTION': 'Atenção!'
+    'ATTENTION': 'Atenção!',
+    'CLIENT': 'Cliente'
 }
 
 const successMessages = {
