@@ -14,6 +14,7 @@ module.exports = {
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
+        "bundleIdentifier": "com.diventech.salooni",
         "supportsTablet": true
     },
     "android": {
