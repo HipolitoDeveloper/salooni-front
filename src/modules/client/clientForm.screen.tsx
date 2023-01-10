@@ -11,10 +11,10 @@ import Input from "@components/form/Input";
 import LayoutForm from "@components/layout/LayoutForm";
 import DatePickerInput from "@components/form/datepicker/DatePickerInput";
 import useSession from "@hooks/session/useSession";
-import {useCallCloudCodeMutation} from "@modules/cloud/cloud.graphql.generated";
 import {TGraphQLError} from "../../types/graphQL.type";
 import {useCreateClientMutation} from "@modules/client/client.graphql.generated";
 import {useLayout} from "@hooks/layout/useLayout";
+import {dialogUsefulButtons} from "@components/dialogs/Dialog";
 
 const defaultValue = {
     birthdate: new Date(),
@@ -29,14 +29,17 @@ const ClientFormScreen = () => {
     const {handleGraphQLError, handleSuccessDialog, handleLoading} = useLayout();
 
 
-    const {handleSubmit, control} = useForm<TClientForm>({
+    const {handleSubmit, control, reset} = useForm<TClientForm>({
         resolver: zodResolver(SClientForm),
         defaultValues: defaultValue
     });
 
     const [createClient] = useCreateClientMutation({
         onCompleted() {
-            handleSuccessDialog(successMessages.CREATION_SUCCESS)
+            handleSuccessDialog({
+                description: successMessages.CREATION_SUCCESS,
+                buttons: dialogUsefulButtons['yesOrNo']
+            })
             handleLoading(false)
         },
         onError(error) {
@@ -53,15 +56,22 @@ const ClientFormScreen = () => {
                 link: session.salon.id
             }
         }
-
-        await createClient({
-            variables: {
-                input: {
-                    fields: data
-                }
-            }
+        handleSuccessDialog({
+            description: successMessages.CREATION_SUCCESS,
+            buttons: [{...dialogUsefulButtons['yesOrNo'][0], onPress: () => {}}, {...dialogUsefulButtons['yesOrNo'][1]}]
         })
+        // await createClient({
+        //     variables: {
+        //         input: {
+        //             fields: data
+        //         }
+        //     }
+        // })
 
+    }
+
+    const resetForm = async () => {
+        reset();
     }
 
     return (

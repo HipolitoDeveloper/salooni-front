@@ -1,5 +1,5 @@
 import Button, {IButton} from "../form/Button";
-import {AlertDialog as BaseAlertDialog} from "native-base";
+import {AlertDialog as BaseAlertDialog, Text} from "native-base";
 import React, {useRef} from "react";
 
 export interface IDialog {
@@ -9,6 +9,13 @@ export interface IDialog {
     title: string;
     buttons?: IButton[]
     children: React.ReactNode
+}
+
+export const dialogUsefulButtons = {
+    'yesOrNo': [
+        {variant: 'solid', children: <Text color='white.1000' fontWeight='bold'>Sim</Text>, name: "confirmButton", backgroundColor: 'green.1000'},
+        {variant: 'solid', children: <Text color='white.1000' fontWeight='bold'>Não</Text>, name: "refuseButton", backgroundColor: 'red.1000'}
+    ]
 }
 
 const Dialog = ({isOpen, onClose, children, buttons, title}) => {
@@ -28,8 +35,8 @@ const Dialog = ({isOpen, onClose, children, buttons, title}) => {
 
                 {buttons.length > 0 && (
                     <BaseAlertDialog.Footer>
-                        {buttons.map(({variant, onPress, children, name}) => (
-                            <Button key={name} variant={variant} onPress={onPress}>
+                        {buttons.map(({variant, onPress, children, name, ...props}) => (
+                            <Button key={name} variant={variant} onPress={onPress ?? onClose} marginLeft={5} {...props}>
                                 {children}
                             </Button>
                         ))}

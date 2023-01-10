@@ -20,6 +20,9 @@ const colors = {
     },
     blue: {
         1000: '#6EBEDB'
+    },
+    red: {
+        1000: '#fa4e63'
     }
 }
 
