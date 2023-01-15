@@ -38,7 +38,7 @@ const EmployeeSignup: React.FC<IEmployeeSignup> = () => {
 
     const [callCloud] = useCallCloudCodeMutation({
         onCompleted({callCloudCode: {result: {data}}}) {
-            handleSuccessDialog(successMessages.SIGNUP_SUCCESS)
+            handleSuccessDialog({description: successMessages.SIGNUP_SUCCESS})
             handleLoading(false)
         },
         onError(error) {

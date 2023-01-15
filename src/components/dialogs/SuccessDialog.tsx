@@ -12,10 +12,10 @@ export interface ISuccessDialog {
     buttons?:  IButton[]
 }
 
-const SuccessDialog: React.FC<ISuccessDialog> = ({isOpen, onClose, onOpen, description, buttons}) => {
+const SuccessDialog: React.FC<ISuccessDialog> = ({isOpen, onClose, onOpen, description, buttons= []}) => {
 
     return (
-        <Dialog isOpen={isOpen} onClose={onClose} buttons={buttons ?? []} title={application.SUCCESS}>
+        <Dialog isOpen={isOpen} onClose={onClose} buttons={buttons} title={application.SUCCESS}>
                 <HStack alignItems='center' space='10px'>
                     <Text>
                         {description}
