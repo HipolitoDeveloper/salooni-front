@@ -2,7 +2,11 @@ import Button, {IButton} from "../form/Button";
 import {AlertDialog as BaseAlertDialog, Text} from "native-base";
 import React, {useRef} from "react";
 
-export interface IDialog {
+const ELEMENTS = {
+    closeButton: {testID: 'close-button'}
+}
+
+interface IDialog {
     isOpen: boolean;
     onClose: () => void;
     onOpen?: () => void;
@@ -11,14 +15,24 @@ export interface IDialog {
     children: React.ReactNode
 }
 
-export const dialogUsefulButtons = {
+const dialogUsefulButtons = {
     'yesOrNo': [
-        {variant: 'solid', children: <Text color='white.1000' fontWeight='bold'>Sim</Text>, name: "confirmButton", backgroundColor: 'green.1000'},
-        {variant: 'solid', children: <Text color='white.1000' fontWeight='bold'>Não</Text>, name: "refuseButton", backgroundColor: 'red.1000'}
+        {
+            variant: 'solid',
+            children: <Text color='white.1000' fontWeight='bold'>Sim</Text>,
+            name: "confirmButton",
+            backgroundColor: 'green.1000'
+        },
+        {
+            variant: 'solid',
+            children: <Text color='white.1000' fontWeight='bold'>Não</Text>,
+            name: "refuseButton",
+            backgroundColor: 'red.1000'
+        }
     ]
 }
 
-const Dialog = ({isOpen, onClose, children, buttons, title}) => {
+const Dialog: React.FC<IDialog> = ({isOpen, onClose, children, buttons, title}) => {
 
     const cancelRef = useRef(null);
 
@@ -27,7 +41,7 @@ const Dialog = ({isOpen, onClose, children, buttons, title}) => {
                          isKeyboardDismissable={true}
         >
             <BaseAlertDialog.Content>
-                <BaseAlertDialog.CloseButton/>
+                <BaseAlertDialog.CloseButton {...ELEMENTS.closeButton}/>
                 <BaseAlertDialog.Header>{title}</BaseAlertDialog.Header>
                 <BaseAlertDialog.Body>
                     {children}
@@ -48,4 +62,9 @@ const Dialog = ({isOpen, onClose, children, buttons, title}) => {
     )
 }
 
-export default Dialog
+export {
+    Dialog,
+    ELEMENTS,
+    IDialog,
+    dialogUsefulButtons
+}
